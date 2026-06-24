@@ -1,0 +1,38 @@
+services:
+  mariadb:
+    image: mariadb:10.6
+    container_name: mariadb-db
+    restart: unless-stopped
+    environment:
+      - MARIADB_ROOT_PASSWORD=Harlov1234!
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./init-mariadb.sql:/docker-entrypoint-initdb.d/init-mariadb.sql:ro
+
+  login:
+    build:
+      # context must be relative to this compose file (infra/).
+      # ../bc-login/login-impl points to the correct build context from infra/.
+      context: ../../bc-login/login-impl
+      dockerfile: ../../bc-login/login-impl/Dockerfile
+    image: sop-login:local
+    container_name: sop-login
+    restart: unless-stopped
+    depends_on:
+      - mariadb
+    environment:
+      DB_URL: jdbc:mariadb
+      DB_HOST: mariadb
+      DB_PORT: 3306
+      DB_NAME: sopinfo_login_db
+      DB_USERNAME: login
+      DB_PASSWORD: login
+      JAVA_OPTS: "-Dserver.port=9455 -Dsecurity.enabled=false"
+      JAVA_TOOL_OPTIONS: "-Dsecurity.enabled=false"
+      SPRING_JPA_DDL_AUTO: update
+      SPRING_PROFILES_ACTIVE: jpa,shared
+      SERVER_SSL_ENABLED: "false"
+      SECURITY_ENABLED: "false"
+    ports:
+      - "9455:9455"

@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+            <groupId>local.sop.sopinfo</groupId>
+          <artifactId>parent</artifactId>
+          <version>${revision}</version>
+          <relativePath>../../parent-POM/pom.xml</relativePath>
+    </parent>
+
+    <artifactId>instructor-impl</artifactId>
+    <packaging>jar</packaging>
+
+
+<dependencies>
+ 
+  <!-- shared-kernel inherited-->
+
+  <dependency>
+    <groupId>local.sop.sopinfo</groupId>
+    <artifactId>instructor-api</artifactId>
+    <version>${revision}</version>
+  </dependency>
+
+  <dependency>
+    <groupId>local.sop.sopinfo</groupId>
+    <artifactId>common-web</artifactId>
+    <version>${revision}</version>
+  </dependency>
+  <dependency>
+    <groupId>local.sop.sopinfo</groupId>
+    <artifactId>common-core</artifactId>
+    <version>${revision}</version>
+  </dependency>
+
+  <dependency>
+    <groupId>local.sop.sopinfo</groupId>
+    <artifactId>common-data</artifactId>
+    <version>${revision}</version>
+  </dependency>
+
+  <dependency>
+    <groupId>local.sop.sopinfo</groupId>
+    <artifactId>common-security</artifactId>
+    <version>${revision}</version>
+  </dependency>
+
+  <dependency>
+    <groupId>org.flywaydb</groupId>
+    <artifactId>flyway-core</artifactId>
+  </dependency>
+  
+<dependency>
+    <groupId>org.flywaydb</groupId>
+    <artifactId>flyway-mysql</artifactId>
+  </dependency>
+
+  <dependency>
+    <groupId>org.mariadb.jdbc</groupId>
+    <artifactId>mariadb-java-client</artifactId>
+    <scope>runtime</scope>
+  </dependency>
+
+  <dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+  </dependency>
+
+  <dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-jpa</artifactId>
+  </dependency>
+
+  <dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-actuator</artifactId>
+  </dependency>
+
+  <dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-validation</artifactId>
+  </dependency>
+
+  <dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-security</artifactId>
+  </dependency>
+
+  <dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-configuration-processor</artifactId>
+    <optional>true</optional>
+  </dependency>
+  
+</dependencies>
+
+<!-- Optional: pin the main class for the Boot plugin -->
+<properties>
+  <start-class>local.sop.sopinfo.instructor.InstructorStartApplication</start-class>
+  <spring-boot.run.skip>false</spring-boot.run.skip>
+</properties>
+
+<build>
+  <plugins>
+    <!-- makes an executable Spring Boot jar -->
+    <plugin>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-maven-plugin</artifactId>
+      <!-- (Optional) if auto-detection fails, use the start-class property -->
+      <configuration>
+        <!-- This module is a library (no main class); skip repackage -->
+        <skip>false</skip>
+        <mainClass>${start-class}</mainClass>
+      </configuration>
+      <executions>
+        <execution>
+          <goals>
+            <goal>repackage</goal>
+          </goals>
+        </execution>
+      </executions>
+    </plugin>
+    <!-- activate flatten-plugin, config/vers. from parent -->
+      <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>flatten-maven-plugin</artifactId>
+      </plugin>
+  </plugins>
+</build>
+
+</project>

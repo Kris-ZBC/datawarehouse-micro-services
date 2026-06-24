@@ -1,0 +1,88 @@
+@startuml 101_apprentice_instructor_saga_login
+
+title Apprentice / Instructor — Login SAGA sequence
+
+actor "Anonymous User" as User
+
+participant "AuthHandler BC\n<<SAGA>>" as AuthHandler  
+participant "UserHandler BC\n<<SAGA>>" as UserHandler  
+
+participant "Consent BC" as ConsentBC
+database "Data Warehouse" as Data
+participant "Audit Log" as AuditLog
+participant "Error Log" as ErrorLog
+
+skinparam SequenceGroupBorderColor #Pink
+
+User -> AuthHandler: POST Login(credentials..)
+activate AuthHandler
+
+AuthHandler -> UserHandler: Find user (credentials) see #201
+activate UserHandler
+
+alt Person Found
+
+    UserHandler --> AuthHandler: personId
+    else Not Found
+
+    UserHandler --> AuthHandler: Null 
+    AuthHandler --> User: 401 Unauthorized 
+    deactivate UserHandler
+end
+
+skinparam SequenceGroupBorderColor Black
+loop Consent Given
+AuthHandler -> ConsentBC: Get consent(personId)
+activate ConsentBC
+
+ConsentBC -> Data: SELECT consent
+activate Data
+
+Data --> ConsentBC: boolean
+deactivate Data
+
+ConsentBC -> AuditLog: Log GET consent
+
+skinparam SequenceGroupBorderColor #b870ca
+
+alt Has given consent
+    ConsentBC --> AuthHandler: True
+        AuthHandler -> UserHandler: Get person type (personId) see #202
+        activate UserHandler 
+
+    alt Apprentice 
+        UserHandler --> AuthHandler: apprenticeRecord
+        AuthHandler --> User: 200 OK (apprenticeInfo)
+
+        else Instructor
+        UserHandler --> AuthHandler: instructorRecord
+        AuthHandler --> User: 200 OK (instructorInfo)
+
+        else No type found
+        UserHandler --> AuthHandler: null
+        deactivate UserHandler
+        AuthHandler --> User: 500 Server Error
+
+    end
+
+    ' TODO: Find out how to get either apprentice or instructor from person
+    else Has not given consent
+    ConsentBC --> AuthHandler: False
+    AuthHandler --> User: Ask for consent
+    User -> AuthHandler: Consent boolean
+    
+    AuthHandler -> ConsentBC: Update consent (userId)
+
+    ConsentBC -> Data: UPDATE consent
+    activate Data
+    Data --> ConsentBC: OK (rows affected)
+    deactivate Data
+    ConsentBC -> AuditLog: Log consent update
+    deactivate ConsentBC
+
+end
+end
+
+footer
+Auth Handler ID 101
+endfooter

@@ -1,0 +1,225 @@
+@startuml BC - Consent - Classdiagram - IMPLEMENTATION
+left to right direction
+skinparam packageStyle rectangle
+skinparam Shadowing false
+skinparam classFontSize 12
+skinparam classFontName Times New Roman
+skinparam WrapWidth 260
+
+folder "BC - Consent - Implementation" #Salmon {
+
+    legend left
+        Colors / stereotypes
+        ---
+        Salmon = BC - Consent - Implementation
+        Red = Consent-api
+        Yellow = InterfaceAdapters
+        LightGreen = Consent-impl
+        LightBlue = Domain
+        <<DTO>>, <<API>>, <<UseCase>>, <<RepositoryPort>>, <<Entity>>, <<Mapper>>, <<AggregateRoot>>, <<ValueObject>>, <<Configuration>>
+    endlegend
+
+    folder "Consent-impl" #LightGreen {
+        package "sop" {
+            package "sopinfo" {
+                package "consent" {
+
+                    package "domain" #LightBlue {
+
+                        package "config" {
+
+                            ' Ensures autowiring and configuration of Consent domain components
+                            class ConsentDomainConfig <<Configuration>> {
+                                + configureDomain()
+								
+                            }
+						
+                        }
+						note bottom of config
+    						ensures autowiring of ConsentDomain
+						end note	
+
+                        package "model" {
+
+                            package "valueobject" {
+
+                                class ConsentId <<ValueObject>> {
+                                    - value : UUID
+                                    + value() : UUID
+                                }
+
+                                class ConsentStatementId <<ValueObject>> {
+                                    - value : UUID
+                                    + value() : UUID
+                                }
+                            }
+
+                            class ConsentAggregateRoot <<AggregateRoot>> {
+                                - consentId : ConsentId
+                                - personReference : String
+                                - consentStatementId : ConsentStatementId
+                                - purpose : String
+                                - status : String
+                            }
+                        }
+
+                        package "port" {
+                            package "out" {
+
+                                interface ConsentRepositoryPort <<RepositoryPort>> {
+                                    + save(consent : ConsentAggregateRoot) : ConsentAggregateRoot
+                                    + findById(id : ConsentId) : Optional<ConsentAggregateRoot>
+                                    + findByPersonReference(personReference : String) : Optional<ConsentAggregateRoot>
+                                }
+                            }
+                        }
+                    }
+
+                    package "application" {
+                        package "service" {
+
+                            class ConsentApplicationService <<UseCase>> {
+                                + grantConsent(cmd : GrantConsentCmd) : GrantedConsentResponse
+                                + getConsent(query : GetConsentQuery) : ConsentResponse
+                                + withdrawConsent(cmd : WithdrawConsentCmd) : WithdrawnConsentResponse
+                                + updateConsentStatement(cmd : UpdateConsentStatementCmd) : UpdatedConsentStatementResponse
+                                + getConsentStatement(query : GetConsentStatementQuery) : ConsentStatementResponse
+                            }
+                        }
+                    }
+
+                    package "InterfaceAdapters" #Yellow {
+
+                        package "Persistence" {
+
+                            package "JPA" {
+
+                                class ConsentEntity <<Entity>> {
+                                    - id : UUID
+                                    - personReference : String
+                                    - consentStatementId : UUID
+                                    - purpose : String
+                                    - status : String
+                                    + getId() : UUID
+                                    + getPersonReference() : String
+                                    + getConsentStatementId() : UUID
+                                    + getPurpose() : String
+                                    + getStatus() : String
+                                }
+
+                                class ConsentJpaMapper <<Mapper>> {
+                                    + toDomain(entity : ConsentEntity) : ConsentAggregateRoot
+                                    + toEntity(domain : ConsentAggregateRoot) : ConsentEntity
+                                }
+
+                                class ConsentRepositoryJpaAdapter <<Repository>> {
+                                    + save(consent : ConsentAggregateRoot) : ConsentAggregateRoot
+                                    + findById(id : ConsentId) : Optional<ConsentAggregateRoot>
+                                    + findByPersonReference(personReference : String) : Optional<ConsentAggregateRoot>
+                                }
+
+                                interface ConsentSpringDataRepository <<JPA Repository>> {
+                                    + save(entity : ConsentEntity) : ConsentEntity
+                                    + findById(id : UUID) : Optional<ConsentEntity>
+                                }
+                            }
+                        }
+                    }
+
+                }
+            }
+        }
+    }
+
+    package "Consent-api" #Red {
+        package "sop" {
+            package "sopinfo" {
+                package "consent" {
+                    package "application" {
+                        package "api" {
+                            package "dto" {
+
+                                class GrantConsentCmd <<DTO>> {
+                                    - personReference : String
+                                    - consentStatementId : UUID
+                                    - purpose : String
+                                }
+
+                                class GrantedConsentResponse <<DTO>> {
+                                    - consentId : UUID
+                                    - status : String
+                                }
+
+                                class GetConsentQuery <<DTO>> {
+                                    - personReference : String
+                                }
+
+                                class ConsentResponse <<DTO>> {
+                                    - consentId : UUID
+                                    - personReference : String
+                                    - consentStatementId : UUID
+                                    - purpose : String
+                                    - status : String
+                                }
+
+                                class WithdrawConsentCmd <<DTO>> {
+                                    - personReference : String
+                                }
+
+                                class WithdrawnConsentResponse <<DTO>> {
+                                    - consentId : UUID
+                                    - status : String
+                                }
+
+                                class UpdateConsentStatementCmd <<DTO>> {
+                                    - consentStatementId : UUID
+                                    - statementText : String
+                                }
+
+                                class UpdatedConsentStatementResponse <<DTO>> {
+                                    - consentStatementId : UUID
+                                    - statementText : String
+                                }
+
+                                class GetConsentStatementQuery <<DTO>> {
+                                    - consentStatementId : UUID
+                                }
+
+                                class ConsentStatementResponse <<DTO>> {
+                                    - consentStatementId : UUID
+                                    - statementText : String
+                                }
+                            }
+
+                            interface ConsentDirectory <<API>> {
+                                + grantConsent(cmd : GrantConsentCmd) : GrantedConsentResponse
+                                + getConsent(query : GetConsentQuery) : ConsentResponse
+                                + withdrawConsent(cmd : WithdrawConsentCmd) : WithdrawnConsentResponse
+                                + updateConsentStatement(cmd : UpdateConsentStatementCmd) : UpdatedConsentStatementResponse
+                                + getConsentStatement(query : GetConsentStatementQuery) : ConsentStatementResponse
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+ConsentApplicationService ..|> ConsentDirectory : implements
+ConsentApplicationService --> ConsentRepositoryPort : uses
+
+ConsentRepositoryJpaAdapter ..|> ConsentRepositoryPort : implements
+ConsentRepositoryJpaAdapter --> ConsentSpringDataRepository : uses
+ConsentRepositoryJpaAdapter --> ConsentJpaMapper : uses
+
+ConsentJpaMapper --> ConsentEntity : maps
+ConsentJpaMapper --> ConsentAggregateRoot : maps
+
+ConsentAggregateRoot --> ConsentId
+ConsentAggregateRoot --> ConsentStatementId
+
+ConsentDomainConfig ..> ConsentAggregateRoot : configures
+ConsentDomainConfig ..> ConsentRepositoryPort : wires
+
+@enduml

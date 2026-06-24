@@ -1,0 +1,61 @@
+@startuml AuditLog Create Log
+
+title AuditLog - Create Log Sequence
+
+actor "System" as Caller
+participant "AuditLog BC Handler\n<<SAGA>>" as Saga
+participant "AuditLog BC" as Service
+database "AuditLog DB" as Repo
+
+skinparam SequenceGroupBorderColor #F06292
+autonumber
+
+Caller -> Saga : createLog(request)
+activate Saga
+
+alt Consent granted
+	Saga -> Service : CreateLog(Request, consent=true)
+	alt Mapping Does Not Exists
+		activate Service
+		Service -> Repo : mapActorRefToPerson(request.actorRef)
+		Repo --> Service : 200 OK + Person
+	else Mapping Exists
+		Service -> Service : proceed without changes
+		deactivate Service
+	else Mapping Fails
+		Service --> Saga : 400 Bad Request
+		deactivate Service
+		Saga -> Caller : 400 Bad Request
+	end
+else No consent / revoked
+    Saga -> Service : CreateLog(Request, consent=false)
+	Service -> Service : anonymize(request)
+	loop each sensitive field
+		Service -> Service : replace value with "Anonym"
+	end loop
+    Service -> Service : RecordAnonymizationEvent(anonymizeLog)
+	deactivate Service
+end
+
+Service -> Service : assign UUID & timestamp (now)
+Service -> Repo : save(log)
+alt could not save log
+	activate Service
+	Service --> Saga : 500 Internal Server Error
+	deactivate Service
+	Saga -> Caller : 500 Internal Server Error
+	deactivate Saga
+	return
+else saved successfully
+	Service --> Saga : 201 OK + log
+	deactivate Service
+Service --> Caller : 201 OK
+deactivate Service
+end
+
+
+footer
+AuditLog BC – create log flow
+endfooter
+
+@enduml

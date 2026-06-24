@@ -1,0 +1,23 @@
+package local.sop.sopinfo.login.domain.service;
+
+import java.util.UUID;
+
+import local.sop.sopinfo.login.domain.model.Login;
+import local.sop.sopinfo.login.domain.model.valueobjects.HashedPassword;
+import local.sop.sopinfo.login.domain.model.valueobjects.PersonRef;
+import local.sop.sopinfo.login.domain.model.valueobjects.Username;
+import local.sop.sopinfo.sharedkernel.enums.LoginStatus;
+
+public class LoginDomainService implements LoginDomain {
+
+	@Override
+	public Login createLogin(UUID personRef, String username, String password, LoginStatus status) {
+		return Login.builder()
+			.personRef(PersonRef.of(personRef))
+			.username(Username.of(username))
+			.password(HashedPassword.of(password))
+			.status(status)
+			.build();
+	}
+
+}

@@ -1,0 +1,181 @@
+@startuml Notification BC Class Diagram
+top to bottom direction
+title Notification BC Class Diagram
+skinparam packageStyle rectangle
+skinparam Shadowing false
+skinparam classFontSize 12
+skinparam classFontName Arial
+skinparam WrapWidth 260
+skinparam ComponentStyle uml2
+
+package "sharedkernel" #LightYellow {}
+
+package "common" {
+	package "web" #LightGreen  {}
+	package "data" #LightYellow {}
+	package "security" #LightCoral {}
+	package "core" #LightGreen {}
+}
+
+folder "bc-notification" #LightGray {
+	folder "notification-impl" #LightGray {
+		package "sop.local.sopinfo" {
+			package "notification" #LightSteelBlue {
+
+				package "domain" #LightCoral {
+					package "model" {
+
+						package "valueobjects" {
+							class NotificationId {
+								- id: UUID
+							}
+
+							class MessageRef {
+								- id: UUID
+							}
+
+							class CreatedAtTimestamp {
+								- value: Instant
+							}
+						}
+
+						class Notification {
+							- id: NotificationId
+							- seen: boolean
+							- messageRef: MessageRef
+							- createdAt: CreatedAtTimestamp
+						}
+
+						Notification "1" *-- "1" NotificationId : has >
+						Notification "1" *-- "1" MessageRef : has >
+						Notification "1" *-- "1" CreatedAtTimestamp : has >
+					}
+					
+					package "ports.out" {
+						interface NotificationRepositoryPort {
+							+ save(notification: Notification): Notification
+							+ findById(id: UUID): Optional<Notification>
+							+ makeNotificationSeen(id: UUID): void
+							+ delete(id: UUID): void
+						}
+					}
+
+					package "service" {
+						class NotificationDomainServiceConfig <<@Configuration>> { }
+
+						interface NotificationDomain {
+							+ createNotification(notification: Notification): Notification
+						}
+
+						class NotificationDomainService <<implements NotificationDomain>> {
+							+ createNotification(notification: Notification): Notification
+						}
+
+						NotificationDomainService "1" *.. "1" NotificationDomain : implements >
+					}
+				}
+
+				package "interfaceadapters" {
+					package "persistence" {
+						package "jpa" {
+
+							class NotificationEntity <<@Entity>> {
+								- id: UUID
+								- seen: boolean
+								- messageRef: UUID
+								- createdAt: Instant
+							}
+							 
+							class NotificationJpaMapper {
+								+ toDomain(ne: NotificationEntity): Notification
+								+ toEntity(n: Notification): NotificationEntity
+								+ copyToEntity(n: Notification, ne: NotificationEntity): NotificationEntity
+							}
+
+							class NotificationRepositoryAdapter {
+								+ save(n: Notification): Notification
+								+ findById(id: UUID): Optional<Notification>
+								+ makeNotificationSeen(id: UUID): void
+								+ delete(id: UUID): void
+							}
+
+							NotificationRepositoryAdapter "1" *.. "1" NotificationRepositoryPort : implements >
+
+							interface NotificationSpringDataRepository <<implements JpaRepository>> {
+								+ save(ne: NotificationEntity): NotificationEntity
+								+ findById(id: UUID): Optional<NotificationEntity>
+								+ makeNotificationSeen(id: UUID): void
+								+ deleteById(id: UUID): void
+							}
+						}
+					}
+				}
+
+				package "application.service" {
+					class NotificationApplicationService <<@Service>> {
+						+ createNotification(cmd: CreateNotificationCmd): CreatedNotificationResponse
+						+ findById(id: UUID): Optional<NotificationResponse>
+						+ makeNotificationSeen(id: UUID): void
+						+ deleteNotification(id: UUID): void
+					}
+				}
+
+				package "interfaceweb" {
+					class InternalNotificationController <<@RestController>> {
+						+ createNotification(cmd: CreateNotificationCmd): CreatedNotificationResponse <<@PostMapping>>
+						+ makeNotificationSeen(id: UUID): void <<@PutMapping("/{id}/seen")>>
+						+ deleteNotification(id: UUID): void <<@DeleteMapping("/{id}")>>
+					}
+				}
+
+				class NotificationApplicationStart {
+ 					+ main(args: String[]): void
+				}
+			}
+		}
+	}
+
+	folder "notification-api" #LightGray {
+		package "sop.local.sopinfo" {
+			package "notification" #LightSteelBlue {
+				package "application.api" {
+					
+					package "dto" {
+						class CreateNotificationCmd {
+							- messageRef: UUID
+						}
+
+						class CreatedNotificationResponse {
+							- id: UUID
+						}
+
+						class CreateNotificationResult {
+							-id: UUID
+							-seen: boolean
+							-messageRef: UUID
+							-createdAt: Instant
+						}
+					}
+
+					interface NotificationDirectory {
+						+ createNotification(cmd: CreateNotificationCmd): CreatedNotificationResponse
+						+ findById(id: UUID): Optional<NotificationResponse>
+						+ makeNotificationSeen(id: UUID): void
+						+ deleteNotification(id: UUID): void
+					}
+				}
+			}
+		}
+	}
+	
+	NotificationApplicationService ..|> NotificationDirectory : implements
+	NotificationApplicationService "1" *.. "1" NotificationDomain : injects >
+	NotificationApplicationService "1" *.. "1" NotificationRepositoryPort : injects >
+
+	InternalNotificationController "1" *.. "1" NotificationDirectory : injects >
+}
+
+"bc-notification" ..> sharedkernel : uses >
+"bc-notification" ..> common : uses >
+
+@enduml

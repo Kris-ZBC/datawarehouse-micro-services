@@ -1,0 +1,31 @@
+package local.sop.sopinfo.institution.interfaceweb;
+
+import local.sop.sopinfo.institution.application.api.InstitutionDirectory;
+import local.sop.sopinfo.institution.application.api.dto.InstitutionQuery;
+import local.sop.sopinfo.institution.application.api.dto.InstitutionResponse;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
+
+@RestController
+@RequestMapping("/internal/institutions")
+public class InternalInstitutionController {
+
+    private final InstitutionDirectory directory;
+
+    public InternalInstitutionController(InstitutionDirectory directory) {
+        this.directory = directory;
+    }
+
+    @GetMapping("/{id}")
+    public InstitutionResponse findById(@PathVariable UUID id) {
+        return directory.findById(new InstitutionQuery(id));
+    }
+
+    // Ping endpoint
+    @GetMapping("/ping")
+    public ResponseEntity<String> ping() {
+        return ResponseEntity.ok("PONG!");
+    }
+}

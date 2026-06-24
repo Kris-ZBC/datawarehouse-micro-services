@@ -1,0 +1,340 @@
+' Target-state BFF architecture.
+' One top-down visual flow: BFF clients -> operation cards -> handlers -> sagas -> atomic BCs.
+' Names are target topology names. Where a BC operation already exists in code, the diagram keeps that name as closely as possible.
+
+@startuml bff-handler-bc-target-flow
+
+title BFF to Handler to Saga to Bounded Context Target Flow
+
+top to bottom direction
+scale max 3600 width
+hide stereotype
+
+skinparam shadowing false
+skinparam roundCorner 12
+skinparam linetype ortho
+skinparam defaultFontName Helvetica
+skinparam defaultFontSize 12
+skinparam componentStyle rectangle
+skinparam nodesep 20
+skinparam ranksep 45
+
+skinparam component {
+    BackgroundColor<<bff>>          #E6F1FB
+    BorderColor<<bff>>              #185FA5
+    FontColor<<bff>>                #0C447C
+
+    BackgroundColor<<operation>>    #FFF2CC
+    BorderColor<<operation>>        #D6B656
+    FontColor<<operation>>          #6B4E00
+
+    BackgroundColor<<handler>>      #D4F1E4
+    BorderColor<<handler>>          #0F6E56
+    FontColor<<handler>>            #085041
+
+    BackgroundColor<<saga>>         #EEEDFE
+    BorderColor<<saga>>             #534AB7
+    FontColor<<saga>>               #3C3489
+
+    BackgroundColor<<bc>>           #FAECE7
+    BorderColor<<bc>>               #993C1D
+    FontColor<<bc>>                 #711B13
+
+    BackgroundColor<<support>>      #F4F4F4
+    BorderColor<<support>>          #666666
+    FontColor<<support>>            #333333
+}
+
+skinparam package {
+    BackgroundColor #FFFFFF
+    BorderColor #888780
+    FontColor #2C2C2A
+    FontStyle bold
+}
+
+skinparam arrow {
+    Color #5F5E5A
+    FontColor #5F5E5A
+    FontSize 10
+}
+
+package "BFF clients and owned operation cards" {
+    package "App BFF lane" {
+        component "App BFF\nApp/mobile client routes" <<bff>> as app_bff
+        component "Identity -> Auth Handler\nLogin\nChangePassword" <<operation>> as app_identity
+        component "Messages -> Communication Handler\nGetMessageById\nListMessagesForUser\nSendMessage" <<operation>> as app_messages
+        component "Self attendance -> Attendance Handler\nFindAttendanceByApprenticeId\nFindAbsencesByApprenticeId\nFindWorkHourScheduleBySopRef\nRegisterAbsenceForApprentice\nRegisterAttendanceForApprentice" <<operation>> as app_attendance
+    }
+
+    package "Web BFF lane" {
+        component "Web BFF\nApprentice self-service routes" <<bff>> as web_bff
+        component "Identity -> Auth Handler\nLogin\nChangePassword" <<operation>> as web_identity
+        component "Consent -> Consent Handler\nGrantConsent\nRevokeConsent" <<operation>> as web_consent
+        component "Messages -> Communication Handler\nGetMessageById\nListMessagesForUser\nSendMessage" <<operation>> as web_messages
+        component "Self attendance -> Attendance Handler\nFindAttendanceByApprenticeId\nFindAbsencesByApprenticeId\nFindWorkHourScheduleBySopRef\nRegisterAbsenceForApprentice\nRegisterAttendanceForApprentice" <<operation>> as web_attendance
+        component "Profile -> Person Handler\nUpdatePersonalInformation" <<operation>> as web_profile
+    }
+
+    package "Admin / Instructor Web BFF lane" {
+        component "Admin / Instructor Web BFF\nAdmin and instructor routes" <<bff>> as admin_bff
+        component "Account admin -> Auth Handler\nLogin\nResetUserPassword\nDeactivateApprentice\nReactivateApprentice" <<operation>> as admin_account
+        component "Apprentice profile -> Person Handler\nUpdateApprenticeInformation" <<operation>> as admin_profile
+        component "Apprentice overview -> Apprentice Handler\nListApprenticesForInstructor\nGetApprenticeDetails" <<operation>> as admin_apprentice_overview
+        component "Registration -> Registration Handler\nRegisterApprentice\nRegisterInstructor" <<operation>> as admin_registration
+        component "Messages -> Communication Handler\nSendMessage" <<operation>> as admin_messages
+        component "Apprentice attendance -> Attendance Handler\nFindAttendanceByApprenticeId\nFindAbsencesByApprenticeId\nFindWorkHourScheduleBySopRef\nRegisterAbsenceForApprentice\nAcceptAbsenceById\nDeclineAbsenceById\nRegisterAttendanceForApprentice" <<operation>> as admin_attendance
+        component "Education assignment -> Education Handler\nCreateEducationLine\nChangeApprenticeEducationLine" <<operation>> as admin_education_assignment
+        component "Reference lookup\nFindSopById -> SOP Handler\nFindOrganisationById -> Organisation Handler\nFindInstitutionById -> Institution Handler" <<operation>> as admin_reference_lookup
+    }
+
+    package "Technical User Web BFF lane" {
+        component "Technical User Web BFF\nTechnical onboarding routes" <<bff>> as technical_bff
+        component "Identity -> Auth Handler\nLogin" <<operation>> as tech_identity
+        component "Technical onboarding -> Registration Handler\nRegisterInstructor" <<operation>> as tech_onboarding
+    }
+}
+
+package "Capability handlers" {
+    component "Auth Handler\n\nLogin\nChangePassword\nResetUserPassword\nDeactivateApprentice\nReactivateApprentice" <<handler>> as auth_h
+    component "Consent Handler\n\nGrantConsent\nRevokeConsent" <<handler>> as consent_h
+    component "Person Handler\n\nUpdatePersonalInformation\nUpdateApprenticeInformation" <<handler>> as person_h
+    component "Apprentice Handler\n\nListApprenticesForInstructor\nGetApprenticeDetails\nListApprenticesByEducationLine" <<handler>> as apprentice_h
+    component "Registration Handler\n\nRegisterApprentice\nRegisterInstructor" <<handler>> as registration_h
+    component "Communication Handler\n\nGetMessageById\nListMessagesForUser\nSendMessage" <<handler>> as communication_h
+    component "Attendance Handler\n\nFindAttendanceByApprenticeId\nFindAbsencesByApprenticeId\nFindWorkHourScheduleBySopRef\nRegisterAbsenceForApprentice\nAcceptAbsenceById\nDeclineAbsenceById\nRegisterAttendanceForApprentice" <<handler>> as attendance_h
+    component "Education Handler\n\nCreateEducationLine\nChangeApprenticeEducationLine" <<handler>> as education_h
+    component "SOP Handler\n\nFindSopById\nListSopReferences" <<handler>> as sop_h
+    component "Organisation Handler\n\nFindOrganisationById\nListOrganisationReferences" <<handler>> as organisation_h
+    component "Institution Handler\n\nFindInstitutionById\nListInstitutionReferences" <<handler>> as institution_h
+}
+
+package "Sagas / cross-BC orchestration" {
+    component "Login Saga\n\nAuthenticate\nVerifyConsent\nAuditLogin" <<saga>> as login_saga
+    component "Credential Lifecycle Saga\n\nChangePassword\nResetUserPassword\nAuditCredentialChange" <<saga>> as credential_saga
+    component "Apprentice Lifecycle Saga\n\nDeactivateApprentice\nReactivateApprentice" <<saga>> as apprentice_lifecycle_saga
+    component "Consent Lifecycle Saga\n\nGrantConsent\nRevokeConsent\nAuditConsentOutcome" <<saga>> as consent_saga
+    component "Anonymize Saga\n\nAnonymizeByPersonRef" <<saga>> as anonymize_saga
+    component "Apprentice Registration Saga\n\nRegisterApprentice" <<saga>> as apprentice_registration_saga
+    component "Instructor Registration Saga\n\nRegisterInstructor" <<saga>> as instructor_registration_saga
+    component "Message Delivery Saga\n\nSendMessage" <<saga>> as message_saga
+    component "Education Line Lifecycle Saga\n\nCreateEducationLine" <<saga>> as education_line_saga
+    component "Apprentice Education Assignment Saga\n\nChangeApprenticeEducationLine" <<saga>> as apprentice_education_saga
+}
+
+package "bounded contexts" {
+    component "bc-login\nAuthentication, sessions,\nand credentials\n\nCreateLogin\nLogin\nLogout\nValidateSession" <<bc>> as bc_login
+    component "bc-consent\nConsent and consent statements\n\nGrantConsent\nRevokeConsent\nFindConsentByPersonRef" <<bc>> as bc_consent
+    component "bc-audit-log\nAuditlog entries\n\nCreateAuditlog\nFindAll\nFindBySearchParams\nFindById" <<bc>> as bc_audit
+    component "bc-person\nPerson profile data\n\nCreatePerson\nFindPersonById\nFindAll\nSearchByName\nUpdatePersonalInformation\nUpdateApprenticeInformation" <<bc>> as bc_person
+    component "bc-anonymize\nAnonymization events\n\nAnonymizeByPersonRef\nFindById\nFindByParams" <<bc>> as bc_anonymize
+    component "bc-apprentice\nApprentice references\n\nCreateApprentice\nFindApprenticeById\nFindApprenticesByEducationLineId\nFindAllApprentices\nDeactivateApprentice\nReactivateApprentice" <<bc>> as bc_apprentice
+    component "bc-instructor\nInstructor references\n\nCreateInstructor\nFindInstructorById\nFindAllInstructors" <<bc>> as bc_instructor
+    component "bc-education-instructor\nEducation/instructor assignments\n\nAssignInstructorToEducation" <<bc>> as bc_education_instructor
+    component "bc-sop-instructor\nSOP/instructor assignments\n\nAssignInstructorToSop" <<bc>> as bc_sop_instructor
+    component "bc-education\nEducation reference data\n\nFindEducationById\nListEducationReferences" <<bc>> as bc_education
+    component "bc-education-line\nEducation-line lifecycle\n\nCreateEducationLine\nFindEducationLineById" <<bc>> as bc_education_line
+    component "bc-message\nMessage content\n\nCreateMessage\nFindMessageById" <<bc>> as bc_message
+    component "bc-message-person\nInbox and recipient links\n\nCreateMessageRecipientLink\nListMessagesForUser" <<bc>> as bc_message_person
+    component "bc-notification\nNotification content\n\nCreateNotification" <<bc>> as bc_notification
+    component "bc-person-notification\nNotification recipient links\n\nCreateNotificationRecipientLink" <<bc>> as bc_person_notification
+    component "bc-check-in\nAttendance aggregate\nAbsence aggregate\n\nFindAttendanceByApprenticeId\nFindAbsencesByApprenticeId\nRegisterAttendanceForApprentice\nRegisterAbsenceForApprentice\nAcceptAbsenceById\nDeclineAbsenceById" <<bc>> as bc_checkin
+    component "bc-work-hour\nExpected schedules\n\nFindWorkHourScheduleBySopRef" <<bc>> as bc_work_hour
+    component "bc-sop\nSOP reference lookup only\n\nFindSopById\nListSopReferences" <<bc>> as bc_sop
+    component "bc-sop-education\nSOP/education-line assignments\n\nFindEducationLinesBySopRef" <<bc>> as bc_sop_education
+    component "bc-organisation\nSeeded organisation lookup only\n\nFindOrganisationById\nListOrganisationReferences" <<bc>> as bc_organisation
+    component "bc-institution\nSeeded institution lookup only\n\nFindInstitutionById\nListInstitutionReferences" <<bc>> as bc_institution
+}
+
+package "Saga compensation contracts" {
+    component "Compensatable\n\ncompensate(id, sagaContext)" <<support>> as compensatable
+    component "bc-login compensation\nCompensateCreateLogin" <<support>> as bc_login_comp
+    component "bc-person compensation\nCompensateCreatePerson" <<support>> as bc_person_comp
+    component "bc-apprentice compensation\nCompensateCreateApprentice" <<support>> as bc_apprentice_comp
+    component "bc-instructor compensation\nCompensateCreateInstructor" <<support>> as bc_instructor_comp
+    component "bc-consent compensation\nCompensateGrantConsent" <<support>> as bc_consent_comp
+}
+
+' Keep each BFF lane vertical.
+app_bff -[hidden]down-> app_identity
+app_identity -[hidden]down-> app_messages
+app_messages -[hidden]down-> app_attendance
+
+web_bff -[hidden]down-> web_identity
+web_identity -[hidden]down-> web_consent
+web_consent -[hidden]down-> web_messages
+web_messages -[hidden]down-> web_attendance
+web_attendance -[hidden]down-> web_profile
+
+admin_bff -[hidden]down-> admin_account
+admin_account -[hidden]down-> admin_profile
+admin_profile -[hidden]down-> admin_apprentice_overview
+admin_apprentice_overview -[hidden]down-> admin_registration
+admin_registration -[hidden]down-> admin_messages
+admin_messages -[hidden]down-> admin_attendance
+admin_attendance -[hidden]down-> admin_education_assignment
+admin_education_assignment -[hidden]down-> admin_reference_lookup
+
+technical_bff -[hidden]down-> tech_identity
+tech_identity -[hidden]down-> tech_onboarding
+
+' Keep the major bands stacked.
+app_attendance -[hidden]down-> auth_h
+web_profile -[hidden]down-> consent_h
+admin_reference_lookup -[hidden]down-> registration_h
+tech_onboarding -[hidden]down-> registration_h
+
+auth_h -[hidden]down-> login_saga
+consent_h -[hidden]down-> consent_saga
+education_h -[hidden]down-> education_line_saga
+login_saga -[hidden]down-> bc_login
+apprentice_registration_saga -[hidden]down-> bc_apprentice
+message_saga -[hidden]down-> bc_message
+apprentice_education_saga -[hidden]right-> compensatable
+compensatable -[hidden]down-> bc_login_comp
+bc_login_comp -[hidden]down-> bc_person_comp
+bc_person_comp -[hidden]down-> bc_apprentice_comp
+bc_apprentice_comp -[hidden]down-> bc_instructor_comp
+bc_instructor_comp -[hidden]down-> bc_consent_comp
+
+' Operation card to Handler routing.
+' Color group: BFF operation cards route to capability handlers.
+app_identity -[#546E7A]-> auth_h
+app_messages -[#546E7A]-> communication_h
+app_attendance -[#546E7A]-> attendance_h
+
+web_identity -[#546E7A]-> auth_h
+web_consent -[#546E7A]-> consent_h
+web_messages -[#546E7A]-> communication_h
+web_attendance -[#546E7A]-> attendance_h
+web_profile -[#546E7A]-> person_h
+
+admin_account -[#546E7A]-> auth_h
+admin_profile -[#546E7A]-> person_h
+admin_apprentice_overview -[#546E7A]-> apprentice_h
+admin_registration -[#546E7A]-> registration_h
+admin_messages -[#546E7A]-> communication_h
+admin_attendance -[#546E7A]-> attendance_h
+admin_education_assignment -[#546E7A]-> education_h
+admin_reference_lookup -[#546E7A]-> sop_h
+admin_reference_lookup -[#546E7A]-> organisation_h
+admin_reference_lookup -[#546E7A]-> institution_h
+
+tech_identity -[#546E7A]-> auth_h
+tech_onboarding -[#546E7A]-> registration_h
+
+' Handler to Saga calls for cross-BC writes.
+' Color group: Capability handler starts saga orchestration.
+auth_h -[#7E57C2]-> login_saga
+auth_h -[#7E57C2]-> credential_saga
+auth_h -[#7E57C2]-> apprentice_lifecycle_saga
+consent_h -[#7E57C2]-> consent_saga
+consent_h -[#7E57C2]-> anonymize_saga
+registration_h -[#7E57C2]-> apprentice_registration_saga
+registration_h -[#7E57C2]-> instructor_registration_saga
+communication_h -[#7E57C2]-> message_saga
+education_h -[#7E57C2]-> education_line_saga
+education_h -[#7E57C2]-> apprentice_education_saga
+
+' Direct Handler to BC reads or single-context commands.
+' Color group: Person and apprentice read/composition access.
+person_h -[#00897B]-> bc_person
+
+apprentice_h -[#00897B]-> bc_apprentice
+apprentice_h -[#00897B]-> bc_person
+apprentice_h -[#00897B]-> bc_education_line
+
+' Color group: Communication read/composition access.
+communication_h -[#039BE5]-> bc_message
+communication_h -[#039BE5]-> bc_message_person
+communication_h -[#039BE5]-> bc_person
+
+' Color group: Attendance read/composition access.
+attendance_h -[#43A047]-> bc_checkin
+attendance_h -[#43A047]-> bc_work_hour
+attendance_h -[#43A047]-> bc_apprentice
+attendance_h -[#43A047]-> bc_person
+
+' Color group: Reference read/composition access.
+sop_h -[#6D4C41]-> bc_sop
+sop_h -[#6D4C41]-> bc_sop_education
+sop_h -[#6D4C41]-> bc_sop_instructor
+sop_h -[#6D4C41]-> bc_organisation
+sop_h -[#6D4C41]-> bc_institution
+
+organisation_h -[#6D4C41]-> bc_organisation
+institution_h -[#6D4C41]-> bc_institution
+
+' Saga to BC calls through outbound ports/adapters.
+' Color group: Login and credential lifecycle.
+login_saga -[#FB8C00]-> bc_login
+login_saga -[#FB8C00]-> bc_consent
+login_saga -[#FB8C00]-> bc_audit
+
+credential_saga -[#FB8C00]-> bc_login
+credential_saga -[#FB8C00]-> bc_audit
+
+apprentice_lifecycle_saga -[#E53935]-> bc_apprentice
+apprentice_lifecycle_saga -[#E53935]-> bc_audit
+
+' Color group: Consent lifecycle and anonymization.
+consent_saga -[#D81B60]-> bc_consent
+consent_saga -[#D81B60]-> bc_audit
+
+anonymize_saga -[#D81B60]-> bc_anonymize
+anonymize_saga -[#D81B60]-> bc_person
+anonymize_saga -[#D81B60]-> bc_audit
+
+' Color group: Apprentice registration lifecycle.
+apprentice_registration_saga -[#E53935]-> bc_organisation
+apprentice_registration_saga -[#E53935]-> bc_education_line
+apprentice_registration_saga -[#E53935]-> bc_person
+apprentice_registration_saga -[#E53935]-> bc_login
+apprentice_registration_saga -[#E53935]-> bc_apprentice
+apprentice_registration_saga -[#E53935]-> bc_consent
+apprentice_registration_saga -[#E53935]-> bc_audit
+
+' Color group: Instructor registration lifecycle.
+instructor_registration_saga -[#C62828]-> bc_organisation
+instructor_registration_saga -[#C62828]-> bc_person
+instructor_registration_saga -[#C62828]-> bc_login
+instructor_registration_saga -[#C62828]-> bc_instructor
+instructor_registration_saga -[#C62828]-> bc_education_instructor
+instructor_registration_saga -[#C62828]-> bc_sop_instructor
+instructor_registration_saga -[#C62828]-> bc_audit
+
+' Color group: Message and notification delivery.
+message_saga -[#8E24AA]-> bc_person
+message_saga -[#8E24AA]-> bc_message
+message_saga -[#8E24AA]-> bc_message_person
+message_saga -[#8E24AA]-> bc_notification
+message_saga -[#8E24AA]-> bc_person_notification
+
+' Color group: Education lifecycle and apprentice education assignment.
+education_line_saga -[#2E7D32]-> bc_education
+education_line_saga -[#2E7D32]-> bc_education_line
+education_line_saga -[#2E7D32]-> bc_apprentice
+education_line_saga -[#2E7D32]-> bc_audit
+
+apprentice_education_saga -[#2E7D32]-> bc_education_line
+apprentice_education_saga -[#2E7D32]-> bc_apprentice
+apprentice_education_saga -[#2E7D32]-> bc_audit
+
+' Saga compensation support.
+' Compensation endpoints are BC integration contracts, not BFF or user-facing capabilities.
+compensatable -[#9E9E9E,dashed]-> bc_login_comp
+compensatable -[#9E9E9E,dashed]-> bc_person_comp
+compensatable -[#9E9E9E,dashed]-> bc_apprentice_comp
+compensatable -[#9E9E9E,dashed]-> bc_instructor_comp
+compensatable -[#9E9E9E,dashed]-> bc_consent_comp
+
+credential_saga -[#9E9E9E,dashed]-> bc_login_comp
+consent_saga -[#9E9E9E,dashed]-> bc_consent_comp
+consent_saga -[#9E9E9E,dashed]-> bc_person_comp
+apprentice_registration_saga -[#9E9E9E,dashed]-> bc_person_comp
+apprentice_registration_saga -[#9E9E9E,dashed]-> bc_login_comp
+apprentice_registration_saga -[#9E9E9E,dashed]-> bc_apprentice_comp
+instructor_registration_saga -[#9E9E9E,dashed]-> bc_person_comp
+instructor_registration_saga -[#9E9E9E,dashed]-> bc_login_comp
+instructor_registration_saga -[#9E9E9E,dashed]-> bc_instructor_comp
+
+@enduml

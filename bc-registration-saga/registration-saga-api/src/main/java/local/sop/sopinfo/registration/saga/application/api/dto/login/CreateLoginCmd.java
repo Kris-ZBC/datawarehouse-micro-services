@@ -1,0 +1,12 @@
+package local.sop.sopinfo.registration.saga.application.api.dto.login;
+
+import java.util.UUID;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
+public record CreateLoginCmd(
+	@NotNull(message="{login.personRef.invalid}") UUID personRef,
+	@NotBlank(message="{login.username.invalid}") String username,
+	@NotBlank(message="{login.status.invalid}") String status
+) {}

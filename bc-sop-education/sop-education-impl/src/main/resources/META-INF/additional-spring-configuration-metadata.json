@@ -1,0 +1,17 @@
+{"properties": [
+  {
+    "name": "education-line.base-url",
+    "type": "java.lang.String",
+    "description": "A description for 'education-line.base-url'"
+  },
+  {
+    "name": "sop.base-url",
+    "type": "java.lang.String",
+    "description": "A description for 'sop.base-url'"
+  },
+  {
+    "name": "compositekey.validation.enabled",
+    "type": "java.lang.String",
+    "description": "A description for 'compositekey.validation.enabled'"
+  }
+]}

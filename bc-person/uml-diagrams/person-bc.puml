@@ -1,0 +1,240 @@
+@startuml
+title bc-person - Current Bounded Context Overview
+
+hide circle
+skinparam linetype ortho
+skinparam packageStyle rectangle
+skinparam classAttributeIconSize 0
+
+skinparam class {
+	BackgroundColor White
+	BorderColor #888888
+	HeaderBackgroundColor #E8E8E8
+}
+
+package "bc-person" {
+
+	package "person-api" {
+		package "application.api" {
+			interface PersonDirectory <<Port>> {
+				+create(cmd) : UUID
+				+findById(id) : Optional<PersonResponse>
+				+findAll() : List<PersonResponse>
+				+searchByName(name) : List<PersonResponse>
+			}
+
+			class CreatePersonCmd <<DTO>> {
+				+firstName : String
+				+lastName : String
+				+email : String
+				+organizationRef : UUID
+				+phoneNumbers : List<CreatePhoneNumberCmd>
+			}
+
+			class CreatePhoneNumberCmd <<DTO>> {
+				+type : PhoneUserType
+				+value : String
+			}
+
+			class PersonResponse <<DTO>> {
+				+id : UUID
+				+firstName : String
+				+lastName : String
+				+email : String
+				+organizationRef : UUID
+				+phoneNumbers : List<PhoneNumberResponse>
+			}
+
+			class PhoneNumberResponse <<DTO>> {
+				+id : UUID
+				+type : PhoneUserType
+				+value : String
+			}
+		}
+	}
+
+	package "person-impl" {
+
+		package "interfaceweb" {
+			class InternalPersonController <<REST Adapter>> {
+				+create(cmd) : UUID
+				+findAll() : List<PersonResponse>
+				+findById(id) : PersonResponse
+				+searchByName(name) : List<PersonResponse>
+			}
+		}
+
+		package "application" {
+			class PersonApplicationService <<Service>> {
+				-personRepositoryPort : PersonRepositoryPort
+				-personDomain : PersonDomain
+				--
+				+create(cmd) : UUID
+				+findAll() : List<PersonResponse>
+				+findById(id) : Optional<PersonResponse>
+				+searchByName(name) : List<PersonResponse>
+			}
+
+			class PersonResponseMapper <<Mapper>> {
+				+toResponse(person) : PersonResponse
+			}
+		}
+
+		package "domain.model" {
+			class Person <<AggregateRoot>> {
+				+id : PersonId
+				+firstName : FirstName
+				+lastName : LastName
+				+email : Email
+				+organizationRef : OrganizationRef
+				+phoneNumbers : List<PhoneNumber>
+				--
+				+withFirstName(firstName) : Person
+				+withLastName(lastName) : Person
+				+withEmail(email) : Person
+				+withOrganizationRef(organizationRef) : Person
+				+withAddedPhoneNumber(type, value) : Person
+				+withRemovedPhoneNumber(phoneNumberId) : Person
+			}
+
+			class PhoneNumber <<Entity>> {
+				+id : PhoneNumberId
+				+type : PhoneUserType
+				+value : PhoneNumberValue
+				--
+				+withType(type) : PhoneNumber
+				+withValue(value) : PhoneNumber
+			}
+
+			class PhoneNumberDraft <<Domain Input>> {
+				+type : PhoneUserType
+				+value : PhoneNumberValue
+			}
+
+			Person "1" o-- "0..*" PhoneNumber : contains
+		}
+
+		package "domain.model.valueobjects" {
+			class PersonId <<ValueObject>> {
+				+value : UUID
+			}
+
+			class PhoneNumberId <<ValueObject>> {
+				+value : UUID
+			}
+
+			class FirstName <<ValueObject>> {
+				+value : String
+			}
+
+			class LastName <<ValueObject>> {
+				+value : String
+			}
+
+			class Email <<ValueObject>> {
+				+value : String
+			}
+
+			class OrganizationRef <<ValueObject>> {
+				+value : UUID
+			}
+
+			class PhoneNumberValue <<ValueObject>> {
+				+value : String
+			}
+		}
+
+		package "domain.service" {
+			interface PersonDomain <<Domain Service>> {
+				+create(firstName, lastName, email, organizationRef, phoneNumbers) : Person
+			}
+
+			class PersonDomainService <<Service>> {
+				+create(firstName, lastName, email, organizationRef, phoneNumbers) : Person
+			}
+
+			PersonDomain <|.. PersonDomainService
+		}
+
+		package "domain.ports.out" {
+			interface PersonRepositoryPort <<Port>> {
+				+save(person) : Person
+				+findById(id) : Optional<Person>
+				+findAll() : List<Person>
+				+searchByName(name) : List<Person>
+				+findByEmail(email) : Optional<Person>
+			}
+		}
+
+		package "interfaceadapters.persistence.jpa" {
+			class PersonEntity <<JPA Entity>> {
+				+id : UUID
+				+version : long
+				+firstName : String
+				+lastName : String
+				+email : String
+				+organizationRef : UUID
+				+phoneNumbers : List<PhoneNumberEntity>
+			}
+
+			class PhoneNumberEntity <<JPA Entity>> {
+				+id : UUID
+				+version : long
+				+type : PhoneUserType
+				+phoneNumber : String
+				+person : PersonEntity
+			}
+
+			interface PersonSpringDataRepository <<Spring Data>> {
+				+save(entity) : PersonEntity
+				+findById(id) : Optional<PersonEntity>
+				+findAll() : List<PersonEntity>
+				+findByEmail(email) : Optional<PersonEntity>
+				+findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(firstName, lastName) : List<PersonEntity>
+			}
+
+			class PersonRepositoryJpaAdapter <<Adapter>> {
+				-springRepo : PersonSpringDataRepository
+				-mapper : PersonJpaMapper
+				--
+				+save(person) : Person
+				+findById(id) : Optional<Person>
+				+findAll() : List<Person>
+				+searchByName(name) : List<Person>
+				+findByEmail(email) : Optional<Person>
+			}
+
+			class PersonJpaMapper <<Mapper>> {
+				+toDomain(entity) : Person
+				+toEntity(domain) : PersonEntity
+				+copyIntoEntity(domain, entity) : void
+			}
+
+			PersonEntity "1" o-- "0..*" PhoneNumberEntity : owns
+			PhoneNumberEntity "*"-- "1" PersonEntity : person
+			PersonRepositoryJpaAdapter ..|> PersonRepositoryPort
+		}
+
+		package "sharedkernel" {
+			enum PhoneUserType {
+				SELF
+				PARENT
+				GUARDIAN
+				EMERGENCY_CONTACT
+				OTHER
+			}
+		}
+
+		InternalPersonController --> PersonDirectory
+		PersonApplicationService ..|> PersonDirectory
+		PersonApplicationService --> PersonRepositoryPort
+		PersonApplicationService --> PersonDomain
+		PersonApplicationService --> PersonResponseMapper
+		PersonDomainService --> Person
+		PersonRepositoryJpaAdapter --> PersonSpringDataRepository
+		PersonRepositoryJpaAdapter --> PersonJpaMapper
+		PersonJpaMapper --> Person
+		PersonJpaMapper --> PersonEntity
+	}
+}
+@enduml

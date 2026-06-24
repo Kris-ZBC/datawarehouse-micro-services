@@ -1,0 +1,282 @@
+@startuml Instructor BC Class Diagram
+left to right direction
+title Instructor BC Class Diagram
+
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam classFontSize 12
+skinparam classFontName Arial
+skinparam wrapWidth 220
+skinparam componentStyle uml2
+skinparam linetype ortho
+skinparam ranksep 90
+skinparam nodesep 55
+
+folder "Instructor" #LightGrey {
+
+  package "sop.local.sopinfo" {
+    package "instructor" #LightSteelBlue {
+
+      package "interfaceweb" {
+        class InternalInstructorController <<@RestController, planned>> {
+          + create(cmd: CreateInstructorCmd): CreatedInstructorResponse <<@PostMapping>>
+          + findById(query: InstructorQuery): InstructorResponse <<@GetMapping>>
+        }
+      }
+
+      package "application" {
+
+        package "api" {
+          interface InstructorDirectory <<planned>> {
+            + create(cmd: CreateInstructorCmd): CreatedInstructorResponse
+            + findById(query: InstructorQuery): InstructorResponse
+          }
+
+          package "dto" {
+            class CreateInstructorCmd <<DTO, planned>> {
+              - personRef : UUID
+            }
+
+            class InstructorQuery <<DTO, planned>> {
+              - instructorId : UUID
+            }
+
+            class CreatedInstructorResponse <<DTO, planned>> {
+              - instructorId : UUID
+            }
+
+            class InstructorResponse <<DTO, planned>> {
+              - instructorId : UUID
+              - personRef : UUID
+            }
+          }
+
+          note bottom of InstructorResponse
+            Response DTO for this BC.
+            Contains only instructor-owned/reference data.
+          end note
+        }
+
+        class InstructorApplicationService <<planned>> {
+          + create(cmd: CreateInstructorCmd): CreatedInstructorResponse
+          + findById(query: InstructorQuery): InstructorResponse
+        }
+      }
+
+      package "domain" #LightCoral {
+
+        package "services" {
+          interface InstructorDomain <<planned>> {
+            + create(instructor: Instructor): Instructor
+            + findById(id: InstructorId): Optional<Instructor>
+          }
+
+          class InstructorDomainService <<implements InstructorDomain, planned>> {
+            + create(instructor: Instructor): Instructor
+            + findById(id: InstructorId): Optional<Instructor>
+          }
+
+          class InstructorDomainConfig <<@Configuration, planned>> {}
+
+          note bottom of InstructorDomain
+            Can be used by the use case service
+            for domain-specific constraints.
+          end note
+        }
+
+        package "ports" {
+          package "out" {
+            interface InstructorRepositoryPort <<planned>> {
+              + save(instructor: Instructor): Instructor
+              + findById(id: InstructorId): Optional<Instructor>
+            }
+
+            interface PersonPort <<planned>> {
+              + existsById(personId: UUID): boolean
+            }
+
+            interface ApprenticePort <<planned>> {
+              + createApprentice(...): UUID
+            }
+
+            interface LoginPort <<planned>> {
+              + changeDefaultPassword(...): void
+              + resetPassword(...): void
+            }
+
+            interface AuditLogPort <<planned>> {
+              + createAuditLog(...): UUID
+            }
+          }
+        }
+
+        package "model" {
+          class Instructor <<AggregateRoot, planned>> {
+            - instructorId : InstructorId
+            - personRef : PersonRef
+          }
+
+          package "valueobjects" {
+            class InstructorId <<ValueObject, planned>> {
+              - value : UUID
+              + getValue() : UUID
+            }
+
+            class PersonRef <<ValueObject, planned>> {
+              - value : UUID
+              + getValue() : UUID
+            }
+
+            note bottom of InstructorId
+              Invariants:
+              - must be a valid UUID
+              - must be unique
+            end note
+
+            note bottom of PersonRef
+              Invariants:
+              - must be a valid UUID
+              - must reference an existing Person
+            end note
+          }
+        }
+      }
+
+      package "interfaceadapters" {
+
+        package "persistence" {
+          package "jpa" {
+            class InstructorEntity <<@Entity>> {
+              - id : UUID
+              - version : Long
+            }
+
+            class InstructorJpaMapper <<planned>> {
+              + toDomain(entity: InstructorEntity): Instructor
+              + toEntity(instructor: Instructor): InstructorEntity
+              + copyIntoEntity(instructor: Instructor, entity: InstructorEntity): void
+            }
+
+            class InstructorRepositoryJpaAdapter <<implements InstructorRepositoryPort, planned>> {
+              + save(instructor: Instructor): Instructor
+              + findById(id: InstructorId): Optional<Instructor>
+            }
+
+            interface InstructorSpringDataRepository <<JpaRepository, planned>> {
+              + save(entity: InstructorEntity): InstructorEntity
+              + findById(id: UUID): Optional<InstructorEntity>
+            }
+
+            note bottom of InstructorEntity
+              CURRENT STATE:
+              - only id + version exist in code
+              - no person data is persisted here
+            end note
+          }
+        }
+
+        package "out" {
+          class PersonClientAdapter <<implements PersonPort, planned>>
+          class ApprenticeClientAdapter <<implements ApprenticePort, planned>>
+          class LoginClientAdapter <<implements LoginPort, planned>>
+          class AuditLogClientAdapter <<implements AuditLogPort, planned>>
+
+          note bottom of PersonClientAdapter
+            Outbound adapters implement outbound ports and handle
+            the technical integration to external BCs.
+            This BC stores references only and fetches external
+            data when needed.
+          end note
+        }
+
+        package "in" {
+          class InstructorDirectoryAdapter <<planned>>
+        }
+      }
+    }
+  }
+}
+
+package "bc-person" #LightCyan {
+  class PersonServiceFacade <<External>> {
+    + existsById(personId: UUID): boolean
+  }
+}
+
+package "bc-apprentice" #LightCyan {
+  class ApprenticeServiceFacade <<External>> {
+    + createApprentice(...): UUID
+  }
+}
+
+package "bc-login" #LightCyan {
+  class LoginServiceFacade <<External>> {
+    + changeDefaultPassword(...): void
+    + resetPassword(...): void
+  }
+}
+
+package "bc-audit_log" #LightCyan {
+  class AuditLogServiceFacade <<External>> {
+    + createAuditLog(...): UUID
+  }
+}
+
+package "bc-education_instructor" #LightCyan {
+  class EducationInstructorReference <<External>> {
+    + instructorId : UUID
+  }
+}
+
+' -----------------------------
+' Main flow (kept readable)
+' -----------------------------
+
+InternalInstructorController --> InstructorDirectory : uses
+InstructorDirectory <|.. InstructorApplicationService : implements
+
+InstructorApplicationService --> InstructorRepositoryPort : uses
+InstructorApplicationService --> InstructorDomain : uses
+InstructorApplicationService --> PersonPort : uses
+InstructorApplicationService --> ApprenticePort : uses
+InstructorApplicationService --> LoginPort : uses
+InstructorApplicationService --> AuditLogPort : uses
+
+InstructorDomain <|.. InstructorDomainService : implements
+
+Instructor --> InstructorId : has
+Instructor --> PersonRef : has
+
+InstructorRepositoryPort <|.. InstructorRepositoryJpaAdapter : implements
+InstructorRepositoryJpaAdapter --> InstructorSpringDataRepository : uses
+InstructorRepositoryJpaAdapter --> InstructorJpaMapper : uses
+InstructorSpringDataRepository --> InstructorEntity : persists
+
+' Mapper relations: conversion dependencies, not big structural ownership arrows
+InstructorJpaMapper ..> InstructorEntity : maps from/to
+InstructorJpaMapper ..> Instructor : maps from/to
+
+PersonPort <|.. PersonClientAdapter : implements
+ApprenticePort <|.. ApprenticeClientAdapter : implements
+LoginPort <|.. LoginClientAdapter : implements
+AuditLogPort <|.. AuditLogClientAdapter : implements
+
+PersonClientAdapter ..> PersonServiceFacade : calls
+ApprenticeClientAdapter ..> ApprenticeServiceFacade : calls
+LoginClientAdapter ..> LoginServiceFacade : calls
+AuditLogClientAdapter ..> AuditLogServiceFacade : calls
+
+EducationInstructorReference ..> InstructorId : stores reference >
+
+' -----------------------------
+' Hidden layout helpers
+' -----------------------------
+InternalInstructorController -[hidden]-> InstructorApplicationService
+InstructorApplicationService -[hidden]-> InstructorDomainService
+InstructorRepositoryJpaAdapter -[hidden]-> InstructorJpaMapper
+InstructorJpaMapper -[hidden]-> InstructorEntity
+PersonClientAdapter -[hidden]-> ApprenticeClientAdapter
+ApprenticeClientAdapter -[hidden]-> LoginClientAdapter
+LoginClientAdapter -[hidden]-> AuditLogClientAdapter
+
+@enduml

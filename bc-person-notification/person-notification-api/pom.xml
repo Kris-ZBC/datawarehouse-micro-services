@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+      <groupId>local.sop.sopinfo</groupId>
+      <artifactId>parent</artifactId>
+      <version>${revision}</version>
+      <relativePath>../../parent-POM/pom.xml</relativePath>
+    </parent>
+
+    <artifactId>person-notification-api</artifactId>
+    <packaging>jar</packaging>
+
+<dependencies>
+   <!-- Bean validation annotations for DTOs -->
+    <dependency>
+      <groupId>jakarta.validation</groupId>
+      <artifactId>jakarta.validation-api</artifactId>
+      <!-- version comes from the Spring Boot BOM in the parent -->
+    </dependency>
+
+
+  <!-- shared-kernel inherited-->
+</dependencies>
+
+  <build>
+    <plugins>
+      <!-- activate flatten-plugin, config/vers. from parent -->
+      <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>flatten-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

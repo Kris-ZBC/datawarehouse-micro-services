@@ -1,0 +1,24 @@
+@startuml Common Security Class Diagram
+top to bottom direction
+title Common Security BC Class Diagram
+skinparam packageStyle rectangle
+skinparam Shadowing false
+skinparam classFontSize 12
+skinparam classFontName Arial
+skinparam WrapWidth 260
+skinparam ComponentStyle uml2
+
+folder "local.sop.sopinfo.infrastructure.security.config" #LightSalmon {
+    class InternalMtlsProps {
+        +allowedCallers: List<String>
+    }
+    class SecurityConfig <<AutoConfiguration>> {
+        + filterChain(http: HttpSecurity): SecurityFilterChain <<@Bean>>
+    }
+    note bottom of SecurityConfig
+        Defines security configurations for the application, including authentication and authorization settings.
+    end note
+    SecurityConfig "1" *.. "1" InternalMtlsProps : injects >
+}
+
+@enduml

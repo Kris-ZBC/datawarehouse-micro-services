@@ -1,0 +1,7 @@
+{"properties": [
+  {
+    "name": "fqdn.package",
+    "type": "java.lang.String",
+    "description": "A description for 'fqdn.package'"
+  }
+]}

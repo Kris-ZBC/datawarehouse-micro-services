@@ -1,0 +1,184 @@
+@startuml Login BC Class Diagram
+top to bottom direction
+title Login BC Class Diagram
+skinparam packageStyle rectangle
+skinparam Shadowing false
+skinparam classFontSize 12
+skinparam classFontName Arial
+skinparam WrapWidth 260
+skinparam ComponentStyle uml2
+
+package "sharedkernel" #LightYellow {}
+
+package "common" {
+	package "web" #LightGreen  {}
+	package "data" #LightYellow {}
+	package "security" #LightCoral {}
+	package "core" #LightGreen {}
+}
+
+folder "bc-login" #LightGray {
+	folder "login-impl" #LightGray {
+		package "sop.local.sopinfo" {
+			package "login" #LightSteelBlue {
+
+				package "domain" #LightCoral {
+					package "model" {
+
+						package "valueobjects" {
+							class LoginId {
+								- id: UUID
+							}
+
+							class PersonRef {
+								- id: UUID
+							}
+
+							class Username {
+								- value: String
+							}
+
+							class Password {
+								- value: String
+							}
+
+							enum Status {
+								- value: enum {ACTIVE, INACTIVE, SUSPENDED}
+							}
+
+							class CreatedAtTimestamp {
+								- value: Instant
+							}
+						}
+
+						class Login {
+							- id: LoginId
+							- personRef: PersonRef
+							- username: Username
+							- password: Password
+							- status: Status
+							- createdAt: CreatedAtTimestamp
+						}
+
+						Login "1" *-- "1" LoginId : has >
+						Login "1" *-- "1" PersonRef : has >
+						Login "1" *-- "1" Username : has >
+						Login "1" *-- "1" Password : has >
+						Login "1" *-- "1" Status : has >
+						Login "1" *-- "1" CreatedAtTimestamp : has >
+					}
+					
+					package "ports.out" {
+						interface LoginRepositoryPort {
+							+ save(login: Login): Login
+						}
+					}
+
+					package "service" {
+						class LoginDomainServiceConfig <<@Configuration>> { }
+
+						interface LoginDomain {
+							+ createLogin(login: Login): Login
+						}
+
+						class LoginDomainService <<implements LoginDomain>> {
+							+ createLogin(login: Login): Login
+						}
+
+						LoginDomainService "1" *.. "1" LoginDomain : implements >
+					}
+				}
+
+				package "interfaceadapters" {
+					package "persistence" {
+						package "jpa" {
+
+							package "converters" {
+								class StatusConverter <<@Converter>> {
+									+ convertToDatabaseColumn(status: Status): String
+									+ convertToEntityAttribute(dbData: String): Status
+								}
+							}
+
+							class LoginEntity <<@Entity>> {
+								- id: UUID
+								- personRef: UUID
+								- username: String
+								- password: String
+								- status: String
+								- createdAt: Instant
+							}
+							 
+							class LoginJpaMapper {
+								+ toDomain(le: LoginEntity): Login
+								+ toEntity(l: Login): LoginEntity
+							}
+
+							class LoginRepositoryAdapter {
+								+ save(l: Login): Login
+							}
+
+							LoginRepositoryAdapter "1" *.. "1" LoginRepositoryPort : implements >
+
+							interface LoginSpringDataRepository <<implements JpaRepository>> {
+								+ save(le: LoginEntity): LoginEntity
+							}
+						}
+					}
+				}
+
+				package "application.service" {
+					class LoginApplicationService <<@Service>> {
+						+ createLogin(cmd: CreateLoginCmd): CreatedLoginReponse
+					}
+				}
+
+				package "interfaceweb" {
+					class InternalLoginController <<@RestController>> {
+						+ createLogin(cr: CreateLoginCmd): CreatedLoginResponse <<@PostMapping>>
+					}
+				}
+
+				class LoginApplicationStart {
+ 					+ main(args: String[]): void
+				}
+			}
+		}
+	}
+
+	folder "login-api" #LightGray {
+		package "sop.local.sopinfo" {
+			package "login" #LightSteelBlue {
+				package "application.api" {
+					
+					package "dto" {
+						class CreateLoginCmd {
+							- personRef: UUID
+							- username: Username
+							- password: Password
+						}
+
+						class CreatedLoginResponse {
+							- id: UUID
+						}
+					}
+
+					interface LoginDirectory {
+						+ createLogin(cmd: CreateLoginCmd): CreatedLoginResponse
+					}
+				}
+			}
+		}
+	}
+	
+	LoginApplicationService ..|> LoginDirectory : implements
+	LoginApplicationService "1" *.. "1" LoginDomain : injects >
+	LoginApplicationService "1" *.. "1" LoginRepositoryPort : injects >
+
+	InternalLoginController "1" *.. "1" LoginDirectory : injects >
+}
+
+"bc-login" ..> sharedkernel : uses >
+"bc-login" ..> common : uses >
+
+@enduml

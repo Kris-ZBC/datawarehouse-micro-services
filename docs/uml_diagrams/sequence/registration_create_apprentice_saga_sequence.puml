@@ -1,0 +1,219 @@
+@startuml registration_create_apprentice_saga
+title Registration BC (Orchestrator) -> Person BC -> Apprentice BC (Create Apprentice Saga)
+
+' Participants / bounded contexts
+actor "Instructor\n<<JWT>>" as Instructor
+participant "UserHandler BC\n<<SAGA>>" as UserHandler
+participant "Person BC" as PersonBC
+participant "Apprentice BC" as ApprenticeBC
+participant "Education BC" as EducationBC
+participant "Audit Log" as AuditLog
+database "Data Warehouse" as Database
+
+skinparam sequence {
+    GroupBackgroundColor White
+    GroupBorderColor #Pink
+}
+
+Instructor -> UserHandler: Create Apprentice(apprenticeData)
+activate UserHandler
+
+activate PersonBC
+UserHandler -> PersonBC : Create Person(personData)
+alt person is missing data
+	PersonBC --> UserHandler : ExceptionEvent 
+	UserHandler -> AuditLog: Log error
+	alt failed to log
+	AuditLog --> PersonBC: Error logging
+	PersonBC --> UserHandler: Error logging
+	UserHandler --> Instructor: 204 
+	end
+
+else person already exists
+	PersonBC --> UserHandler : PersonAlreadyExistsEvent
+	UserHandler -> AuditLog: Log error
+	alt failed to log
+	AuditLog --> PersonBC: Error logging
+	PersonBC --> UserHandler: Error logging
+	UserHandler --> Instructor: 204 
+	end
+end
+
+
+
+PersonBC -> Database: Insert person record
+activate Database
+Database --> PersonBC: Inserted
+deactivate Database
+PersonBC -> AuditLog: Log new person
+	alt failed to log
+	AuditLog --> PersonBC: Error logging
+	PersonBC --> UserHandler: Error logging
+	UserHandler --> Instructor: 204 
+	end
+PersonBC --> UserHandler : Return personId
+deactivate PersonBC
+UserHandler -> PersonBC : Get Person(personId)
+activate PersonBC
+PersonBC -> Database: Query Person by personId
+activate Database
+Database --> PersonBC: Return person record
+deactivate Database
+PersonBC -> AuditLog: Log query
+	alt failed to log
+	AuditLog --> PersonBC: Error logging
+	PersonBC --> UserHandler: Error logging
+	UserHandler --> Instructor: 204 
+	end
+
+PersonBC --> UserHandler: Return sanitary person record
+deactivate PersonBC
+
+UserHandler -> ApprenticeBC : Create Apprentice(personId, apprenticeData)
+activate ApprenticeBC
+ApprenticeBC -> Database: Insert apprentice record
+activate Database
+Database --> ApprenticeBC: Inserted
+deactivate Database
+ApprenticeBC -> AuditLog: Log new apprentice
+	alt failed to log
+	AuditLog --> ApprenticeBC: Error logging
+	ApprenticeBC --> UserHandler: Error logging
+	UserHandler --> Instructor: 204 
+	end
+ApprenticeBC --> UserHandler : Return apprenticeId
+
+alt failed creating apprentice
+	ApprenticeBC --> UserHandler: Error
+    UserHandler -> PersonBC : Delete Person(personId) ' compensation
+	activate PersonBC
+	PersonBC -> Database: Delete person record
+	activate Database
+	Database --> PersonBC: Deleted
+	deactivate Database
+	PersonBC -> AuditLog: Log compensation
+	alt failed to log
+	AuditLog --> ApprenticeBC: Error logging
+	ApprenticeBC --> UserHandler: Error logging
+	UserHandler --> Instructor: 204 
+	end
+	ApprenticeBC --> UserHandler : ExceptionEvent
+    deactivate PersonBC
+
+end
+
+deactivate ApprenticeBC
+
+
+UserHandler -> ApprenticeBC : Get Apprentice(apprenticeId)
+activate ApprenticeBC
+ApprenticeBC -> Database: Query Apprentice
+activate Database
+Database --> ApprenticeBC: Return Apprentice record
+deactivate Database
+ApprenticeBC -> AuditLog: Log query
+	alt failed to log
+	AuditLog --> ApprenticeBC: Error logging
+	ApprenticeBC --> UserHandler: Error logging
+	UserHandler --> Instructor: 204 
+	end
+
+alt apprentice does not exist
+	ApprenticeBC --> UserHandler : ExceptionEvent
+    UserHandler -> ApprenticeBC : Delete Apprentice(apprenticeId) ' compensation
+
+	ApprenticeBC -> Database: Delete apprentice record
+	activate Database
+	Database --> ApprenticeBC: Deleted
+	deactivate Database
+	ApprenticeBC -> AuditLog: Log compensation
+	alt failed to log
+	AuditLog --> ApprenticeBC: Error logging
+	ApprenticeBC --> UserHandler: Error logging
+	UserHandler --> Instructor: 204 
+	end
+
+	UserHandler -> PersonBC : Delete Person(personId) ' compensation
+	activate PersonBC
+
+	PersonBC -> Database: Delete person record
+	activate Database
+	Database --> PersonBC: Deleted
+	deactivate Database
+	PersonBC -> AuditLog: Log compensation
+		alt failed to log
+	AuditLog --> PersonBC: Error logging
+	PersonBC --> UserHandler: Error logging
+	UserHandler --> Instructor: 204 
+	end
+    deactivate PersonBC
+end
+ApprenticeBC -> UserHandler : ApprenticeCreatedResult(apprenticeId)
+deactivate ApprenticeBC
+
+UserHandler -> EducationBC: Add apprentice to education (apprenticeId, education)
+activate EducationBC
+
+EducationBC -> Database: Insert
+activate Database
+Database --> EducationBC: OK
+deactivate Database
+
+EducationBC -> AuditLog: Log apprentice to education
+	alt failed to log
+	AuditLog --> PersonBC: Error logging
+	PersonBC --> UserHandler: Error logging
+	UserHandler --> Instructor: 204 
+	end
+
+alt failed to add apprentice to education
+	
+	UserHandler -> EducationBC: Delete educationLine(apprenticeId) compensation
+	EducationBC -> Database: Delete educationLine record
+	activate Database
+	Database --> EducationBC: Deleted
+	deactivate Database
+	EducationBC -> AuditLog: Log compensation
+		alt failed to log
+	AuditLog --> EducationBC: Error logging
+	EducationBC --> UserHandler: Error logging
+	UserHandler --> Instructor: 204 
+	end
+	deactivate EducationBC
+
+    UserHandler -> ApprenticeBC : Delete Apprentice(apprenticeId) ' compensation
+	activate ApprenticeBC
+	ApprenticeBC -> Database: Delete apprentice record
+	activate Database
+	Database --> ApprenticeBC: Deleted
+	deactivate Database
+	ApprenticeBC -> AuditLog: Log compensation
+		alt failed to log
+	AuditLog --> ApprenticeBC: Error logging
+	ApprenticeBC --> UserHandler: Error logging
+	UserHandler --> Instructor: 204 
+	end
+	deactivate ApprenticeBC
+	
+	UserHandler -> PersonBC : Delete Person(personId) ' compensation
+	activate PersonBC
+	PersonBC -> Database: Delete person record
+	activate Database
+	Database --> PersonBC: Deleted
+	deactivate Database
+	PersonBC -> AuditLog: Log compensation
+		alt failed to log
+	AuditLog --> PersonBC: Error logging
+	PersonBC --> UserHandler: Error logging
+	UserHandler --> Instructor: 204 
+	end
+    deactivate PersonBC
+end
+
+
+
+UserHandler --> Instructor: Created(apprenticeId)
+deactivate UserHandler
+
+@enduml
+

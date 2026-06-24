@@ -1,0 +1,272 @@
+@startuml EducationLine BC Class Diagram
+top to bottom direction
+title Education Line BC Class Diagram
+skinparam packageStyle rectangle
+skinparam Shadowing false
+skinparam classFontSize 12
+skinparam classFontName Arial
+skinparam WrapWidth 260
+
+folder "Education Line BC" #LightGrey {
+
+	package "education-line-api" #LightBlue {
+		package "local.sop.sopinfo.educationLine" as ApiRoot {
+			package "application.api" {
+				interface EducationLineDirectory {
+					+ createEducationLine(cmd: CreateEducationLineCmd): EducationLineResponse
+					+ findAll(): List<EducationLineResponse>
+					+ findById(id: UUID): EducationLineResponse
+					+ updateEducationLineName(id: UUID, request: UpdateEducationLineNameCmd): EducationLineResponse
+					+ updateEducationLineDuration(id: UUID, request: UpdateEducationLineDurationCmd): EducationLineResponse
+					+ deactivateEducationLine(id: UUID): EducationLineResponse
+					+ activateEducationLine(id: UUID): EducationLineResponse
+				}
+
+				package "dto" {
+					class CreateEducationLineCmd {
+						- name: String
+						- durationYears: Integer
+						- durationMonths: Integer
+						- durationDays: Integer
+						- educationRef: UUID
+					}
+
+					class UpdateEducationLineNameCmd {
+						- name: String
+					}
+
+					class UpdateEducationLineDurationCmd {
+						- durationYears: Integer
+						- durationMonths: Integer
+						- durationDays: Integer
+					}
+
+					class EducationLineResponse {
+						- id: UUID
+						- name: String
+						- durationYears: Integer
+						- durationMonths: Integer
+						- durationDays: Integer
+						- educationRef: UUID
+						- createdAt: Instant
+						- isActive: Boolean
+					}
+				}
+			}
+		}
+	}
+
+	package "education-line-impl" #LightSteelBlue {
+		package "local.sop.sopinfo.educationLine" as ImplRoot {
+
+			class EducationLineStartApplication {
+				+ {static} main(args: String[]): void
+			}
+
+			package "domain" #LightCoral {
+				package "model" {
+					class EducationLine <<AggregateRoot>> {
+						- id: EducationLineId
+						- name: EducationLineName
+						- duration: EducationLineDuration
+						- createdAt: EducationLineCreatedAt
+						- educationRef: EducationRef
+						- active: Boolean
+						+ EducationLine(id: EducationLineId, name: EducationLineName, duration: EducationLineDuration, createdAt: EducationLineCreatedAt, educationRef: EducationRef, active: Boolean)
+						+ create(id: EducationLineId, name: EducationLineName, duration: EducationLineDuration, createdAt: EducationLineCreatedAt, educationRef: EducationRef, active: Boolean): EducationLine
+						+ getId(): EducationLineId
+						+ getName(): EducationLineName
+						+ getDuration(): EducationLineDuration
+						+ getCreatedAt(): EducationLineCreatedAt
+						+ getEducationRef(): EducationRef
+						+ isActive(): Boolean
+						+ builder(): Builder
+					}
+					class Builder {
+						+ id(id: EducationLineId): Builder
+						+ name(name: EducationLineName): Builder
+						+ duration(duration: EducationLineDuration): Builder
+						+ createdAt(createdAt: EducationLineCreatedAt): Builder
+						+ educationRef(educationRef: EducationRef): Builder
+						+ active(active: Boolean): Builder
+						+ build(): EducationLine
+					}
+					EducationLine ..> Builder
+
+					package "valueobjects" {
+						class EducationLineId <<ValueObject>> {
+							- value: UUID
+							+ asString(): String
+							+ newId(): EducationLineId
+							+ parse(raw: String): EducationLineId
+							+ missingException(): ValidationException
+						}
+						class EducationLineName <<ValueObject>> {
+							- value: String
+							+ value(): String
+						}
+						class EducationLineDuration <<ValueObject>> {
+							- years: Integer
+							- months: Integer
+							- days: Integer
+							+ getDurationYears(): int
+							+ getDurationMonths(): int
+							+ getDurationDays(): int
+							+ totalMonths(): int
+							+ totalDays(): int
+							+ asString(): String
+						}
+						class EducationLineCreatedAt <<ValueObject>> {
+							- value: Instant
+							+ now(): EducationLineCreatedAt
+							+ value(): Instant
+							+ toString(): String
+						}
+						class EducationRef <<ValueObject>> {
+							- value: UUID
+							+ value(): UUID
+							+ newEducationRef(): EducationRef
+							+ asString(): String
+						}
+					}
+				}
+
+				package "ports.out" #LightYellow {
+					interface EducationLineRepositoryPort {
+						+ save(educationLine: EducationLine): EducationLine
+						+ findAll(): List<EducationLine>
+						+ findById(id: EducationLineId): Optional<EducationLine>
+						+ updateEducationLineName(id: EducationLineId, name: EducationLineName): Optional<EducationLine>
+						+ updateEducationLineDuration(id: EducationLineId, duration: EducationLineDuration): Optional<EducationLine>
+						+ deactivate(id: EducationLineId): void
+						+ activate(id: EducationLineId): void
+					}
+				}
+
+				package "service" {
+					interface EducationLineDomain {
+						+ createEducationLine(educationLine: EducationLine): EducationLine
+					}
+					class EducationLineDomainService {
+						+ createEducationLine(educationLine: EducationLine): EducationLine
+					}
+					class EducationLineDomainConfig
+					note bottom of EducationLineDomain
+					Domain service interface is optional, but useful for
+					BC-specific domain logic and testable boundaries.
+					end note
+				}
+			}
+
+			package "application.service" {
+				class EducationLineApplicationService {
+					- domain: EducationLineDomain
+					- repository: EducationLineRepositoryPort
+					+ createEducationLine(cmd: CreateEducationLineCmd): EducationLineResponse
+					+ findAll(): List<EducationLineResponse>
+					+ findById(id: UUID): EducationLineResponse
+					+ updateEducationLineName(id: UUID, request: UpdateEducationLineNameCmd): EducationLineResponse
+					+ updateEducationLineDuration(id: UUID, request: UpdateEducationLineDurationCmd): EducationLineResponse
+					+ deactivateEducationLine(id: UUID): EducationLineResponse
+					+ activateEducationLine(id: UUID): EducationLineResponse
+				}
+			}
+
+			package "interfaceweb" #Yellow {
+				class EducationLineController {
+					+ createEducationLine(request: CreateEducationLineCmd): ResponseEntity<EducationLineResponse>
+					+ findAll(): ResponseEntity<List<EducationLineResponse>>
+					+ findById(id: UUID): ResponseEntity<EducationLineResponse>
+					+ updateName(id: UUID, request: UpdateEducationLineNameCmd): ResponseEntity<EducationLineResponse>
+					+ updateDuration(id: UUID, request: UpdateEducationLineDurationCmd): ResponseEntity<EducationLineResponse>
+					+ deactivate(id: UUID): ResponseEntity<EducationLineResponse>
+					+ activate(id: UUID): ResponseEntity<EducationLineResponse>
+				}
+			}
+
+			package "interfaceadapters.persistence" #Yellow {
+				package "jpa" {
+					interface EducationLineSpringDataRepository <<SpringDataRepository>> {
+						+ findBySearchParams(id: UUID, name: String): List<EducationLineEntity>
+						+ update(id: UUID, name: String, durationYears: Integer, durationMonths: Integer, durationDays: Integer): void
+						+ deactivate(id: UUID): void
+						+ activate(id: UUID): void
+					}
+					class EducationLineRepositoryAdapter {
+						+ save(educationLine: EducationLine): EducationLine
+						+ findBySearchParams(id: UUID, name: String): List<EducationLine>
+						+ findAll(): List<EducationLine>
+						+ findById(id: EducationLineId): Optional<EducationLine>
+						+ updateEducationLineName(id: EducationLineId, name: EducationLineName): Optional<EducationLine>
+						+ updateEducationLineDuration(id: EducationLineId, duration: EducationLineDuration): Optional<EducationLine>
+						+ deactivate(id: EducationLineId): void
+						+ activate(id: EducationLineId): void
+					}
+					class EducationLineJpaMapper {
+						+ toDomain(entity: EducationLineEntity): EducationLine
+						+ toEntity(educationLine: EducationLine): EducationLineEntity
+						+ toDomainList(entities: List<EducationLineEntity>): List<EducationLine>
+					}
+					class EducationLineEntity {
+						- id: UUID
+						- name: String
+						- durationYears: Integer
+						- durationMonths: Integer
+						- durationDays: Integer
+						- educationRef: UUID
+						- active: Boolean
+					}
+				}
+
+				package "inmemory" {
+					class InMemoryEducationLineRepositoryImpl {
+						+ save(educationLine: EducationLine): EducationLine
+						+ findAll(): List<EducationLine>
+						+ findById(id: EducationLineId): Optional<EducationLine>
+						+ updateEducationLineName(id: EducationLineId, name: EducationLineName): Optional<EducationLine>
+						+ updateEducationLineDuration(id: EducationLineId, duration: EducationLineDuration): Optional<EducationLine>
+						+ deactivate(id: EducationLineId): void
+						+ activate(id: EducationLineId): void
+					}
+				}
+			}
+		}
+	}
+
+	package "sharedkernel" #LightBlue {
+		package "local.sop.sopinfo.sharedkernel" as SharedKernelRoot {
+			package "exceptions" {
+				class ValidationException
+				class NotFoundException
+			}
+			package "valueobjects.utils" {
+				class UUIDUtil
+			}
+		}
+	}
+}
+
+EducationLineController ..> EducationLineDirectory : uses
+EducationLineApplicationService ..|> EducationLineDirectory : implements
+EducationLineApplicationService ..> EducationLineDirectory : exposes API contract
+EducationLineApplicationService ..> EducationLineDomain : uses
+EducationLineApplicationService ..> EducationLineRepositoryPort : uses
+EducationLineDomainService ..|> EducationLineDomain : implements
+EducationLineDomainConfig ..> EducationLineDomainService : @Bean creates
+EducationLineDomainConfig ..> EducationLineDomain : provides bean
+EducationLineRepositoryAdapter ..|> EducationLineRepositoryPort : implements
+InMemoryEducationLineRepositoryImpl ..|> EducationLineRepositoryPort : implements
+EducationLineRepositoryAdapter ..> EducationLineSpringDataRepository : uses
+EducationLineRepositoryAdapter ..> EducationLineJpaMapper : uses
+EducationLineJpaMapper ..> EducationLineEntity : maps
+EducationLineJpaMapper ..> EducationLine : maps
+EducationLine ..> EducationLineId
+EducationLine ..> EducationLineName
+EducationLine ..> EducationLineDuration
+EducationLine ..> EducationLineCreatedAt
+EducationLine ..> EducationRef
+
+' Package-level sharedkernel usage from the outer BC package.
+ImplRoot ..> SharedKernelRoot : depends on sharedkernel
+
+@enduml

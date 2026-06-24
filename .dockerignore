@@ -1,0 +1,11 @@
+# exclude everything in target EXCEPT the built jar
+**/target/*
+!**/target/*.jar
+**/.idea
+**/.vscode
+**/.DS_Store
+.git
+.gitignore
+node_modules
+shared-kernel
+docs

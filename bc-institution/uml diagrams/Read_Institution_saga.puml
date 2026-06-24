@@ -1,0 +1,50 @@
+@startuml Read Institution Saga
+title Read Institution Saga
+actor "Higher power\n<<JWT>>" as admin
+participant "InstitutionHandler\n<<''SAGA''>>" as saga
+participant "Institution BC" as org
+participant "Audit log BC" as log
+database "Data Warehouse" as database
+
+skinparam sequence {
+    GroupBackgroundColor White
+    GroupBorderColor #Pink
+}
+
+admin -> saga : Read Institution (id)
+saga -> saga : validate request & permissions
+
+alt Unauthorized or invalid request
+    saga -> log : log 403 (Forbidden) or 422 event
+    saga --> admin : 204 no content
+end
+
+saga -> org : Get Institution (by id)
+activate org
+
+org -> database : query Institution
+activate database
+database --> org : Institution data
+deactivate database
+
+org -> log : Log database query and\n(boolean result or full result)
+activate log
+alt Logging failed
+    log --> org : logging error
+    org --> admin : 204 no content
+end
+log --> org : log result
+deactivate log
+
+alt Institution not found
+    org --> saga : null
+    saga -> log : log 404 (not found) event
+    saga --> admin : 204 no content
+end
+
+org --> saga : Institution data
+deactivate org
+
+saga --> admin : 200 OK (Institution data)
+
+@enduml

@@ -1,0 +1,331 @@
+@startuml Auditlog - Classdiagram
+
+top to bottom direction
+title Auditlog - Classdiagram - IMPLEMENTATION
+skinparam packageStyle rectangle
+skinparam Shadowing False
+skinparam classFontSize 12
+skinparam classFontName Arial
+skinparam WrapWidth 260
+
+folder "Shared-Kernel" #LightBlue {
+
+    package "sop.project" {
+
+        package "valueobjects" {
+
+            package "utils" {
+                static class UUIDUtil <<Utility>>{
+                    + newUuid(): UUID
+                    + parseRequired(idString: String): UUID
+                    + require(id; UUID): UUID
+                }
+            }
+
+            interface DomainId {
+                + value(): UUID
+            }
+        }
+
+        package "enums" {
+
+            enum AuditSeverity <<Enum>>{
+                + INFO
+                + WARNING
+                + ERROR
+            }
+
+            class EnumUtils <<Utility>> {
+                - logger: Logger
+                + parseEnum(enumClass: Class<T>, value: String): T
+            }
+
+            note bottom of AuditSeverity
+                Invariants: 
+                Immutable,
+                Not Null
+            end note
+
+        }
+    }
+}
+
+folder "Auditlog-Impl" #LightGreen{
+    package "sop.project.auditlog" {
+        package "domain" #LightCoral{
+            package "model" {
+                ' value objects
+                class AuditlogId <<ValueObject>>{
+                    - id: UUid 
+                    - getId(): UUid
+                }
+
+                class UserIdentifier <<ValueObject>>{
+                    - id: String 
+                    - getId(): String
+                }
+
+                class UserIdentifierFactory <<ValueObject>>{
+                    - uniLoginPattern: Pattern
+                    + UserIdentifierFactory(pattern: String)
+                    + create(raw: String): UserIdentifier
+                }
+
+                class TimestampVO <<ValueObject>>{
+                    - datetime: Instant
+                    - getDatetime(): Instant
+                }
+
+                class Description <<ValueObject>>{
+                    - text: String
+                    - getText(): String
+                }
+                
+                note bottom of AuditlogId
+                    Invariants: 
+                    Unique,
+                    Valid,
+                    Immutable,
+                    Not Null
+                end note
+
+                note bottom of UserIdentifier
+                    Invariants: 
+                    Valid,
+                    Immutable,
+                    Not Null,
+                    UniLogin OR "ANONYMOUS"
+                end note
+
+                note bottom of TimestampVO
+                    Invariants: 
+                    Immutable,
+                    Not Null
+                end note
+
+                note bottom of Description
+                    Invariants: 
+                    Not-empty,
+                    Immutable,
+                    Not Null
+                end note
+                
+
+                ' aggregate root
+                class Auditlog <<AggregateRoot>>{
+                    - auditlogId: AuditlogId
+                    - userIdentifier: UserIdentifier
+                    - timestamp: Timestamp
+                    - description: Description
+                    - auditSeverity: AuditSeverity
+                    + getAuditlogId(): AuditlogId
+                    + getUserIdentifiery(): UserIdentifier
+                    + getTimestamp(): Timestamp
+                    + getDescription(): Description
+                    + getAuditSeverity(): AuditSeverity
+                }
+
+                Auditlog "1" *-- "n" AuditlogId : has >
+                Auditlog "1" *-- "n" UserIdentifierFactory : has >
+                Auditlog "1" *-- "n" TimestampVO : has >
+                Auditlog "1" *-- "n" Description : has >
+                UserIdentifierFactory ..> UserIdentifier : creates >
+                
+            }
+
+            package "ports" {
+                package "out" #LemonChiffon {
+                    interface AuditlogRepositoryPort {
+                        + save(auditlog: Auditlog): Auditlog
+                        + findById(id: UUID): Optional<Auditlog>
+                        + findAll(): List<Auditlog>
+                        + findBySearchParams(id: UUID, userIdentifier: String, severity: AuditSeverity): List<Auditlog>
+
+                    }
+                }
+            }
+
+            package "service" {
+                interface AuditlogDomain {
+                    + createAuditlog(String userIdentifier, auditSeverity severity, String description): Auditlog
+                }
+                interface AuditlogDomainService {
+                    + createAuditlog(String userIdentifier, auditSeverity severity, String description): Auditlog
+                }
+                class AuditlogDomainConfig <<Configuration>> {
+                    auditlogDomain() : AuditlogDomain
+                }
+                AuditlogDomainService ..> AuditlogDomainConfig : injects >
+                AuditlogDomainService ..> AuditlogDomain : implements >
+                AuditlogDomainConfig ..> AuditlogRepositoryPort : injects >
+            }
+
+        }
+
+        package "config" #Green{
+            class UserIdentifierFactoryConfig <<Configuration>> {
+                + userIdentifierFactory(props: UserIdentifierPatternProps): UserIdentifierFactory
+            }
+
+            class UserIdentifierPatternProps <<ConfigurationProperties>> {
+                + pattern: String
+            }
+
+            UserIdentifierFactoryConfig --> UserIdentifierFactory : creates >
+            UserIdentifierFactoryConfig --> UserIdentifierPatternProps : uses >
+
+            package "converters"{
+                class AuditSeverityConverter <<Component>> {
+                    + convert(source: String): AuditSeverity
+                }
+
+                AuditSeverityConverter --> EnumUtils : uses >
+                AuditSeverityConverter --> AuditSeverity : converts to >
+            }
+        }
+
+        package "application" #PaleGreen{
+            package "api" {
+                package "dto" {
+                    class AuditlogResponse <<DTO>>{
+                        - auditlogId: UUID
+                        - userIdentifier: String
+                        - timestamp: Instant
+                        - auditSeverity: AuditSeverity
+                        - description: String
+                        + auditlogId(): UUID
+                        + userIdentifier(): String
+                        + timestamp(): Instant
+                        + auditSeverity(): AuditSeverity
+                        + description(): String
+                    }
+
+                    class CreateAuditlogCmd <<DTO>>{
+                        - userIdentifier: String
+                        - auditSeverity: AuditSeverity
+                        - description: String
+                        + userIdentifier(): String
+                        + auditSeverity(): AuditSeverity
+                        + description(): String
+                    }
+
+                    class CreatedAuditlogResponse <<DTO>>{
+                        - auditlogId: UUID
+                        + auditlogId(): UUID
+                    }
+
+                    class ReadAuditlogByIdQuery <<DTO>>{
+                        - id: UUID
+                        + id(): UUID
+                    }
+
+                    class ReadAuditlogBySeverityQuery <<DTO>>{
+                        - auditSeverity: AuditSeverity
+                        + auditSeverity(): AuditSeverity
+                    }
+
+                    class ReadAuditlogByUserIdentifierQuery <<DTO>>{
+                        - userIdentifier: String
+                        + userIdentifier(): String
+                    }
+                    
+
+                    AuditlogResponse "1" ..> "n" AuditSeverity : uses
+                    CreateAuditlogCmd "1" ..> "n" AuditSeverity : uses
+                    ReadAuditlogBySeverityQuery "1" ..> "n" AuditSeverity : uses
+                }
+
+                interface AuditlogDirectory <<API>>{
+                    + createAuditlog(cmd: CreateAuditlogCmd): CreatedAuditlogResponse
+                    + findById(id: UUID): AuditlogResponse
+                    + findAll(): List<AuditlogResponse>
+                    + findBySearchParams(id: UUID, userIdentifier: String, severity: AuditSeverity, TimestampVO: Instant, description: String): List<AuditlogResponse>
+                }
+            }
+            package "service" {
+                class AuditlogApplicationService <<USECASE>>{
+                    domain: AuditlogDomain
+                    + createAuditlog(cmd: CreateAuditlogCmd): CreatedAuditlogResponse
+                    + findById(id: UUID): AuditlogResponse
+                    + findAll(): List<AuditlogResponse>
+                    + findBySearchParams(id: UUID, userIdentifier: String, severity: AuditSeverity, timestampVO: Instant, description: String): List<AuditlogResponse>
+                }
+                AuditlogApplicationService ..> AuditlogDirectory : implements > 
+                AuditlogApplicationService ..> AuditlogDomain : injects >           
+            
+            }
+        }
+        package "interfaceweb" #LightGray{
+            class AuditlogController <<Controller>> {
+                - directory: AuditlogDirectory
+                + createAuditlog(CreateAuditlogCmd cmd): CreateAuditlogResult
+                + findById(id: UUID): AuditlogResponse
+                + findAll(): List<AuditlogResponse>
+                + findBySearchParams(id: UUID, serIdentifier: String, severity: AuditSeverity, timestampVO: Instant, description: String) : ResponseEntity<List<AuditlogResponse>>
+            }
+            AuditlogController ..> AuditlogDirectory : injects >
+        }
+        package "interfaceadapters" #Yellow{
+            package "persistence" {
+                package "jpa" {
+                    class AuditlogEntity {
+                        - id: UUID
+                        - userIdentifier: String
+                        - severity: AuditSeverity
+                        - timestamp: Timestamp
+                        - description: String
+                        + AuditlogEntity()
+                        + AuditlogEntity(id: UUID, userIdentifier: String, severity: AuditSeverity, timestamp: Timestamp, description: String)
+                        + getId(): UUID
+                        + setId(id: UUID)
+                        + getUserIdentifier(): String
+                        + setUserIdentifier(userIdentifier: String)
+                        + getSeverity(): AuditSeverity
+                        + setSeverity(severity: AuditSeverity)
+                        + getTimestamp(): Timestamp
+                        + setTimestamp(timestamp: Timestamp)
+                        + getDescription(): String
+                        + setDescription(description: String)
+                    }
+
+                    class AuditlogJpaMapper {
+                        - AuditlogJpaMapper()
+                        + toDomain(entity: AuditlogEntity): Auditlog
+                        + toEntity(auditlog: Auditlog): AuditlogEntity
+                        + toExistingEntity(auditlog: Auditlog, entity: AuditlogEntity): void
+                    }
+
+                    AuditlogJpaMapper --> AuditlogEntity : maps >
+                    AuditlogJpaMapper --> Auditlog : maps >
+
+                    class AuditlogRepositoryAdapter <<Repository>> {
+                        - jpaRepository: AuditlogSpringDataRepository
+                        + AuditlogRepositoryAdapter(jpaRepository: AuditlogSpringDataRepository)
+                        + save(auditLog: Auditlog): Auditlog
+                        + findBySearchParams(id: UUID, userIdentifier: String, auditSeverity: AuditSeverity): List<Auditlog>
+                        + findAll(): List<Auditlog>
+                        + findById(auditlogId: AuditlogId): Optional<Auditlog>
+                        + anonymizeUserForLogs(ids: List<UUID>): int
+                    }
+
+                    AuditlogRepositoryAdapter --> AuditlogSpringDataRepository : uses >
+                    AuditlogRepositoryAdapter --> Auditlog : returns >
+                    AuditlogRepositoryAdapter --> AuditlogJpaMapper : uses >
+
+
+                    interface AuditlogSpringDataRepository {
+                        + findBySearchParams(id: UUID, userIdentifier: String, severity: AuditSeverity): List<AuditlogEntity>
+                        + anonymizeUserForLogs(ids: List<UUID>): int
+                    }
+
+                    AuditlogSpringDataRepository --> AuditlogEntity : works with >
+
+                }
+            }
+        }
+    }
+}
+
+Auditlog "1" ..> "n" AuditSeverity : uses
+
+@enduml

@@ -1,0 +1,17 @@
+@startuml Common Core Class Diagram
+top to bottom direction
+title Common Core BC Class Diagram
+skinparam packageStyle rectangle
+skinparam Shadowing false
+skinparam classFontSize 12
+skinparam classFontName Arial
+skinparam WrapWidth 260
+skinparam ComponentStyle uml2
+
+folder "local.sop.sopinfo.infrastructure.core" #LightGreen {
+    class CoreAutoConfiguration <<AutoConfiguration>> {}
+}
+
+
+
+@enduml

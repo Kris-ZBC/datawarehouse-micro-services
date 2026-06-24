@@ -1,0 +1,280 @@
+@startuml SopInstructor BC Class Diagram
+top to bottom direction
+title SOP Instructor BC Class Diagram
+skinparam packageStyle rectangle
+skinparam Shadowing false
+skinparam classFontSize 12
+skinparam classFontName Arial
+skinparam WrapWidth 260
+
+folder "Sop Instructor BC" #LightGrey {
+
+	package "sop-instructor-api" #LightBlue {
+		package "local.sop.sopinfo.sopInstructor" as ApiRoot {
+			package "application.api" {
+
+				interface SopInstructorDirectory {
+					+ createSopInstructor(cmd: CreateSopInstructorCmd): CreatedSopInstructorResult
+					+ findBySopRef(sopRef: UUID): List<SopInstructorResponse>
+					+ findByInstructorRef(instructorRef: UUID): List<SopInstructorResponse>
+					+ findBySopRefAndInstructorRef(sopRef: UUID, instructorRef: UUID): SopInstructorResponse
+					+ activate(cmd: ToggleActivateSopInstructorCmd): SopInstructorResponse
+					+ deactivate(cmd: ToggleActivateSopInstructorCmd): SopInstructorResponse
+				}
+
+				package "dto" {
+					class CreateSopInstructorCmd <<record>> {
+						- sopRef: UUID
+						- instructorRef: UUID
+					}
+
+					class ToggleActivateSopInstructorCmd <<record>> {
+						- sopRef: UUID
+						- instructorRef: UUID
+					}
+
+					class CreatedSopInstructorResult <<record>> {
+						- sopRef: UUID
+						- instructorRef: UUID
+					}
+
+					class SopInstructorResponse <<record>> {
+						- id: SopInstructorId
+						- sopRef: UUID
+						- instructorRef: UUID
+						- createdAt: LocalDateTime
+						- isActive: boolean
+					}
+				}
+			}
+		}
+	}
+
+	package "sop-instructor-impl" #LightSteelBlue {
+		package "local.sop.sopinfo.sopInstructor" as ImplRoot {
+
+			class SopInstructorStartApplication {
+				+ {static} main(args: String[]): void
+			}
+
+			package "domain" #LightCoral {
+				package "model" {
+
+					class SopInstructor <<AggregateRoot>> {
+						- id: SopInstructorId
+						- sopRef: SopRef
+						- instructorRef: InstructorRef
+						- createdAt: CreatedAt
+						- active: Boolean
+						+ SopInstructor(id: SopInstructorId, sopRef: SopRef, instructorRef: InstructorRef, createdAt: CreatedAt, active: Boolean)
+						+ getId(): SopInstructorId
+						+ getSopRef(): SopRef
+						+ getInstructorRef(): InstructorRef
+						+ getCreatedAt(): CreatedAt
+						+ getActive(): Boolean
+						+ builder(): Builder
+					}
+
+					class Builder {
+						+ id(id: SopInstructorId): Builder
+						+ sopRef(sopRef: SopRef): Builder
+						+ instructorRef(instructorRef: InstructorRef): Builder
+						+ createdAt(createdAt: CreatedAt): Builder
+						+ active(active: Boolean): Builder
+						+ build(): SopInstructor
+					}
+					SopInstructor ..> Builder
+
+					package "valueobjects" {
+
+						together {
+
+							class SopInstructorId <<ValueObject>> {
+								- sopRef: SopRef
+								- instructorRef: InstructorRef
+							}
+
+							class SopRef <<ValueObject>> {
+								- value: UUID
+								+ value(): UUID
+							}
+
+							class InstructorRef <<ValueObject>> {
+								- value: UUID
+								+ value(): UUID
+							}
+
+							class CreatedAt <<ValueObject>> {
+								- value: LocalDateTime
+								+ now(): CreatedAt
+								+ value(): LocalDateTime
+								+ toString(): String
+							}
+
+							' ===== Valueobjects Invariants =====
+
+							note right of SopRef
+							- implements DomainId
+							- must not be null
+							end note
+
+							note right of InstructorRef
+							- implements DomainId
+							- must not be null
+							end note
+
+							note right of SopInstructorId
+							- sopRef must not be null
+							- instructorRef must not be null
+							end note
+
+							note right of CreatedAt
+							- must not be null
+							- format: dd-MM-yyyy HH:mm:ss
+							end note
+
+						}
+						
+					}
+					
+					' ===== model Invariant =====
+					note right of SopInstructor
+						- active must not be null
+					end note
+
+				}
+
+				package "ports.out" #LightYellow {
+					interface SopInstructorRepositoryPort {
+						+ save(sopInstructor: SopInstructor): SopInstructor
+						+ findBySopRef(sopRef: SopRef): List<SopInstructor>
+						+ findByInstructorRef(instructorRef: InstructorRef): List<SopInstructor>
+						+ findBySopRefAndInstructorRef(sopRef: SopRef, instructorRef: InstructorRef): Optional<SopInstructor>
+						+ activate(id: SopInstructorId): Optional<SopInstructor>
+						+ deactivate(id: SopInstructorId): Optional<SopInstructor>
+					}
+				}
+
+				package "service" {
+					interface SopInstructorDomain {
+						+ createSopInstructor(sopInstructor: SopInstructor): SopInstructor
+					}
+
+					class SopInstructorDomainService {
+						+ createSopInstructor(sopInstructor: SopInstructor): SopInstructor
+					}
+
+					class SopInstructorDomainConfig
+				}
+			}
+
+			package "application.service" {
+				class SopInstructorApplicationService {
+					- domain: SopInstructorDomain
+					- repository: SopInstructorRepositoryPort
+					+ createSopInstructor(cmd: CreateSopInstructorCmd): CreatedSopInstructorResult
+					+ findBySopRef(sopRef: UUID): List<SopInstructorResponse>
+					+ findByInstructorRef(instructorRef: UUID): List<SopInstructorResponse>
+					+ findBySopRefAndInstructorRef(sopRef: UUID, instructorRef: UUID): SopInstructorResponse
+					+ activate(cmd: ToggleActivateSopInstructorCmd): SopInstructorResponse
+					+ deactivate(cmd: ToggleActivateSopInstructorCmd): SopInstructorResponse
+				}
+			}
+
+			package "interfaceweb" #Yellow {
+				class SopInstructorController {
+					+ createSopInstructor(request: CreateSopInstructorCmd): ResponseEntity<CreatedSopInstructorResult>
+					+ findBySopRef(sopRef: UUID): ResponseEntity<List<SopInstructorResponse>>
+					+ findByInstructorRef(instructorRef: UUID): ResponseEntity<List<SopInstructorResponse>>
+					+ findBySopRefAndInstructorRef(sopRef: UUID, instructorRef: UUID): ResponseEntity<SopInstructorResponse>
+					+ activate(request: ToggleActivateSopInstructorCmd): ResponseEntity<SopInstructorResponse>
+					+ deactivate(request: ToggleActivateSopInstructorCmd): ResponseEntity<SopInstructorResponse>
+				}
+			}
+
+			package "interfaceadapters.persistence" #Yellow {
+				package "jpa" {
+
+					class SopInstructorEntityId <<@Embeddable>> {
+						- sopRef: UUID
+						- instructorRef: UUID
+					}
+
+					class SopInstructorEntity <<@Entity>> {
+						- id: SopInstructorEntityId
+						- createdAt: LocalDateTime
+						- active: boolean
+					}
+
+					interface SopInstructorSpringDataRepository <<SpringDataRepository>> {
+						+ findBySopRefAndInstructorRef(sopRef: UUID, instructorRef: UUID): Optional<SopInstructorEntity>
+						+ findBySopRef(sopRef: UUID): List<SopInstructorEntity>
+						+ findByInstructorRef(instructorRef: UUID): List<SopInstructorEntity>
+					}
+
+					class SopInstructorRepositoryAdapter {
+						+ save(sopInstructor: SopInstructor): SopInstructor
+						+ findBySopRef(sopRef: SopRef): List<SopInstructor>
+						+ findByInstructorRef(instructorRef: InstructorRef): List<SopInstructor>
+						+ findBySopRefAndInstructorRef(sopRef: SopRef, instructorRef: InstructorRef): Optional<SopInstructor>
+						+ activate(id: SopInstructorId): Optional<SopInstructor>
+						+ deactivate(id: SopInstructorId): Optional<SopInstructor>
+					}
+
+					class SopInstructorJpaMapper {
+						+ toDomain(entity: SopInstructorEntity): SopInstructor
+						+ toEntity(domain: SopInstructor): SopInstructorEntity
+						+ toDomainList(entities: List<SopInstructorEntity>): List<SopInstructor>
+					}
+				}
+
+				package "inmemory" {
+					class InMemorySopInstructorRepositoryImpl {
+						+ save(sopInstructor: SopInstructor): SopInstructor
+						+ findBySopRef(sopRef: SopRef): List<SopInstructor>
+						+ findByInstructorRef(instructorRef: InstructorRef): List<SopInstructor>
+						+ findBySopRefAndInstructorRef(sopRef: SopRef, instructorRef: InstructorRef): Optional<SopInstructor>
+						+ activate(id: SopInstructorId): Optional<SopInstructor>
+						+ deactivate(id: SopInstructorId): Optional<SopInstructor>
+					}
+				}
+			}
+		}
+	}
+
+	package "sharedkernel" #LightBlue {
+		package "local.sop.sopinfo.sharedkernel" as SharedKernelRoot {
+			package "exceptions" {
+				class ValidationException
+				class NotFoundException
+				class Other
+			}
+			package "valueobjects" {
+				interface DomainId
+			}
+		}
+	}
+}
+
+SopInstructorController ..> SopInstructorDirectory : uses
+SopInstructorApplicationService ..|> SopInstructorDirectory : implements
+SopInstructorApplicationService ..> SopInstructorDomain : uses
+SopInstructorApplicationService ..> SopInstructorRepositoryPort : uses
+SopInstructorDomainService ..|> SopInstructorDomain : implements
+SopInstructorDomainConfig ..> SopInstructorDomainService : @Bean creates
+SopInstructorDomainConfig ..> SopInstructorDomain : provides bean
+SopInstructorRepositoryAdapter ..|> SopInstructorRepositoryPort : implements
+InMemorySopInstructorRepositoryImpl ..|> SopInstructorRepositoryPort : implements
+SopInstructorRepositoryAdapter ..> SopInstructorSpringDataRepository : uses
+SopInstructorRepositoryAdapter ..> SopInstructorJpaMapper : uses
+SopInstructorJpaMapper ..> SopInstructorEntity : maps
+SopInstructorJpaMapper ..> SopInstructor : maps
+
+SopInstructor ..> SopInstructorId
+SopInstructorId ..> SopRef
+SopInstructorId ..> InstructorRef
+SopInstructor ..> CreatedAt
+
+ImplRoot ..> SharedKernelRoot : depends on sharedkernel
+
+@enduml

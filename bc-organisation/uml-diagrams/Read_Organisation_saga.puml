@@ -1,0 +1,50 @@
+@startuml Read Organisation Saga
+title Read Organisation Saga
+actor "Higher power\n<<JWT>>" as admin
+participant "OrganisationHandler\n<<''SAGA''>>" as saga
+participant "Organisation BC" as org
+participant "Audit log BC" as log
+database "Data Warehouse" as database
+
+skinparam sequence {
+    GroupBackgroundColor White
+    GroupBorderColor #Pink
+}
+
+admin -> saga : Read Organisation (id)
+saga -> saga : validate request & permissions
+
+alt Unauthorized or invalid request
+    saga -> log : log 403 (Forbidden) or 422 event
+    saga --> admin : 204 no content
+end
+
+saga -> org : Get Organisation (by id)
+activate org
+
+org -> database : query Organisation
+activate database
+database --> org : Organisation data
+deactivate database
+
+org -> log : Log database query and\n(boolean result or full result)
+activate log
+alt Logging failed
+    log --> org : logging error
+    org --> admin : 204 no content
+end
+log --> org : log result
+deactivate log
+
+alt Organisation not found
+    org --> saga : null
+    saga -> log : log 404 (not found) event
+    saga --> admin : 204 no content
+end
+
+org --> saga : Organisation data
+deactivate org
+
+saga --> admin : 200 OK (Organisation data)
+
+@enduml

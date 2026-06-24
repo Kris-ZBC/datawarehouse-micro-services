@@ -1,0 +1,9 @@
+package local.sop.sopinfo.workhour.application.api.dto;
+
+import java.util.UUID;
+
+import jakarta.validation.constraints.NotNull;
+
+public record FindByScheduleIdQuery(
+    @NotNull(message = "{key.invalid}") UUID id) 
+{}

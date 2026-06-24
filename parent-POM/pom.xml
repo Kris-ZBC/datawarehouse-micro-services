@@ -1,0 +1,362 @@
+<!--
+Parent pom for multi-module project aggregator and BOM (dependency management)
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>local.sop.sopinfo</groupId>
+        <artifactId>bom</artifactId>
+        <version>${revision}</version>
+        <relativePath>../master-BOM/pom.xml</relativePath>
+    </parent>
+
+    <artifactId>parent</artifactId>
+    <packaging>pom</packaging>
+    
+    <modules>       
+        <!-- Other modules -->
+        <module>../shared-kernel</module>
+        <module>../common-data</module>
+        <module>../common-security</module>
+        <module>../common-web</module>
+        <module>../common-core</module>
+        <module>../coverage-report</module>
+        <module>../common-validation</module>
+        
+        <!-- Bounded Context -->
+        <module>../bc-apprentice/apprentice-api</module>
+        <module>../bc-apprentice/apprentice-impl</module>
+
+        <module>../bc-audit-log/audit-log-api</module>
+        <module>../bc-audit-log/audit-log-impl</module>
+
+        <module>../bc-consent/consent-api</module>
+        <module>../bc-consent/consent-impl</module>
+
+        <module>../bc-education/education-api</module>
+        <module>../bc-education/education-impl</module>
+
+		    <module>../bc-education-instructor/education-instructor-api</module>
+        <module>../bc-education-instructor/education-instructor-impl</module>
+
+        <module>../bc-education-line/education-line-api</module>
+        <module>../bc-education-line/education-line-impl</module>
+        
+        <module>../bc-institution/institution-api</module>
+        <module>../bc-institution/institution-impl</module>
+
+        <module>../bc-instructor/instructor-api</module>
+        <module>../bc-instructor/instructor-impl</module>
+
+        <module>../bc-message/message-api</module>
+        <module>../bc-message/message-impl</module>
+        
+        <module>../bc-notification/notification-api</module>
+        <module>../bc-notification/notification-impl</module>
+        
+        <module>../bc-person/person-api</module>
+        <module>../bc-person/person-impl</module>
+
+        <module>../bc-sop/sop-api</module>
+        <module>../bc-sop/sop-impl</module>
+
+        <module>../bc-work-hour/work-hour-api</module>
+        <module>../bc-work-hour/work-hour-impl</module>
+
+        <module>../bc-anonymize/anonymize-api</module>
+        <module>../bc-anonymize/anonymize-impl</module>
+
+        <module>../bc-login/login-api</module>
+        <module>../bc-login/login-impl</module>
+
+        <module>../bc-person-notification/person-notification-api</module>
+        <module>../bc-person-notification/person-notification-impl</module>
+
+        <module>../bc-sop-education/sop-education-api</module>
+        <module>../bc-sop-education/sop-education-impl</module>
+
+        <module>../bc-message-person/message-person-api</module>
+        <module>../bc-message-person/message-person-impl</module>
+
+        <module>../bc-sop-instructor/sop-instructor-api</module>
+        <module>../bc-sop-instructor/sop-instructor-impl</module>
+
+        <!-- SAGA -->
+        <module>../bc-organisation/organisation-api</module>
+        <module>../bc-organisation/organisation-impl</module>
+
+        <module>../bc-consent-saga/consent-saga-api</module>
+        <module>../bc-consent-saga/consent-saga-impl</module>
+
+        <module>../bc-education-line-saga/education-line-saga-api</module>
+        <module>../bc-education-line-saga/education-line-saga-impl</module>
+
+        <module>../bc-education-saga/education-saga-api</module>
+        <module>../bc-education-saga/education-saga-impl</module>
+
+        <module>../bc-login-saga/login-saga-api</module>
+        <module>../bc-login-saga/login-saga-impl</module>
+
+        <module>../bc-anonymize-saga/anonymize-saga-api</module>
+        <module>../bc-anonymize-saga/anonymize-saga-impl</module>
+
+        <module>../bc-registration-saga/registration-saga-api</module>
+        <module>../bc-registration-saga/registration-saga-impl</module>
+
+		<module>../bc-message-saga/message-saga-api</module>
+        <module>../bc-message-saga/message-saga-impl</module>
+
+        
+    </modules>
+
+  <!-- ========= Dependency Management ========= -->
+    
+    <dependencyManagement>
+        <!-- master-BOM (this is were version are controlled) -->
+        <dependencies>
+            <!--
+            <dependency>
+                <groupId>local.sop.sopinfo</groupId>
+                <artifactId>bom</artifactId>
+                <version>${revision}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            -->
+        </dependencies>
+    </dependencyManagement>
+
+      <!-- AUTO teststack for to be inherited by all children -->
+      <dependencies>
+                <!-- JUnit 5, Mockito, AssertJ, etc. -->
+        <dependency>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-test</artifactId>
+        <scope>test</scope>
+        </dependency>
+
+        <!-- ArchUnit (JUnit 5) -->
+        <dependency>
+        <groupId>com.tngtech.archunit</groupId>
+        <artifactId>archunit-junit5</artifactId>
+        <scope>test</scope>
+        </dependency>
+
+        <!-- Mockito core for advanced usages -->
+        <dependency>
+          <groupId>org.mockito</groupId>
+          <artifactId>mockito-core</artifactId>
+          <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+  <build>
+       <plugins>
+       <!-- Compiler (inherited by children) -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <release>${java.version}</release>
+            <compilerArgs>
+              <arg>-proc:full</arg>
+          </compilerArgs>
+        <annotationProcessorPaths>
+          <!-- Spring Boot config metadata -->
+          <path>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+          </path>
+        </annotationProcessorPaths>
+        </configuration>
+        <!-- Disable processing for tests -->
+        <executions>
+          <execution>
+            <id>default-testCompile</id>
+            <goals><goal>testCompile</goal></goals>
+            <configuration>
+              <compilerArgs>
+                <arg>-proc:none</arg>
+                <!-- Optional: hide the warning line altogether -->
+                <!-- <arg>-Xlint:-options</arg> -->
+              </compilerArgs>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Root Surefire: pass ${argLine}; exclude E2E/IT by default -->
+      <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-surefire-plugin</artifactId>
+      <configuration>
+        <argLine>${surefire.jacoco.args} ${mockito.agent.argLine} ${test.jvm.args.extra}</argLine>
+        <useModulePath>false</useModulePath>
+        <useManifestOnlyJar>false</useManifestOnlyJar>
+        <excludes>
+          <exclude>**/*IT.java</exclude>
+        </excludes>
+        <excludedGroups>e2e</excludedGroups>
+      </configuration>
+    </plugin>
+      <!-- JaCoCo ONLY in root: prepare-agent@initialize, report@verify, report-aggregate@verify -->
+      <plugin>
+      <groupId>org.jacoco</groupId>
+      <artifactId>jacoco-maven-plugin</artifactId>
+      <version>${jacoco.maven.plugin.version}</version>
+      <executions>
+
+        <!-- 1) UNIT TEST AGENT (all modules) -->
+        <execution>
+          <id>before-unit-test-execution</id>
+          <goals>
+            <goal>prepare-agent</goal>
+          </goals>
+          <configuration>
+            <propertyName>surefire.jacoco.args</propertyName>
+            <destFile>${project.build.directory}/jacoco-output/jacoco-unit-tests.exec</destFile>
+          </configuration>
+        </execution>
+
+        <!-- 2) INTEGRATION TEST AGENT (all modules) -->
+        <execution>
+          <id>before-integration-test-execution</id>
+          <phase>pre-integration-test</phase>
+          <goals>
+            <goal>prepare-agent</goal>
+          </goals>
+          <configuration>
+            <propertyName>failsafe.jacoco.args</propertyName>
+            <destFile>${project.build.directory}/jacoco-output/jacoco-integration-tests.exec</destFile>
+          </configuration>
+        </execution>
+
+        <!-- 3) PER-MODULE MERGE (UT+IT -> merged.exec) -->
+        <execution>
+          <id>merge-unit-and-integration</id>
+          <phase>post-integration-test</phase>
+          <goals>
+            <goal>merge</goal>
+          </goals>
+          <configuration>
+            <fileSets>
+              <fileSet>
+                <directory>${project.build.directory}/jacoco-output/</directory>
+                <includes>
+                  <include>*.exec</include>
+                </includes>
+              </fileSet>
+            </fileSets>
+            <destFile>${project.build.directory}/jacoco-output/merged.exec</destFile>
+          </configuration>
+        </execution>
+
+        <!-- 4) PER-MODULE REPORT (merged.exec -> site/jacoco-merged-test-coverage-report) -->
+        <execution>
+          <id>create-merged-report</id>
+          <phase>verify</phase>
+          <goals>
+            <goal>report</goal>
+          </goals>
+          <configuration>
+            <dataFile>${project.build.directory}/jacoco-output/merged.exec</dataFile>
+            <outputDirectory>
+              ${project.reporting.outputDirectory}/jacoco-merged-test-coverage-report
+            </outputDirectory>
+          </configuration>
+        </execution>
+        <!--
+        <execution>
+          <id>check-coverage</id>
+          <phase>verify</phase>
+          <goals>
+            <goal>check</goal>
+          </goals>
+          <configuration>
+            <dataFile>${project.build.directory}/jacoco-output/merged.exec</dataFile>
+            <rules>
+              <rule>
+                <element>BUNDLE</element>
+                <limits>
+                  <limit>
+                    <counter>INSTRUCTION</counter>
+                    <value>COVEREDRATIO</value>
+                    <minimum>0.35</minimum>
+                  </limit>
+                </limits>
+              </rule>
+            </rules>
+          </configuration>
+        </execution>
+        -->
+      </executions>
+    </plugin>
+      <!-- Enforcer: hygiene rules -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-enforcer-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>enforce</id>
+            <goals><goal>enforce</goal></goals>
+            <configuration>
+              <rules>
+                <requireJavaVersion>
+                  <version>[21,)</version>
+                </requireJavaVersion>
+                <requireMavenVersion>
+                  <version>[3.9,)</version>
+                </requireMavenVersion>
+                <dependencyConvergence/>
+                <banDuplicateClasses/>
+                <enforceBytecodeVersion>
+                  <maxJdkVersion>${java.version}</maxJdkVersion>
+                </enforceBytecodeVersion>
+                <requireNoRepositories/>
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-failsafe-plugin</artifactId>
+      <configuration>
+        <argLine>${surefire.jacoco.args} ${mockito.agent.argLine} ${test.jvm.args.extra}</argLine>
+      </configuration>
+      <executions>
+        <execution>
+          <goals>
+            <goal>integration-test</goal>
+            <goal>verify</goal>
+          </goals>
+        </execution>
+      </executions>
+    </plugin>
+    </plugins>
+  </build>
+  <!-- ===== Profiles ===== -->
+  <profiles>
+    <!-- Auto-add shared-kernel where marker file exists -->
+    <profile>
+      <id>shared-kernel-auto</id>
+      <activation>
+        <file>
+          <exists>.uses-shared-kernel</exists>
+        </file>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>local.sop.sopinfo</groupId>
+          <artifactId>shared-kernel</artifactId>
+          <version>${revision}</version>
+        </dependency>
+      </dependencies>
+    </profile>
+    </profiles>
+
+</project>

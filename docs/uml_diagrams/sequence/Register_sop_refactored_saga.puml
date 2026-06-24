@@ -1,0 +1,103 @@
+@startuml Register SOP
+title Register SOP
+actor "Higher power\n<<JWT>>" as admin
+participant "Organization Handler BC\n<<SAGA>>" as regi
+participant "SOP BC" as sop
+participant "Institution BC" as ins
+participant "Audit log BC" as log
+database "Data Warehouse" as database
+
+skinparam sequence {
+    GroupBackgroundColor White
+    GroupBorderColor #Pink
+}
+
+admin -> regi : register SOP(Id, location, institutionId,...)
+regi -> regi : validate request
+alt Register request missing parameter
+    regi -> log : log 422 event
+    regi --> admin : 204 no content
+end
+regi -> ins : GetInstitution(institutionId)
+activate ins
+ins -> database : Query institution
+activate database
+database --> ins : return institution data
+deactivate database
+    ins -> log : Log database query and and (boolean result or full result)
+    activate log
+alt Logging failed
+    ins <-- log : Logging error
+    ins --> admin : 204 no content
+end
+    ins <-- log : Log result
+    deactivate log
+
+alt Institution not found
+    ins --> regi : null
+    ins -> log : log 404 (not found) event
+    regi --> admin : 204 no content
+end
+ins --> regi : institution data
+deactivate ins
+    regi -> sop : get SOP(by id)
+activate sop
+    sop -> database : Query SOP
+activate database
+alt SOP already exists
+    database --> sop : null
+    sop -> log : log 409 (conflict) event
+    regi --> admin : 204 no content
+end
+    database --> sop : SOP data
+    sop -> log : Log database query
+    activate log
+deactivate database
+alt Logging failed
+    sop <-- log : Logging error
+    sop --> admin : 204 no content
+end
+    sop <-- log : Log result
+    deactivate log
+
+    sop --> regi : SOP data
+deactivate sop
+
+regi -> sop : Register SOP (new)
+activate sop
+
+alt Sop missing parameters
+    sop --> regi : ExceptionEvent
+    sop -> log : log 422 (Unprocessable Entity) event
+    regi --> admin : 204 no content
+end
+
+sop -> log : Log database query
+activate log
+alt Logging failed
+    sop <-- log : Logging error
+    sop --> admin : 204 no content
+end
+    sop <-- log : Log result
+    deactivate log
+    sop -> database : Register SOP
+activate database
+    database --> sop : SOP data
+deactivate database
+
+    sop -> database : Query SOP (sanity check)
+activate database
+    database --> sop : SOP data
+
+deactivate database
+    sop -> log : Log register query
+activate log
+alt Logging failed
+    sop <-- log : Logging error
+deactivate log
+    sop --> admin : 204 no content
+end
+    sop --> regi : SOP (new)
+deactivate sop
+    regi --> admin : 204 no content
+@enduml

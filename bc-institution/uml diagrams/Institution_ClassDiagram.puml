@@ -1,0 +1,102 @@
+@startuml BC - Institution - Classdiagram - IMPLEMENTATION
+left to right direction
+skinparam packageStyle rectangle
+skinparam Shadowing false
+skinparam classFontSize 12
+skinparam classFontName "Segoe UI", sans-serif
+skinparam WrapWidth 260
+
+folder "Shared Kernel" #LightBlue {
+    package local.sop.sharedkernel {
+        package valueobjects {
+            class DomainId <<ValueObject>> {
+                - value : UUID
+                + value() : UUID
+            }
+        }
+        package exceptions {
+            class NotFoundException <<Exception>>
+        }
+    }
+}
+
+folder "BC - Institution - Implementation" #Salmon {
+    
+    legend left
+        Colors / Stereotypes
+        ---
+        Salmon = BC - Institution - Implementation
+        Red = Institution-api (Contract)
+        Yellow = InterfaceAdapters (Infrastructure)
+        LightGreen = Institution-impl (Application)
+        LightBlue = Shared Kernel
+    endlegend
+
+    folder "Institution-api" #Red {
+        package "local.sop.sopinfo.institution.application.api" {
+            interface InstitutionDirectory <<API>> {
+                + findById(query: InstitutionQuery) : InstitutionResponse
+            }
+            
+            package "dto" {
+                class InstitutionResponse <<DTO/Record>> {
+                    - id : UUID
+                    - name : String
+                    - address : String
+                    + id() : UUID
+                    + name() : String
+                    + address() : String
+                }
+
+                class InstitutionQuery <<DTO/Record>> {
+                    - id : UUID
+                    + id() : UUID
+                }
+            }
+        }
+    }
+
+    folder "Institution-impl" #LightGreen {
+        package "local.sop.sopinfo.institution" {
+            
+            package "interfaceweb" #Yellow {
+                class InternalInstitutionController <<Controller>> {
+                    - directory : InstitutionDirectory
+                    + findById(id: UUID) : InstitutionResponse
+                }
+            }
+
+            package "application.service" {
+                class InstitutionApplicationService <<UseCase>> {
+                    - repository : InstitutionSpringDataRepository
+                    + findById(query: InstitutionQuery) : InstitutionResponse
+                }
+            }
+
+            package "interfaceadapters.persistence" #Yellow {
+                package "jpa" {
+                    class InstitutionEntity <<Entity>> {
+                        - id : UUID
+                        - name : String
+                        - address : String
+                        - version : long
+                        + getId() : UUID
+                        + getName() : String
+                        + getAddress() : String
+                    }
+                    interface InstitutionSpringDataRepository <<Repository>>
+                }
+            }
+        }
+    }
+}
+
+' Relationships
+InstitutionApplicationService ..|> InstitutionDirectory : implements
+InstitutionApplicationService --> InstitutionSpringDataRepository : uses
+InstitutionApplicationService ..> InstitutionEntity : maps from
+InstitutionApplicationService ..> NotFoundException : throws
+InternalInstitutionController --> InstitutionDirectory : injects
+InternalInstitutionController ..> InstitutionQuery : creates
+
+@enduml

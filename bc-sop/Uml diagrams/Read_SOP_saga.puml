@@ -1,0 +1,37 @@
+@startuml Read SOP Sequence
+title Read SOP Sequence
+actor "Higher power\n<<JWT>>" as admin
+participant "InternalSOPController" as controller
+participant "SOPApplicationService" as service
+participant "SOPRepository" as repo
+participant "Audit log BC" as log
+database "MariaDB" as db
+
+admin -> controller : GET /internal/sop/{id}
+activate controller
+
+controller -> service : findById(SOPQuery)
+activate service
+
+service -> service : log info: "Searching for SOP..."
+
+service -> repo : findById(uuid)
+activate repo
+repo -> db : SELECT * FROM sop
+db --> repo : result
+repo --> service : Optional<Entity>
+deactivate repo
+
+alt SOP not found
+    service -> service : log warn: "SOP NOT FOUND"
+    service --[#red]> controller : throw NotFoundException("sop.notFound")
+    controller --[#red]> admin : 404 Not Found (via Global Handler)
+else SOP found
+    service -> log : Log access event
+    service --> controller : SOPResponse
+    deactivate service
+    controller --> admin : 200 OK (SOPResponse)
+end
+deactivate controller
+
+@enduml

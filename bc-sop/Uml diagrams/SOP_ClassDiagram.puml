@@ -1,0 +1,106 @@
+@startuml BC - SOP - Classdiagram - IMPLEMENTATION
+left to right direction
+skinparam packageStyle rectangle
+skinparam Shadowing false
+skinparam classFontSize 12
+skinparam classFontName "Segoe UI", sans-serif
+skinparam WrapWidth 260
+
+folder "Shared Kernel" #LightBlue {
+    package local.sop.sharedkernel {
+        package valueobjects {
+            class DomainId <<ValueObject>> {
+                - value : UUID
+                + value() : UUID
+            }
+        }
+        package exceptions {
+            class NotFoundException <<Exception>>
+        }
+    }
+}
+
+folder "BC - SOP - Implementation" #Salmon {
+    
+    legend left
+        Colors / Stereotypes
+        ---
+        Salmon = BC - SOP - Implementation
+        Red = SOP-api (Contract)
+        Yellow = InterfaceAdapters (Infrastructure)
+        LightGreen = SOP-impl (Application)
+        LightBlue = Shared Kernel
+    endlegend
+
+    folder "SOP-api" #Red {
+        package "local.sop.sopinfo.sop.application.api" {
+            interface SOPDirectory <<API>> {
+                + findById(query: SOPQuery) : SOPResponse
+            }
+            
+            package "dto" {
+                class SOPResponse <<DTO/Record>> {
+                    - id : UUID
+                    - name : String
+                    - address : String
+                    - education : String
+                    + id() : UUID
+                    + name() : String
+                    + address() : String
+                    + education() : String
+                }
+
+                class SOPQuery <<DTO/Record>> {
+                    - uuid : UUID
+                    + uuid() : UUID
+                }
+            }
+        }
+    }
+
+    folder "SOP-impl" #LightGreen {
+        package "local.sop.sopinfo.sop" {
+            
+            package "interfaceweb" #Yellow {
+                class InternalSOPController <<Controller>> {
+                    - directory : SOPDirectory
+                    + findById(id: UUID) : SOPResponse
+                }
+            }
+
+            package "application.service" {
+                class SOPApplicationService <<UseCase>> {
+                    - repository : SOPSpringDataRepository
+                    + findById(query: SOPQuery) : SOPResponse
+                }
+            }
+
+            package "interfaceadapters.persistence" #Yellow {
+                package "jpa" {
+                    class SOPEntity <<Entity>> {
+                        - id : UUID
+                        - name : String
+                        - address : String
+                        - education : String
+                        - version : long
+                        + getId() : UUID
+                        + getName() : String
+                        + getAddress() : String
+                        + getEducation() : String
+                    }
+                    interface SOPSpringDataRepository <<Repository>>
+                }
+            }
+        }
+    }
+}
+
+' Relationships
+SOPApplicationService ..|> SOPDirectory : implements
+SOPApplicationService --> SOPSpringDataRepository : uses
+SOPApplicationService ..> SOPEntity : maps from
+SOPApplicationService ..> NotFoundException : throws
+InternalSOPController --> SOPDirectory : injects
+InternalSOPController ..> SOPQuery : creates
+
+@enduml

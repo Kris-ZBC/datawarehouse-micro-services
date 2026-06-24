@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Root POM
+   This POM is used to reference the parent POM project.
+   It ensures that the project can be run from the root directory
+--><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+           
+  <modelVersion>4.0.0</modelVersion>
+           
+         
+  <parent>
+                
+    <groupId>local.sop.sopinfo</groupId>
+                
+    <artifactId>parent</artifactId>
+                
+    <version>${revision}</version>
+                
+    <relativePath>parent-POM/pom.xml</relativePath>
+             
+  </parent>
+          
+  <artifactId>aggregator</artifactId>
+          
+  <packaging>pom</packaging>
+          
+  <name>root</name>
+          
+        
+  <modules>
+                
+    <module>master-BOM/pom.xml</module>
+                
+    <module>parent-POM/pom.xml</module>    
+      
+  </modules>
+  
+</project>

@@ -1,0 +1,83 @@
+@startuml Shared Kernel Class Diagram
+top to bottom direction
+title Shared Kernel BC Class Diagram
+skinparam packageStyle rectangle
+skinparam Shadowing false
+skinparam classFontSize 12
+skinparam classFontName Arial
+skinparam WrapWidth 260
+skinparam ComponentStyle uml2
+
+' Shared Kernel folders = LightBlue
+
+folder "local.sop.sopinfo.sharedkernel" #LightBlue {
+    package "enums" { 
+        package "sagas" {
+             Enum "SagaOutcome" {
+            - SUCCEEDED
+            - IDEMPOTENT
+            - COMPENSATED
+            - PARTIAL_FAILURE
+            }
+        }
+        Enum "ActorType" {
+            - USER
+            - SYSTEM
+            - SERVICE
+        }
+        Enum "Severity" {
+            - USER
+            - SERVICE
+            - SYSTEM
+        }
+        Enum "WeekDay" {
+            - MONDAY
+            - TUESDAY
+            - WEDNESDAY
+            - THURSDAY
+            - FRIDAY
+            - SATURDAY
+            - SUNDAY
+
+        }
+        
+    }
+    package "exceptions" {
+        Enum "ErrorCode" {
+        - VALIDATION
+        - INVARIANT
+        - NOT_FOUND
+        - CONFLICT
+        - CONCURRENCY
+        - PRECONDITION 
+        }
+        class DomainException <<extends RuntimeException>> {
+            + errorCode: ErrorCode
+            + messageKey: String
+            + args: Map<String, Object>
+        }
+        DomainException "1" *-- "1" ErrorCode : has >
+        class ValidationException <<extends DomainException>> { }
+        class NotFoundException <<extends DomainException>> { }
+        class ConcurrencyException <<extends DomainException>> { }
+        class PreconditionException <<extends DomainException>> { }
+        class InvariantException <<extends DomainException>> { }
+        class ConflictException <<extends DomainException>> { }
+    }
+
+    package "valueobjects" {
+        Interface DomainId {
+            + value(): UUID
+        }
+
+        package "utils" {
+            class UUIDUtils {
+                + parseRequired(raw: String, field: String) : UUID
+                + require(id: UUID, field: String) : UUID
+                + newUuid() : UUID
+            }
+        }
+    }
+        
+}
+@enduml

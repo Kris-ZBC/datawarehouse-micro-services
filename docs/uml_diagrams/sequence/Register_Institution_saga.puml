@@ -1,0 +1,84 @@
+@startuml Register Institution
+title Register Institution
+actor "Higher power\n<<JWT>>" as admin
+participant "Organization Handler BC\n<<SAGA>>" as regi
+participant "Institution BC" as ins
+participant "Audit log BC" as log
+database "Data Warehouse" as database
+
+skinparam sequence {
+    GroupBackgroundColor White
+    GroupBorderColor #Pink
+}
+
+admin -> regi : Register institution (id, location,...)
+regi -> regi : validate request
+alt Register request missing parameter
+    regi -> log : log 422 (Unprocessable Entity) event
+    regi --> admin : 204 no content
+end
+regi -> ins : Get institution(by id)
+activate ins
+ins -> database : query Institution
+activate database
+database --> ins : Institution data
+deactivate database
+    ins -> log : Log database query and\n(boolean result or full result)
+activate log
+alt Logging failed
+    log --> ins : logging error
+    ins --> admin : 204 no content
+end
+    log --> ins : log result
+deactivate log
+alt Institution already exists
+    ins --> regi : institution data
+    regi -> log : log 409 (conflict) event
+    regi --> admin : 204 no content
+end
+
+ins --> regi : null
+deactivate ins
+
+regi -> ins : Register institution
+activate ins
+    ins -> log : Log database query
+activate log
+alt Logging failed
+    log --> ins : logging error
+    ins --> admin : 204 no content
+end
+log --> ins : log result
+    deactivate log
+ins -> database : register institution in datawerehouse
+activate database
+database --> ins : return institution data 
+deactivate database
+
+ins -> database : query institution (sanity check)
+activate database
+ins -> log : log query
+activate log
+alt Logging failed
+    log --> ins : logging error
+    ins --> admin : 204 no content
+end
+log --> ins : log result
+deactivate log
+database --> ins : return data
+deactivate database
+
+    ins -> log : Log database query
+activate log
+alt Logging failed
+    log --> ins : logging error
+    ins --> admin : 204 no content
+end
+    log --> ins : log result
+    deactivate log
+
+ins --> regi : institution (new)
+deactivate ins
+
+regi --> admin : 204 no content
+@enduml

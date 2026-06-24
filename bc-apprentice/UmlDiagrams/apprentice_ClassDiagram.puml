@@ -1,0 +1,214 @@
+@startuml Apprentice Class Diagram
+title Apprentice Class Diagram
+
+left to right direction
+skinparam packageStyle rectangle
+skinparam Shadowing false
+skinparam classFontSize 12
+skinparam classFontName Times New Roman
+skinparam WrapWidth 260
+skinparam Linetype ortho
+
+
+folder "BC - Apprentice - Implementation " #Salmon {
+
+                    legend left
+                Colors / stereotypes
+                ---
+                Salmon = BC - Apprentice - Implementation
+                Red = Apprentice-api
+                Yellow = InterfaceAdapters
+                LightGreen = Apprentice-impl
+                LightBlue  = Shared Kernel (cross-BC stable types)
+                <<AggregateRoot>>, <<ValueObject>>, <<Enum>>, <<Utility>> as in DDD
+                endlegend
+
+    folder "Apprentice-impl" #LightGreen {
+        package "sop" {
+            package "sopinfo" {
+                package "Apprentice" {
+                    package "Domain" {
+                        package "Model" {
+                            class Apprentice <<AggregateRoot>>{
+                                - apprenticeId : UUID
+                                - personRef : UUID
+                                - educationLineRef : UUID
+                                + GetApprenticeId() : UUID
+                                + GetPersonRef() : UUID
+                                + GetEducationLineRef() : UUID
+                                + WithApprenticeId(apprenticeId: UUID) : Apprentice
+                                + WithPersonRef(personRef: UUID) : Apprentice
+                                + WithEducationLineRef(educationLineRef: UUID) : Apprentice
+                                
+                            }
+                            package "ValueObjects"{
+                                class ApprenticeId <<ValueObject>>{
+                                    - value : UUID
+                                    + getValue() : UUID
+                                }
+                                class PersonRef <<ValueObject>>{
+                                    - value : UUID
+                                    + getValue() : UUID
+                                }
+                                class EducationLineRef <<ValueObject>> {
+                                    - value : UUID
+                                    + getValue() : UUID
+                                }
+
+                                note top of ApprenticeId
+                                    Invariants:
+                                    - Must be a valid UUID
+                                    - Must be unique
+                                    - Must not be null
+                                end note
+                                note top of PersonRef
+                                    Invariants:
+                                    - Must be a valid UUID
+                                    - Must reference an existing Person
+                                    - Must not be null
+                                end note
+                                note top of EducationLineRef
+                                    Invariants:
+                                    - Must be a valid UUID
+                                    - Must reference an existing EducationLine
+                                    - Must not be null
+                                end note
+                            }
+                            Apprentice *-- ApprenticeId
+                            Apprentice *-- PersonRef
+                            Apprentice *-- EducationLineRef
+                        }
+                        package "Ports" {
+                            package "Out" {
+                                interface ApprenticeRepository {
+                                    + save(apprentice: Apprentice) : Apprentice
+                                    + findById(apprenticeId: UUID) : Apprentice
+                                    + findByEducationLineId(educationLineId: UUID) : Apprentice
+                                    + findAll() : List<Apprentice>
+                                }
+                            }
+                        }
+                        package "Service" {
+                            class ApprenticeDomain {
+                                + create(ApprenticeId: id, PersonRef: personRef, EducationLineRef: educationLineRef) : Apprentice
+                            }
+                            class ApprenticeDomainService {
+                                + create(ApprenticeId id, PersonRef personRef, EducationLineRef educationLineRef) : Apprentice
+                            }
+                            class ApprenticeDomainServiceConfig {
+                                + apprenticeDomain(apprenticeDomainService: ApprenticeDomainService) : ApprenticeDomain
+                            }
+                            ApprenticeDomainService "1" *.. "1" ApprenticeDomain : implements >
+                        }
+                    }
+                    package "InterfaceAdapters" #yellow{
+                        package "Persistance"{
+                            class ApprenticeEntity{
+                                - id : UUID
+                                - personRef : UUID
+                                - educationLineRef : UUID
+                                + GetId() : UUID
+                                + GetPersonRef() : UUID
+                                + GetEducationLineRef() : UUID
+                                + WithApprenticeId(id: UUID) : ApprenticeEntity
+                                + WithPersonRef(personRef: UUID) : ApprenticeEntity
+                                + WithEducationLineRef(educationLineRef: UUID) : ApprenticeEntity
+                            }
+                            interface ApprenticeSpringDataRepository{
+                                + findByEducationLineId(educationLineId: UUID) : Optional<ApprenticeEntity>
+                            }
+
+                            class ApprenticeRepositoryAdapter {
+                                - apprenticeSpringDataRepository : ApprenticeSpringDataRepository
+                                - apprenticeJpaMapper : ApprenticeJpaMapper
+                                + save(apprentice: Apprentice) : Apprentice
+                                + findById(apprenticeId: UUID) : Apprentice
+                                + findByEducationLineId(educationLineId: UUID) : Apprentice
+                                + findAll() : List<Apprentice>
+                            }
+                            class ApprenticeJpaMapper {
+                                + toEntity(apprentice: Apprentice) : ApprenticeEntity
+                                + toDomain(entity: ApprenticeEntity) : Apprentice
+                            }
+                        }
+                    }
+                    package "Application"{
+                        package "Services"{
+                            class ApprenticeApplicationService{
+                                + create(cmd: CreateApprenticeCmd) : CreatedApprenticeResponse
+                                + findById(apprenticeId: UUID) : ApprenticeResponse
+                                + findByEducationLineId(educationLineId: UUID) : ApprenticeResponse
+                                + findAll() : List<ApprenticeResponse>
+                            }
+                        }
+                    }
+                    package "InterfaceWeb"{
+                        class ApprenticeController  <<Controller>> {
+                            - Directory : ApprenticeDirectory
+                            + create(cmd: CreateApprenticeCmd) : CreatedApprenticeResponse
+                            + findById(apprenticeId: UUID) : ApprenticeResponse
+                            + findByEducationLineId(educationLineId: UUID) : ApprenticeResponse
+                            + findAll() : List<ApprenticeResponse>
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    folder Apprentice-api #DarkGreen {
+        package "sop" {
+            package "sopinfo" {
+                package "Apprentice" {
+                    package "application" {
+                        package "api" {
+                            package "dto" {
+                                class ApprenticeResponse <<DTO>> {
+                                    - apprenticeId : UUID
+                                    - personRef : UUID
+                                    - educationLineRef : UUID
+                                    + GetApprenticeId() : UUID
+                                    + GetPersonRef() : UUID
+                                    + GetEducationLineRef() : UUID
+                                }
+                                class CreateApprenticeCmd <<DTO>> {
+                                    - personRef : UUID
+                                    - educationLineRef : UUID
+                                    + GetPersonRef() : UUID
+                                    + GetEducationLineRef() : UUID
+                                }
+                                class CreatedApprenticeResponse <<DTO>> {
+                                    - apprenticeId : UUID
+                                    + GetApprenticeId() : UUID
+                                }
+                            }
+                            interface ApprenticeDirectory <<API>> {
+                                + createApprenticeResponse(cmd: CreateApprenticeCmd) : CreatedApprenticeResponse
+                                + findById(apprenticeId: UUID) : ApprenticeResponse
+                                + findByEducationLineId(educationLineId: UUID) : ApprenticeResponse
+                                + findAll() : List<ApprenticeResponse>
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+
+
+
+ApprenticeEntity --> ApprenticeApplicationService : uses
+ApprenticeApplicationService --> ApprenticeRepositoryAdapter : uses
+ApprenticeApplicationService ..> ApprenticeDirectory : implements
+ApprenticeController --> ApprenticeApplicationService : calls
+ApprenticeController ..> ApprenticeDirectory : injects
+ApprenticeRepositoryAdapter --> ApprenticeSpringDataRepository : uses
+ApprenticeRepositoryAdapter --> ApprenticeJpaMapper : uses
+ApprenticeSpringDataRepository --> ApprenticeEntity : queries
+ApprenticeJpaMapper --> ApprenticeEntity : maps
+ApprenticeApplicationService "1" *.. "1" ApprenticeDomain : injects >
+
+@enduml

@@ -1,0 +1,40 @@
+/' @startuml Create Apprentice
+title Create Apprentice
+actor "Client\n<<JWT>>" as client
+participant "Apprentice BC" as apprentice
+database "Data Warehouse" as database
+
+skinparam sequence {
+    GroupBackgroundColor White
+    GroupBorderColor #FF9999
+}
+
+client -> apprentice : Create Apprentice (personRef, educationLineRef)
+activate apprentice
+
+apprentice -> apprentice : validate request & permissions
+
+alt Unauthorized or invalid request
+    apprentice --> client : 403 Forbidden or 422 Unprocessable Entity
+end
+
+apprentice -> apprentice : generate UUID for apprenticeId
+apprentice -> database : save Apprentice
+activate database
+database --> apprentice : Apprentice created
+deactivate database
+
+alt Could not save apprentice
+    apprentice --> client : 500 Internal Server Error
+end
+
+apprentice --> client : 201 Created (Apprentice data)
+deactivate apprentice
+
+@enduml
+ '/
+
+
+
+
+/' sequence diagrams arent used for bc ? '/

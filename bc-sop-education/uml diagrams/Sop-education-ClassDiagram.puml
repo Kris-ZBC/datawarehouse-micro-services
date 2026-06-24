@@ -1,0 +1,161 @@
+# BC-SOP-EL-Offering PlantUML Diagram
+
+Copy the code below and paste it into [PlantUML Online Editor](http://www.plantuml.com/plantuml/uml/) or your IDE's PlantUML plugin.
+
+```plantuml
+@startuml BC-SOP-Education Diagram
+left to right direction
+skinparam packageStyle rectangle
+skinparam Shadowing false
+skinparam classFontSize 12
+skinparam classFontName Times New Roman
+skinparam WrapWidth 260
+
+folder "Shared Kernel" #LightBlue {
+    package sop {
+        package sopinfo {
+            package valueobjects {
+                class DomainId <<ValueObject>> {
+                    - value : UUID
+                    + value() : UUID
+                }
+                
+                package utils {
+                    class UUIDGenerator <<Utility>> {
+                        + generateUUID() : UUID
+                        + parseRequired(idString : String) : UUID
+                        + require(id : UUID) : UUID
+                    }
+                }
+            }
+        }
+    }
+}
+
+folder "BC - SOP-Education - Implementation" #Salmon {
+    
+    folder "SOP-Education-impl" #LightGreen {
+        package "sop" {
+            package "sopinfo" {
+                package "sopeducation" {
+                    package "InterfaceAdapters" #yellow {
+                        package "Persistence" {
+                            package "JPA" {
+                                class SOPELOfferingEntity {
+                                    - sopId : UUID
+                                    - educationLineId : UUID
+                                    - createdAt : Timestamp
+                                    + getId() : UUID
+                                    + getEducationLineId() : UUID
+                                    + getCreatedAt() : Timestamp
+                                }
+                                
+                                interface SOPELSpringDataRepository {
+                                    + findBySopId(sopId : UUID) : List<SOPELOfferingEntity>
+                                    + findByEducationLineId(elId : UUID) : List<SOPELOfferingEntity>
+                                }
+                                
+                                class SOPELOfferingRepositoryImpl {
+                                    - springRepository : SOPELSpringDataRepository
+                                    + findBySopId(sopId : UUID) : List<SOPELOffering>
+                                    + findByEducationLineId(elId : UUID) : List<SOPELOffering>
+                                    + save(offering : SOPELOffering) : SOPELOffering
+                                    + delete(sopId : UUID, elId : UUID) : void
+                                    - toEntity(offering : SOPELOffering) : SOPELOfferingEntity
+                                    - toDomain(entity : SOPELOfferingEntity) : SOPELOffering
+                                }
+                            }
+                        }
+                    }
+                    
+                    package "interfaceweb" {
+                        class SOPELOfferingController <<Controller>> {
+                            - service : SOPELOfferingService
+                            + GetEducationLinesBySopId(sopId : UUID) : Json<List<UUID>>
+                            + GetSopsByEducationLineId(elId : UUID) : Json<List<UUID>>
+                            + CreateOffering(request : CreateOfferingRequest) : Json<OfferingResponse>
+                            + DeleteOffering(sopId : UUID, elId : UUID) : Json<Void>
+                        }
+                    }
+                    
+                    package "application" {
+                        package "service" {
+                            class SOPELOfferingService <<UseCase>> {
+                                - repository : SOPELOfferingRepository
+                                + findEducationLinesBySopId(sopId : UUID) : List<UUID>
+                                + findSopsByEducationLineId(elId : UUID) : List<UUID>
+                                + createOffering(sopId : UUID, elId : UUID) : OfferingResponse
+                                + deleteOffering(sopId : UUID, elId : UUID) : void
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    folder "SOP-EL-Offering-api" #Red {
+        package "sop" {
+            package "sopinfo" {
+                package "sopeloffering" {
+                    package "application" {
+                        package "api" {
+                            package "dto" {
+                                class CreateOfferingRequest <<DTO>> {
+                                    - sopId : UUID
+                                    - educationLineId : UUID
+                                    + sopId() : UUID
+                                    + educationLineId() : UUID
+                                }
+                                
+                                class OfferingResponse <<DTO>> {
+                                    - sopId : UUID
+                                    - educationLineId : UUID
+                                    - createdAt : Timestamp
+                                    + sopId() : UUID
+                                    + educationLineId() : UUID
+                                    + createdAt() : Timestamp
+                                }
+                                
+                                class SOPELOffering <<Domain>> {
+                                    - sopId : UUID
+                                    - educationLineId : UUID
+                                    - createdAt : Timestamp
+                                    + sopId() : UUID
+                                    + educationLineId() : UUID
+                                    + createdAt() : Timestamp
+                                }
+                            }
+                            
+                            interface SOPELOfferingRepository <<API>> {
+                                + findBySopId(sopId : UUID) : List<SOPELOffering>
+                                + findByEducationLineId(elId : UUID) : List<SOPELOffering>
+                                + save(offering : SOPELOffering) : SOPELOffering
+                                + delete(sopId : UUID, elId : UUID) : void
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+SOPELOfferingRepositoryImpl ..|> SOPELOfferingRepository : implements
+SOPELOfferingRepositoryImpl --> SOPELSpringDataRepository : uses
+SOPELOfferingRepositoryImpl --> SOPELOfferingEntity : uses
+SOPELOfferingService --> SOPELOfferingRepository : injects
+SOPELOfferingController --> SOPELOfferingService : injects
+SOPELOfferingController ..> CreateOfferingRequest : uses
+SOPELOfferingController ..> OfferingResponse : returns
+SOPELOfferingService ..> OfferingResponse : returns
+
+note right of SOPELOfferingEntity
+    Composite Primary Key:
+    (sop_id, education_line_id)
+    
+    Table: sop_el_offering
+end note
+
+@enduml
+```

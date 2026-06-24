@@ -1,0 +1,126 @@
+@startuml BC - Organisation - Classdiagram - IMPLEMENTATION (Domain uses shared Kernel)
+left to right direction
+skinparam packageStyle rectangle
+skinparam Shadowing false
+skinparam classFontSize 12
+skinparam classFontName Times New Roman
+skinparam WrapWidth 260
+folder "Shared Kernel" #LightBlue {
+    package sop {
+        package sopinfo {
+
+            ' valueobjects pakke'
+            package valueobjects {
+
+                class DomainId <<ValueObject>> {
+                        - value : UUID
+                        + value() : UUID
+                    }
+
+                    package utils {
+                        class UUIDGenerator <<Utility>> {
+                        + generateUUID() : UUID
+                        + parseRequired(idString : String) : UUID
+                        + require(id : UUID) : UUID
+                    }
+                }
+
+            }
+        }
+    }
+}
+folder "BC - Organisation - Implementation " #Salmon {
+
+                    legend left
+                Colors / stereotypes
+                ---
+                Salmon = BC - Organisation - Implementation
+                Red = Organisation-api
+                Yellow = InterfaceAdapters
+                LightGreen = Organisation-impl
+                LightBlue  = Shared Kernel (cross-BC stable types)
+                <<AggregateRoot>>, <<ValueObject>>, <<Enum>>, <<Utility>> as in DDD
+                endlegend
+    folder "Organisation-impl" #LightGreen{
+        package "sop"{
+            package "sopinfo" {
+                package "Organisation"{
+                    package "InterfaceAdapters" #yellow{
+                    package "Persistance"{
+                        package "JPA"{
+                            class OrganisationEntity{
+                                - id : UUID
+                                - addresse : String
+                                - name : String
+                                + GetId() : uuid
+                                + GetAddresse() : string
+                                + GetCvr() : string
+                            }
+                            interface OrganisationSpringDataRepository{}
+                        }
+                    }
+                }
+
+                    package "interfaceweb"{
+                        class InternalOrganisationController  <<Controller>> {
+                            - Directory : OrganisationDirectory
+                            + findById(query:InternalOrganisationControllerById) : Json<OrganisationResponse>
+                        }
+                    }
+                    package "application"{
+
+
+                        package "service"{
+                            class OrganisationApplicationService <<UseCase>>{
+                                + findById(query:InternalOrganisationControllerById) : OrganisationResponse
+                            }
+                        }
+                   
+                    }
+                }
+
+
+                
+            }
+        }
+    }
+    
+        folder "Organisation-api" #green{
+            package "sop"{
+                package "sopinfo" {
+                    package "Organisation"{
+                        package "application"{
+                            package "api"{
+                                package "dto"{
+                                    class OrganisationResponse  <<DTO>> {
+                                        - Id : UUID
+                                        - Name : String
+                                        - Cvr : String
+                                        + Id() : UUID
+                                        + Name() : String
+                                        + Cvr() : String
+                                    }
+
+                                    class OrganisationQuery <<DTO>> {
+                                        - UUID : UUID
+                                        + UUID() : UUID
+                                    }
+                                }
+                                interface OrganisationDirectory <<API>>{
+                                    + findById(query:InternalOrganisationControllerById) : Response
+                                
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    } 
+}  
+
+OrganisationEntity --> OrganisationApplicationService : uses
+OrganisationApplicationService ..|> OrganisationDirectory       : implements
+InternalOrganisationController ..> OrganisationDirectory       : injects
+
+
+@enduml

@@ -1,0 +1,233 @@
+@startuml Education - ClassDiagram
+top to bottom direction
+title BC - Education - ClassDiagram - IMPLEMENTATION
+skinparam packageStyle rectangle
+skinparam Shadowing false
+skinparam classFontSize 12
+skinparam classFontName Arial
+skinparam WrapWidth 260
+skinparam ComponentStyle uml2
+
+folder "BC - Education - Implementation (education-impl)" #LightGrey {
+  package "Education - api" #LightBlue{
+    package "local.sop.sopinfo.education" {
+      package "application" {
+        package "api" {
+          package "dto" {
+            class EducationDTO {
+              - id : UUID
+              - name : String
+              - category : String
+              + id() : UUID
+              + name() : String
+              + category() : String
+              + isActivated() : Boolean
+            }
+
+            class CreateEducationCmd {
+              - name : String
+              - category : String
+              + name() : String
+              + category() : String
+            }
+
+            class UpdateEducationCmd {
+              - id : UUID
+              - name : String
+              - category : String
+              + id() : UUID
+              + name() : String
+              + category() : String 
+            }
+
+            class EducationQuery {
+              - id : UUID
+              + id() : UUID
+            }
+
+            class EducationResponse {
+              - id : UUID
+              - name : String
+              - category : String
+              + id() : UUID
+              + name() : String
+              + category() : String
+            }
+
+            class ActivateEducationCmd {
+              // No fields needed for activation request
+            }
+
+            class DeactivateEducationCmd {
+              // No fields needed for deactivation request
+            }
+          }
+        }
+        interface EducationDirectory {
+          + createEducation(cmd : CreateEducationCmd) : EducationResponse
+          + updateEducation(cmd : UpdateEducationCmd) : EducationResponse
+          + findById(query : EducationQuery) : Optional<EducationResponse>
+          + findAll() : List<EducationResponse>
+          + activateEducation(id : EducationId) : void
+          + deactivateEducation(id : EducationId) : void
+        }
+      }
+    }
+  }
+
+  package "Education - impl" #LightSteelBlue{
+    package "local.sop.sopinfo.education" {
+      package "domain" #LightCoral {
+        package "model" {
+          package "valueobjects" {
+            class EducationId <<ValueObject>> {
+              - id : UUID
+              + getId() : UUID
+            }
+
+            class EducationName <<ValueObject>> {
+              - name : String
+              + getName() : String
+            }
+
+            class EducationCategory <<ValueObject>> {
+              - category : String
+              + getCategory() : String
+            }
+          }
+
+          class Education <<AggregateRoot>> {
+            - educationId : EducationId
+            - educationName : EducationName
+            - educationCategory : EducationCategory
+            - isActivated : Boolean
+            + getEducationId() : EducationId
+            + getEducationName() : EducationName
+            + getEducationCategory() : EducationCategory
+            + activate() : Boolean
+            + deactivate() : Boolean
+          }
+          Education "1" *-- "1" EducationId : has >
+          Education "1" *-- "1" EducationName : has >
+          Education "1" *-- "1" EducationCategory : has >
+        }
+
+        package "service" {
+          interface EducationDomain {
+            + createEducation(name: EducationName, category: EducationCategory) : Education
+          }
+
+          class EducationDomainConfig{
+            + educationDomain(): EducationDomain
+          }
+
+          class EducationDomainService <<@Component>> {
+            + createEducation(name: EducationName, category: EducationCategory) : Education
+          }
+          note bottom of EducationDomain
+          - The domainService interface is not mandatory, but can be used incase of BC specific logic
+          end note
+        }
+
+        EducationDomainService "1" ..> "1" EducationDomain : implements >
+
+        package "ports" {
+          package "out" #LightYellow {
+            interface EducationRepositoryPort {
+              + create(education : Education) : Education
+              + update(education : Education) : Education
+              + findById(id : EducationId) : Optional<Education>
+              + findAll() : List<Education>
+              + activate(education : Education) : void
+              + deactivate(education : Education) : void
+            }
+          }
+        }
+      }
+
+      package "application" {
+        package "service" {
+          class EducationApplicationService {
+            - domain : EducationDomain
+            + createEducation(cmd : CreateEducationCmd) : EducationResponse
+            + updateEducation(cmd : UpdateEducationCmd) : EducationResponse
+            + findById(query : EducationQuery) : Optional<EducationResponse>
+            + findAll() : List<EducationResponse>
+            + activateEducation(id : EducationId) : void
+            + deactivateEducation(id : EducationId) : void
+          }
+          EducationApplicationService "1" ..> "1" EducationDirectory : implements >
+          EducationApplicationService "1" ..> "1" EducationDomain : can be used >
+          EducationApplicationService "1" ..> "1" EducationRepositoryPort : injects >
+        }
+      }
+
+      package "interfaceadapters" #Yellow {
+        package "persistence" {
+          package "inmemory" {
+            class InMemoryEducationRepositoryImpl {
+              + create(Education education) : Education
+              + update(Education education) : Education
+              + findById(EducationId id) : Optional<Education>
+              + findAll() : List<Education>
+              + activate(Education education) : void
+              + deactivate(Education education) : void
+            }
+            InMemoryEducationRepositoryImpl "1" .> "1" EducationRepositoryPort : implements >
+          }
+          package "jpa" {
+            interface JpaRepository{
+              + create(entity) : entity
+              + findById(id) : entity
+            }
+
+            interface EducationSpringDataRepository <<SpringDataRepository>> {
+              + create(Education education) : Education
+              + update(Education education) : Education
+              + findById(id : UUID) : Optional<EducationEntity>
+              + findAll() : List<EducationEntity>
+              + activate(Education education) : void
+              + deactivate(Education education) : void
+            }
+
+            class EducationEntity {
+              - id : UUID
+              - name : String
+              - category : String
+              - isActivated : Boolean
+              + getId() : UUID
+              + getName() : String
+              + getCategory() : String
+              + isActivated() : Boolean
+            }
+
+            class EducationJpaMapper {
+              + toEntity(Education education) : EducationEntity
+              + toDomain(EducationEntity entity) : Education
+              + toDomainList(List<EducationEntity> entities) : List<Education>
+            }
+
+            class EducationRepositoryAdapter {
+              - jpaRepository : JpaEducationRepository
+              - mapper: EducationJpaMapper
+              + create(education : Education) : Education
+              + update(education : Education) : Education
+              + findById(id : EducationId) : Education
+              + findAll() : List<Education>
+              + activate(Education education) : void
+              + deactivate(Education education) : void
+            }
+            EducationSpringDataRepository "1" .> "1" JpaRepository : extends
+            EducationRepositoryAdapter "1" .> "1" EducationRepositoryPort : implements >
+            EducationRepositoryAdapter "1" ..> "1" EducationSpringDataRepository: uses
+            EducationRepositoryAdapter "1" .> "1" EducationJpaMapper : uses
+            EducationJpaMapper "1" .> "1" EducationEntity : uses
+            EducationJpaMapper "1" .> "1" Education : uses
+          }
+        }
+      }
+    }
+  }
+}
+
+@enduml

@@ -1,0 +1,18 @@
+
+@startuml Read-SOP
+title Read SOP
+actor "User\n<<JWT>>" as user
+participant "saga" as saga
+participant "SOP-BC" as sop
+participant "AuditLog-BC" as log
+database "Database" as db
+
+user -> saga : getSOP(id)
+saga -> sop : fetchById(id)
+sop -> db : query SOP
+db --> sop : SOP data
+sop -> log : log read
+log --> sop : log result
+sop --> saga : return SOP
+saga --> user : return SOP
+@enduml

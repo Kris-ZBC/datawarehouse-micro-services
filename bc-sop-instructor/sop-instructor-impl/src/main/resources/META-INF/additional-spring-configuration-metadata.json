@@ -1,0 +1,12 @@
+{"properties": [
+  {
+    "name": "sop.base-url",
+    "type": "java.lang.String",
+    "description": "A description for 'sop.base-url'"
+  },
+  {
+    "name": "instructor.base-url",
+    "type": "java.lang.String",
+    "description": "A description for 'instructor.base-url'"
+  }
+]}

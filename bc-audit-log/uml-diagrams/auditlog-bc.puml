@@ -1,0 +1,423 @@
+@startuml AuditLog BC Class Diagram
+title AuditLog Bounded Context – Domain View
+
+left to right direction
+scale 1.4
+
+skinparam packageStyle rectangle
+skinparam Shadowing false
+skinparam classFontSize 11
+skinparam classFontName Arial
+skinparam WrapWidth 300
+skinparam ArrowColor #555555
+skinparam NoteBackgroundColor #FFFFF0
+skinparam NoteBorderColor #AAAAAA
+skinparam PackageBorderColor #888888
+skinparam nodesep 30
+skinparam ranksep 120
+
+skinparam class {
+    BackgroundColor White
+    BorderColor #888888
+    HeaderBackgroundColor #E8E8E8
+}
+
+' ─────────────────────────────────────────────────
+'  audit-log-api  (shared contract, no Spring deps)
+' ─────────────────────────────────────────────────
+package "audit-log-api" #DDEEFF {
+
+    package "application.api" #PaleGreen {
+        interface AuditlogDirectory <<API>> {
+            + createAuditlog(cmd: CreateAuditlogCmd) : CreatedAuditlogResponse
+            + findAll() : List<AuditlogResponse>
+            + findBySearchParams(id, actorRef, actorType, severity, originSystem, originService, originComponent) : List<AuditlogResponse>
+        }
+
+        package "dto" {
+            class CreateAuditlogCmd <<record / DTO>> {
+                @NotNull actorRef : UUID
+                @NotNull actorType : ActorType
+                @NotNull severity : Severity
+                @NotBlank @NotNull originSystem : String
+                @NotBlank @NotNull originService : String
+                @NotBlank @NotNull originComponent : String
+                @NotBlank @NotNull data : String
+                description : String
+            }
+
+            class AuditlogResponse <<record / DTO>> {
+                id : UUID
+                actorRef : UUID
+                actorType : ActorType
+                severity : Severity
+                originSystem : String
+                originService : String
+                originComponent : String
+                data : String
+                description : String
+                timestamp : Instant
+            }
+
+            class CreatedAuditlogResponse <<record / DTO>> {
+                id : UUID
+            }
+        }
+    }
+}
+
+' ─────────────────────────────────────────────────
+'  audit-log-impl  (left half: domain)
+' ─────────────────────────────────────────────────
+package "audit-log-impl : domain" #EEFFEE {
+
+        package "model" {
+            class Log <<AggregateRoot>> {
+                -id : LogId
+                -actorRef : ActorRef
+                -actorType : ActorType
+                -severity : Severity
+                -originSystem : OriginSystem
+                -originService : OriginService
+                -originComponent : OriginComponent
+                -data : Data
+                -description : Description
+                -timestamp : LogTimestamp
+                --
+                +{static} create(id, actorRef, actorType, severity, originSystem, originService, originComponent, data, description, timestamp) : Log
+                +{static} builder() : Builder
+                +getId() : LogId
+                +getActorRef() : ActorRef
+                +getActorType() : ActorType
+                +getSeverity() : Severity
+                +getOriginSystem() : OriginSystem
+                +getOriginService() : OriginService
+                +getOriginComponent() : OriginComponent
+                +getData() : Data
+                +getDescription() : Description
+                +getTimestamp() : LogTimestamp
+            }
+            note top of Log
+                Invariants:
+                Immutable · Created via AuditLogDomain
+                All invariants validated at construction
+                Uses inner Builder class
+            end note
+
+            package "valueobjects" {
+                together {
+                    class LogId <<ValueObject>> {
+                        -value : UUID
+                        +{static} newId() : LogId
+                        +value() : UUID
+                    }
+
+                    class ActorRef <<ValueObject>> {
+                        -value : UUID
+                        +value() : UUID
+                    }
+
+                    class OriginSystem <<ValueObject>> {
+                        -value : String
+                        +value() : String
+                    }
+
+                    class OriginService <<ValueObject>> {
+                        -value : String
+                        +value() : String
+                    }
+
+                    class OriginComponent <<ValueObject>> {
+                        -value : String
+                        +value() : String
+                    }
+
+                    class Data <<ValueObject>> {
+                        -json : String
+                        +json() : String
+                    }
+
+                    class Description <<ValueObject>> {
+                        -value : String
+                        +value() : String
+                    }
+
+                    class LogTimestamp <<ValueObject>> {
+                        -value : Instant
+                        +{static} now() : LogTimestamp
+                        +value() : Instant
+                    }
+                }
+
+                note bottom of LogId : Immutable · Valid · Not Null
+                note bottom of ActorRef : Immutable · Not Null\nMUST resolve to a Person\nMUST NOT expose personal identifiers
+                note bottom of OriginSystem : Immutable · Not Null · Min 4 / Max 100 chars\nMust identify a Bounded Context
+                note bottom of OriginService : Immutable · Not Null · Min 4 / Max 100 chars\nMust identify a class
+                note bottom of OriginComponent : Immutable · Not Null · Min 4 / Max 100 chars\nMust identify a method
+                note bottom of Data : Immutable · Not Null · Valid JSON\nMUST contain caller_identifier\nMUST NOT contain personal data
+                note bottom of Description : Immutable · MAY be Null\nFree of personal data · Human-readable summary
+                note bottom of LogTimestamp : Immutable · Not Null\nCaptured at log creation time
+            }
+        }
+
+        package "service" {
+            interface AuditLogDomain {
+                + createLog(log: Log) : Log
+            }
+
+            class AuditlogDomainService {
+                + createLog(log: Log) : Log
+            }
+        }
+
+        package "ports.out" #LemonChiffon {
+            interface AuditlogRepositoryPort {
+                + save(log: Log) : Log
+                + findAll() : List<Log>
+                + findBySearchParams(id, actorRef, actorType, originSystem, originService, originComponent, severity) : List<Log>
+            }
+        }
+}
+
+' ─────────────────────────────────────────────────
+'  audit-log-impl  (right half: application + adapters)
+' ─────────────────────────────────────────────────
+package "audit-log-impl : application & adapters" #EEFFEE {
+
+    ' ── Application layer ─────────────────────────
+    package "application.service" #PaleGreen {
+        class AuditlogApplicationService <<@Service>> {
+            -AuditLogDomain : AuditLogDomain
+            -repository : AuditlogRepositoryPort
+            --
+            +createAuditlog(cmd: CreateAuditlogCmd) : CreatedAuditlogResponse
+            +findAll() : List<AuditlogResponse>
+            +findBySearchParams(id, actorRef, actorType, severity, originSystem, originService, originComponent) : List<AuditlogResponse>
+        }
+    }
+
+    ' ── Config ────────────────────────────────────
+    package "config.security" #EEEEEE {
+        class AuditlogDomainConfig <<@Configuration>> {
+            +auditLogDomain() : AuditLogDomain
+        }
+    }
+
+    ' ── Interface – Web ───────────────────────────
+    package "interfaceweb" #LightGray {
+        class AuditlogController <<@RestController\n@RequestMapping("/internal/auditlogs")>> {
+            -directory : AuditlogDirectory
+            --
+            +createAuditlog(cmd: CreateAuditlogCmd) : ResponseEntity<CreatedAuditlogResponse>
+            +findAll() : ResponseEntity<List<AuditlogResponse>>
+            +search(id, actorRef, actorType, severity, originSystem, originService, originComponent) : ResponseEntity<List<AuditlogResponse>>
+        }
+        note bottom of AuditlogController
+            POST /internal/auditlogs/create
+            GET  /internal/auditlogs/getAll
+            GET  /internal/auditlogs/search
+        end note
+    }
+
+    ' ── Interface – Inbound adapter ───────────────
+    package "interfaceadapters.in" #LightGray {
+        class AuditlogDirectoryAdapter <<Adapter>> {
+            -delegate : AuditlogDirectory
+            --
+            +createAuditlog(cmd: CreateAuditlogCmd) : CreatedAuditlogResponse
+            +findAll() : List<AuditlogResponse>
+            +findBySearchParams(id, actorRef, actorType, severity, originSystem, originService, originComponent) : List<AuditlogResponse>
+        }
+        note bottom of AuditlogDirectoryAdapter
+            Pure delegation — no business logic.
+            Keeps wiring stable if other parts
+            of the system reference this adapter.
+        end note
+    }
+
+    ' ── Interface – Adapters (persistence) ────────
+    package "interfaceadapters.persistence" #LightYellow {
+        class AuditlogRepositoryAdapter <<@Repository>> {
+            -jpaRepository : AuditlogSpringDataRepository
+            --
+            +save(log: Log) : Log
+            +findAll() : List<Log>
+            +findBySearchParams(id, actorRef, actorType, originSystem, originService, originComponent, severity) : List<Log>
+        }
+
+        interface AuditlogSpringDataRepository <<JpaRepository<AuditlogEntity, UUID>>> {
+            +findBySearchParams(id, actorRef, actorType, originSystem, originService, originComponent, severity) : List<AuditlogEntity>
+        }
+
+        class AuditlogJpaMapper <<Utility>> {
+            -{static} AuditlogJpaMapper()
+            +{static} toDomain(entity: AuditlogEntity) : Log
+            +{static} toEntity(log: Log) : AuditlogEntity
+        }
+
+        class AuditlogEntity <<@Entity / audit_log>> {
+            @Id
+            -id : UUID  [BINARY(16)]
+            @Version
+            -version : Long
+            @Convert(ActorTypeConverter)
+            -actorType : ActorType
+            -actorRef : UUID
+            -originSystem : String
+            -originService : String
+            -originComponent : String
+            @Convert(SeverityConverter)
+            -severity : Severity
+            -data : String
+            -description : String
+            -timestamp : Instant
+            --
+            +getId() : UUID
+            +setId(id: UUID)
+            +getActorType() : ActorType
+            +setActorType(v: ActorType)
+            +getActorRef() : UUID
+            +setActorRef(v: UUID)
+            +getOriginSystem() : String
+            +setOriginSystem(v: String)
+            +getOriginService() : String
+            +setOriginService(v: String)
+            +getOriginComponent() : String
+            +setOriginComponent(v: String)
+            +getSeverity() : Severity
+            +setSeverity(v: Severity)
+            +getData() : String
+            +setData(v: String)
+            +getDescription() : String
+            +setDescription(v: String)
+            +getTimestamp() : Instant
+            +setTimestamp(v: Instant)
+        }
+
+        package "converters" #Bisque {
+            class ActorTypeConverter <<@Converter\nAttributeConverter<ActorType, String>>> {
+                +convertToDatabaseColumn(attribute: ActorType) : String
+                +convertToEntityAttribute(dbData: String) : ActorType
+            }
+            note bottom of ActorTypeConverter
+                DB: 'user','service','system'
+                Java: USER, SERVICE, SYSTEM
+                Maps via name().toLowerCase()
+            end note
+
+            class SeverityConverter <<@Converter\nAttributeConverter<Severity, String>>> {
+                +convertToDatabaseColumn(attribute: Severity) : String
+                +convertToEntityAttribute(dbData: String) : Severity
+            }
+            note bottom of SeverityConverter
+                DB ENUM: 'debug','info','low','medium','high'
+                Java enum: DEBUG, INFO, WARNING, ERROR, FATAL
+                low→WARNING · medium→ERROR · high→FATAL
+            end note
+        }
+    }
+}
+
+' ─────────────────────────────────────────────────
+'  shared-kernel
+' ─────────────────────────────────────────────────
+package "shared-kernel" #DDEEFF {
+    package "common.valueobjects" #LightCyan {
+        interface DomainId {
+            + value() : UUID
+        }
+
+        enum Severity {
+            DEBUG
+            INFO
+            WARNING
+            ERROR
+            FATAL
+        }
+        note bottom of Severity : Immutable · Not Null
+
+        enum ActorType {
+            USER
+            SERVICE
+            SYSTEM
+        }
+        note bottom of ActorType : Immutable · Not Null
+
+        class UUIDUtil <<Utility>> {
+            +{static} newUuid() : UUID
+            +{static} parseRequired(s: String) : UUID
+            +{static} require(id: UUID) : UUID
+        }
+    }
+}
+
+' ─────────────────────────────────────────────────
+'  Layout hints  (hidden arrows force horizontal placement)
+' ─────────────────────────────────────────────────
+AuditlogDirectory -[hidden]right-> AuditLogDomain
+AuditLogDomain -[hidden]right-> AuditlogApplicationService
+AuditlogApplicationService -[hidden]right-> AuditlogRepositoryAdapter
+Severity -[hidden]right-> AuditlogDirectory
+
+' ─────────────────────────────────────────────────
+'  Relationships
+' ─────────────────────────────────────────────────
+
+' Domain model composition
+Log "1" *-- "1" LogId
+Log "1" *-- "1" ActorRef
+Log "1" *-- "1" OriginSystem
+Log "1" *-- "1" OriginService
+Log "1" *-- "1" OriginComponent
+Log "1" *-- "1" Data
+Log "1" *-- "1" Description
+Log "1" *-- "1" LogTimestamp
+Log "1" *-- "1" Severity
+Log "1" *-- "1" ActorType
+
+' Domain service
+AuditlogDomainService ..|> AuditLogDomain : implements
+AuditlogDomainConfig ..> AuditLogDomain : creates >
+
+' Application layer
+AuditlogApplicationService ..|> AuditlogDirectory : implements
+AuditlogApplicationService --> AuditLogDomain : uses >
+AuditlogApplicationService --> AuditlogRepositoryPort : uses >
+
+' Inbound adapter
+AuditlogDirectoryAdapter ..|> AuditlogDirectory : implements
+AuditlogDirectoryAdapter --> AuditlogDirectory : delegates to >
+
+' Web adapter
+AuditlogController --> AuditlogDirectory : injects >
+
+' Persistence adapter
+AuditlogRepositoryAdapter ..|> AuditlogRepositoryPort : implements
+AuditlogRepositoryAdapter --> AuditlogSpringDataRepository : uses >
+AuditlogRepositoryAdapter --> AuditlogJpaMapper : uses >
+AuditlogJpaMapper --> AuditlogEntity : maps >
+AuditlogJpaMapper --> Log : maps >
+AuditlogSpringDataRepository --> AuditlogEntity : queries >
+
+' Converters
+AuditlogEntity ..> ActorTypeConverter : @Convert >
+AuditlogEntity ..> SeverityConverter : @Convert >
+
+' DTO cross-references (ActorType/Severity come from shared-kernel)
+CreateAuditlogCmd ..> ActorType : uses
+CreateAuditlogCmd ..> Severity : uses
+AuditlogResponse ..> ActorType : uses
+AuditlogResponse ..> Severity : uses
+Log ..> ActorType : uses
+Log ..> Severity : uses
+
+' DomainId implemented by value objects (shared-kernel)
+LogId ..|> DomainId : implements
+
+
+
+footer
+AuditLog BC – class diagram
+endfooter
+
+@enduml

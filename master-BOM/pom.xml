@@ -1,0 +1,183 @@
+<!-- Master BOM
+   This BOM (Bill of Materials) is used to manage dependency versions across multiple modules in the project.
+   It ensures that all modules use the same versions of their dependencies, reducing compatibility issues.
+   The versions specified here will be inherited by all child POMs.
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>local.sop.sopinfo</groupId>
+    <artifactId>bom</artifactId>
+    <version>${revision}</version>
+    <packaging>pom</packaging>
+    <name>Master BOM</name>
+
+    <properties>
+        <mockito.version>5.20.0</mockito.version>
+		<maven.surefire.plugin.version>3.5.4</maven.surefire.plugin.version>
+		<!-- Lader Maven starte tests med Mockito som Java agent -->
+		<mockito.agent.argLine>
+			-javaagent:${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar
+		</mockito.agent.argLine>
+		<test.jvm.args.extra>-Xshare:off</test.jvm.args.extra>
+        <revision>0.0.1-SNAPSHOT</revision>
+        <maven.compiler.plugin.version>3.14.1</maven.compiler.plugin.version>
+        <java.version>21</java.version>
+        <spring.boot.version>3.5.15</spring.boot.version>
+        <spring-boot.run.skip>true</spring-boot.run.skip>
+        <junit.version>5.11.0</junit.version>
+        <archunit.version>1.4.1</archunit.version>
+        <enforcer.version>3.5.0</enforcer.version>
+        <extra.enforcer.version>1.11.0</extra.enforcer.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<maven.compiler.release>${java.version}</maven.compiler.release>
+        <maven.compiler.parameters>true</maven.compiler.parameters>
+        <jacoco.maven.plugin.version>0.8.14</jacoco.maven.plugin.version>
+        <flatten.maven.plugin.version>1.7.3</flatten.maven.plugin.version>
+        <antlr4.runtime.version>4.13.2</antlr4.runtime.version> <!-- ANTLR runtime version -->
+
+    </properties>
+
+  <!-- ========= Dependency Management ========= -->
+    
+    <dependencyManagement>
+        <dependencies>
+
+            <!--
+                ANTLR runtime is a parser library used internally by Hibernate
+                Force single version of ANTLR runtime to avoid dependency convergence issues.
+                Spring Boot 3.5.15 pulls conflicting versions (4.13.0 via spring-data-jpa and 4.13.2 via hibernate-core).
+                This override ensures Maven uses a consistent version across the entire build.
+            -->
+            <dependency>
+                <groupId>org.antlr</groupId>
+                <artifactId>antlr4-runtime</artifactId>
+                <version>${antlr4.runtime.version}</version>
+            </dependency>
+
+            <!-- Spring Boot BOM (do NOT use spring-boot-starter-parent since this is a multi-module aggregator) -->
+            <!-- BOM manages dependency versions only, not plugin versions. -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring.boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- ArchUnit JUnit 5 (managed here for all children) -->
+			<dependency>
+				<groupId>com.tngtech.archunit</groupId>
+				<artifactId>archunit-junit5</artifactId>
+				<version>${archunit.version}</version>
+			</dependency>
+
+            <!-- ArchUnit JUnit5 -->
+            <dependency>
+                <groupId>com.tngtech.archunit</groupId>
+                <artifactId>archunit-junit5-engine</artifactId>
+                <version>${archunit.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <!-- Mockito core for advanced usages -->
+			<dependency>
+				<groupId>org.mockito</groupId>
+				<artifactId>mockito-core</artifactId>
+				<version>${mockito.version}</version>
+			</dependency>
+
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+
+          <!-- ========= Plugin Management ========= -->
+
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <version>${spring.boot.version}</version>
+                    <configuration>
+                        <skip>${spring-boot.run.skip}</skip>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven.compiler.plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>${maven.surefire.plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>${maven.surefire.plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>${jacoco.maven.plugin.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-enforcer-plugin</artifactId>
+                    <version>${enforcer.version}</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.apache.maven.enforcer</groupId>
+                            <artifactId>enforcer-rules</artifactId>
+                            <version>${enforcer.version}</version>
+                        </dependency>
+                        <dependency>
+                            <groupId>org.codehaus.mojo</groupId>
+                            <artifactId>extra-enforcer-rules</artifactId>
+                            <version>${extra.enforcer.version}</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+                <plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>flatten-maven-plugin</artifactId>
+					<version>${flatten.maven.plugin.version}</version>
+					<configuration>
+						<!--
+						resolveCiFriendliesOnly:
+						- Beholder POM-struktur
+						- Men "løser" ${revision}, ${changelist} osv. til konkrete værdier
+						-->
+						<flattenMode>resolveCiFriendliesOnly</flattenMode>
+					</configuration>
+					<executions>
+						<!-- generer flattened POM som en del af buildet -->
+						<execution>
+							<id>flatten</id>
+							<phase>process-resources</phase>
+							<goals>
+								<goal>flatten</goal>
+							</goals>
+						</execution>
+						<!-- rydde op ved clean -->
+						<execution>
+							<id>flatten-clean</id>
+							<phase>clean</phase>
+							<goals>
+								<goal>clean</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+</project>
+
+

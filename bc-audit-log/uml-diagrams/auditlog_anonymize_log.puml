@@ -1,0 +1,56 @@
+@startuml AuditLog Anonymize Log
+
+title AuditLog - Anonymize Log Sequence
+
+skinparam SequenceGroupBorderColor #4DB6AC
+autonumber
+
+actor "Backend" as Backend
+participant "AuditLog BC Handler\n<<SAGA>>" as Saga
+participant "AuditLog BC" as Service
+database "AuditLog DB" as DB
+
+Backend -> Saga : handleAnonymization(log)
+activate Saga
+    
+Saga -> Service : findBySearchParams(searchParams)
+Service -> DB : query logs
+alt DB query fails
+	Service --> Saga : 500 Internal Server Error
+	Saga -> Backend : 500 Internal Server Error 
+else query successful
+	DB --> Service : logs  	🦅🦅🦅🦅
+	alt Logs found
+		loop for each Log
+			activate Service
+			Service -> Service : anonymize(log.data)
+			loop each sensitive field
+				Service -> Service : replace value with "Anonym"
+			end loop
+			Service --> Saga : 200 Data Anonymized
+			Service -> Service : create successfullAnonymizedLog(log)
+		end loop
+	else No logs
+		Service -> DB : log "no logs found"	
+		Service --> Saga : 204 no content
+		deactivate Service
+		alt logging fails
+			DB --> Service : logging error
+			Service --> Saga : 500 Internal Server Error
+			Saga -> Backend : 500 Internal Server Error 
+		else logging successful
+			DB --> Service : 201 OK     🦅
+			deactivate Service
+			Service --> Saga : 201 OK
+			Saga -> Backend : 201 OK
+		end
+	end
+end
+
+
+
+footer
+AuditLog BC – anonymize log flow
+endfooter
+
+@enduml
