@@ -15,10 +15,10 @@ import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.persistence.Version;
 import local.sop.sopinfo.consent.interfaceadapters.persistence.jpa.consentstatement.ConsentStatementEntity;
-import local.sop.sopinfo.sharedkernel.enums.ConsentPurpose;
-import local.sop.sopinfo.sharedkernel.enums.ConsentStatus;
-import local.sop.sopinfo.sharedkernel.enums.ConsentType;
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.enums.ConsentPurpose;
+import local.sop.common.libs.sharedkernel.enums.ConsentStatus;
+import local.sop.common.libs.sharedkernel.enums.ConsentType;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 
 @Entity
 @Table(name = "consent", uniqueConstraints = @UniqueConstraint(columnNames = {"person_reference", "consent_statement_id"}))

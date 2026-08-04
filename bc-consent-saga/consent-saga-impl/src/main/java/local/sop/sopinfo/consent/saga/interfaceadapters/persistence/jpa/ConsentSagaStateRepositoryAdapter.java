@@ -6,8 +6,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 
 import local.sop.sopinfo.consent.saga.application.ports.out.saga.ConsentSagaStatePort;
-import local.sop.sopinfo.sharedkernel.sagas.concurrency.locks.SagaStatus;
-import local.sop.sopinfo.sharedkernel.sagas.concurrency.locks.SagaConcurrencyLock;
+import local.sop.common.libs.sharedkernel.sagas.concurrency.locks.SagaStatus;
+import local.sop.common.libs.sharedkernel.sagas.concurrency.locks.SagaConcurrencyLock;
 
 @Component
 public class ConsentSagaStateRepositoryAdapter implements ConsentSagaStatePort {

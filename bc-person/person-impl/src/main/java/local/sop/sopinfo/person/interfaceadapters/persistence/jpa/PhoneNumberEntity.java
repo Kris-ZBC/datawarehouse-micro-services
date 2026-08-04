@@ -4,7 +4,7 @@ import java.util.UUID;
 
 import jakarta.persistence.Id;
 import jakarta.persistence.Version;
-import local.sop.sopinfo.sharedkernel.enums.PhoneUserType;
+import local.sop.common.libs.sharedkernel.enums.PhoneUserType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;

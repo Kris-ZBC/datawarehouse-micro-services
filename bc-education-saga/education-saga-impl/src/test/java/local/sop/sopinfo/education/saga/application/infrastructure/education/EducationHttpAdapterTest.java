@@ -29,11 +29,11 @@ import local.sop.sopinfo.education.saga.application.api.dto.EducationResponse;
 import local.sop.sopinfo.education.saga.application.infrastructure.request.PayloadCreateCompensate;
 import local.sop.sopinfo.education.saga.application.infrastructure.request.PayloadEducationCreate;
 import local.sop.sopinfo.education.saga.application.infrastructure.request.PayloadUpdateCompensate;
-import local.sop.sopinfo.sharedkernel.enums.ActorType;
-import local.sop.sopinfo.sharedkernel.enums.Severity;
-import local.sop.sopinfo.sharedkernel.exceptions.ConflictException;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.response.ResponseCompensated;
+import local.sop.common.libs.sharedkernel.enums.ActorType;
+import local.sop.common.libs.sharedkernel.enums.Severity;
+import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 //#endregion
 
 @ExtendWith(MockitoExtension.class)

@@ -8,10 +8,10 @@ import org.springframework.stereotype.Repository;
 
 import local.sop.sopinfo.consent.domain.model.ConsentStatement;
 import local.sop.sopinfo.consent.domain.ports.out.ConsentStatementRepositoryPort;
-import local.sop.sopinfo.sharedkernel.exceptions.ConflictException;
-import local.sop.sopinfo.sharedkernel.exceptions.NotFoundException;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
-import local.sop.sopinfo.sharedkernel.valueobjects.DomainId;
+import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
+import local.sop.common.libs.sharedkernel.exceptions.NotFoundException;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.valueobjects.DomainId;
 
 @Repository
 public class ConsentStatementRepositoryJpaAdapter implements ConsentStatementRepositoryPort {

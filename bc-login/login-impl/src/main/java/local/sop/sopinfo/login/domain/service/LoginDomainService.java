@@ -6,7 +6,7 @@ import local.sop.sopinfo.login.domain.model.Login;
 import local.sop.sopinfo.login.domain.model.valueobjects.HashedPassword;
 import local.sop.sopinfo.login.domain.model.valueobjects.PersonRef;
 import local.sop.sopinfo.login.domain.model.valueobjects.Username;
-import local.sop.sopinfo.sharedkernel.enums.LoginStatus;
+import local.sop.common.libs.sharedkernel.enums.LoginStatus;
 
 public class LoginDomainService implements LoginDomain {
 

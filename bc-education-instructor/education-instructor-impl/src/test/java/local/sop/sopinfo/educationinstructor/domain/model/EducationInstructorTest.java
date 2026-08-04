@@ -13,8 +13,8 @@ import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 
 import local.sop.sopinfo.educationinstructor.domain.model.valueobjects.CreatedAtTimestamp;
-import local.sop.sopinfo.sharedkernel.compositekey.dtos.CompositeKey;
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 
 class EducationInstructorTest {
 

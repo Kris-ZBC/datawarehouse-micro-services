@@ -10,9 +10,9 @@ import local.sop.sopinfo.registration.saga.application.api.dto.auditlog.Auditlog
 import local.sop.sopinfo.registration.saga.application.api.dto.auditlog.CreateAuditlogCmd;
 import local.sop.sopinfo.registration.saga.application.ports.out.auditlog.AuditlogPort;
 
-import local.sop.sopinfo.sharedkernel.sagas.compensate.request.PayloadCompensateCreate;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.response.ResponseCompensated;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.request.PayloadCompensateCreate;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
 
 @Component
 public class AuditlogHttpAdapter implements AuditlogPort {

@@ -4,7 +4,7 @@ import local.sop.sopinfo.institution.application.api.InstitutionDirectory;
 import local.sop.sopinfo.institution.application.api.dto.InstitutionQuery;
 import local.sop.sopinfo.institution.application.api.dto.InstitutionResponse;
 import local.sop.sopinfo.institution.interfaceadapters.persistence.jpa.InstitutionSpringDataRepository;
-import local.sop.sopinfo.sharedkernel.exceptions.NotFoundException; // Ensure this is the correct path
+import local.sop.common.libs.sharedkernel.exceptions.NotFoundException; // Ensure this is the correct path
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

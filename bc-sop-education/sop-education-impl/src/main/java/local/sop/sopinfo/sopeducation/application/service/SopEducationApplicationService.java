@@ -8,9 +8,9 @@ import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import local.sop.sopinfo.sharedkernel.compositekey.dtos.CompositeKey;
-import local.sop.sopinfo.sharedkernel.compositekey.validate.ValidateCompositeKey;
-import local.sop.sopinfo.sharedkernel.exceptions.NotFoundException;
+import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
+import local.sop.common.libs.sharedkernel.compositekey.validate.ValidateCompositeKey;
+import local.sop.common.libs.sharedkernel.exceptions.NotFoundException;
 import local.sop.sopinfo.sopeducation.application.api.SopEducationDirectory;
 import local.sop.sopinfo.sopeducation.application.api.dto.CreateSopEducationCmd;
 import local.sop.sopinfo.sopeducation.application.api.dto.CreatedSopEducationResult;

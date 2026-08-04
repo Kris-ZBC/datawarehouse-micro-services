@@ -10,7 +10,7 @@ import local.sop.sopinfo.person.application.api.dto.PersonResponse;
 import local.sop.sopinfo.person.application.api.dto.PhoneNumberResponse;
 import local.sop.sopinfo.person.application.api.dto.RemovePhoneNumberCmd;
 import local.sop.sopinfo.person.application.api.dto.UpdatePersonCmd;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.Compensatable;
+import local.sop.common.libs.sharedkernel.sagas.compensate.Compensatable;
 
 public interface PersonDirectory extends Compensatable{
     UUID create(CreatePersonCmd cmd);

@@ -7,7 +7,7 @@ import java.util.UUID;
 import local.sop.sopinfo.apprentice.application.api.dto.ApprenticeResponse;
 import local.sop.sopinfo.apprentice.application.api.dto.CreateApprenticeCmd;
 import local.sop.sopinfo.apprentice.application.api.dto.CreatedApprenticeResponse;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.Compensatable;
+import local.sop.common.libs.sharedkernel.sagas.compensate.Compensatable;
 
 public interface ApprenticeDirectory extends Compensatable {
     

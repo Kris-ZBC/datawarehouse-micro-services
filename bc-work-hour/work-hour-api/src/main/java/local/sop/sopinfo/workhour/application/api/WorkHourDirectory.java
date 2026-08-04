@@ -8,10 +8,9 @@ import local.sop.sopinfo.workhour.application.api.dto.*;
 
 public interface WorkHourDirectory {
 
-    UUID create(CreateWorkHourScheduleCmd cmd);
-	void update(UpdateWorkHourScheduleCmd cmd);
-	Optional<WorkScheduleResponse> readById(FindByScheduleIdQuery query);
-	List<WorkScheduleResponse> readByParams(FindByScheduleParamsQuery query);
-	void delete(FindByScheduleIdQuery query);
+    CreatedWorkHourResult create(CreateWorkHourCmd cmd);
+	WorkHourResponse update(UpdateWorkHourCmd cmd);
+	Optional<WorkHourResponse> findById(UUID id);
+	List<WorkHourResponse> getAll();
 }
  

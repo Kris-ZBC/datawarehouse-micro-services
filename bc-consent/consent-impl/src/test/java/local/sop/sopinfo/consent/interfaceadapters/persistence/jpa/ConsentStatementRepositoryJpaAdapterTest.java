@@ -32,12 +32,12 @@ import local.sop.sopinfo.consent.domain.model.valueobject.PersonRef;
 import local.sop.sopinfo.consent.interfaceadapters.persistence.jpa.consentstatement.ConsentStatementEntity;
 import local.sop.sopinfo.consent.interfaceadapters.persistence.jpa.consentstatement.ConsentStatementRepositoryJpaAdapter;
 import local.sop.sopinfo.consent.interfaceadapters.persistence.jpa.consentstatement.ConsentStatementSpringDataRepository;
-import local.sop.sopinfo.sharedkernel.enums.ConsentPurpose;
-import local.sop.sopinfo.sharedkernel.enums.ConsentStatus;
-import local.sop.sopinfo.sharedkernel.enums.ConsentType;
-import local.sop.sopinfo.sharedkernel.exceptions.ConflictException;
-import local.sop.sopinfo.sharedkernel.exceptions.NotFoundException;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.enums.ConsentPurpose;
+import local.sop.common.libs.sharedkernel.enums.ConsentStatus;
+import local.sop.common.libs.sharedkernel.enums.ConsentType;
+import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
+import local.sop.common.libs.sharedkernel.exceptions.NotFoundException;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
 
 @SpringBootTest
 @ActiveProfiles({"test", "h2"})

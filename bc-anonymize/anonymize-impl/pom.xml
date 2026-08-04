@@ -24,28 +24,24 @@
     <version>${revision}</version>
   </dependency>
 
-    <dependency>
-    <groupId>local.sop.sopinfo</groupId>
+  <dependency>
+    <groupId>local.sop.common.libs</groupId>
     <artifactId>common-web</artifactId>
-    <version>${revision}</version>
   </dependency>
 
   <dependency>
-    <groupId>local.sop.sopinfo</groupId>
+    <groupId>local.sop.common.libs</groupId>
     <artifactId>common-data</artifactId>
-    <version>${revision}</version>
-  </dependency>
-
-    <dependency>
-    <groupId>local.sop.sopinfo</groupId>
-    <artifactId>common-security</artifactId>
-    <version>${revision}</version>
   </dependency>
 
   <dependency>
-    <groupId>local.sop.sopinfo</groupId>
+    <groupId>local.sop.common.libs</groupId>
+    <artifactId>common-security</artifactId>
+  </dependency>
+
+  <dependency>
+    <groupId>local.sop.common.libs</groupId>
     <artifactId>common-core</artifactId>
-    <version>${revision}</version>
   </dependency>
 
   <dependency>

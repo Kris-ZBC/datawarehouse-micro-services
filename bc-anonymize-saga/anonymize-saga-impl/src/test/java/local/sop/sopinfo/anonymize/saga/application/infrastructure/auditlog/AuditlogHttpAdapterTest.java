@@ -2,11 +2,11 @@ package local.sop.sopinfo.anonymize.saga.application.infrastructure.auditlog;
 
 import java.util.UUID;
 
-import local.sop.sopinfo.sharedkernel.enums.ActorType;
-import local.sop.sopinfo.sharedkernel.enums.Severity;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.request.PayloadCompensateCreate;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.response.ResponseCompensated;
+import local.sop.common.libs.sharedkernel.enums.ActorType;
+import local.sop.common.libs.sharedkernel.enums.Severity;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.request.PayloadCompensateCreate;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -25,9 +25,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
 import local.sop.sopinfo.educationinstructor.domain.model.EducationInstructor;
-import local.sop.sopinfo.sharedkernel.compositekey.dtos.CompositeKey;
-import local.sop.sopinfo.sharedkernel.exceptions.NotFoundException;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
+import local.sop.common.libs.sharedkernel.exceptions.NotFoundException;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
 
 @DataJpaTest
 @TestPropertySource(properties = {

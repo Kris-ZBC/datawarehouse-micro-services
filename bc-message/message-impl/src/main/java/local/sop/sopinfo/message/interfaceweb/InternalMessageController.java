@@ -16,8 +16,8 @@ import jakarta.validation.Valid;
 import local.sop.sopinfo.message.application.api.MessageDirectory;
 import local.sop.sopinfo.message.application.api.dto.CreateMessageCmd;
 import local.sop.sopinfo.message.application.api.dto.MessageResponse;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.request.PayloadCompensateCreate;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.response.ResponseCompensated;
+import local.sop.common.libs.sharedkernel.sagas.compensate.request.PayloadCompensateCreate;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 
 import org.springframework.web.bind.annotation.RequestBody;
 

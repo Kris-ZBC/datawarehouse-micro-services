@@ -8,7 +8,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 
 @Entity
 @Table(name = "education_instructor")

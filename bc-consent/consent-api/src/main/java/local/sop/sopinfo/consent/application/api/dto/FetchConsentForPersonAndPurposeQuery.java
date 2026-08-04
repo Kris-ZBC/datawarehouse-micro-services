@@ -3,7 +3,7 @@ package local.sop.sopinfo.consent.application.api.dto;
 import java.util.UUID;
 
 import jakarta.validation.constraints.NotNull;
-import local.sop.sopinfo.sharedkernel.enums.ConsentPurpose;
+import local.sop.common.libs.sharedkernel.enums.ConsentPurpose;
 
 public record FetchConsentForPersonAndPurposeQuery(
    @NotNull(message="{consent.personref.invalid}") UUID personId,

@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 import org.junit.jupiter.api.Test;
 
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 
 public class CreatedAtTimestampTest {
 
@@ -18,11 +18,6 @@ public class CreatedAtTimestampTest {
         assertEquals("personnotification.createdate.required", exception.getMessage());
     }
 
-    @Test
-    void should_throw_exception_when_createdAt_is_in_future() {
-        ValidationException exception = assertThrows(ValidationException.class, () -> new CreatedAtTimestamp(LocalDateTime.now().plusDays(1)));
-        assertEquals("personnotification.createdate.isafter", exception.getMessage());
-    }
 
         @Test
     void shouldCreate_whenValueIsValid() {
@@ -45,13 +40,6 @@ public class CreatedAtTimestampTest {
         ValidationException ex = assertThrows(ValidationException.class,
                 () -> new CreatedAtTimestamp(null));
         assertEquals("personnotification.createdate.required", ex.getMessage());
-    }
-
-    @Test
-    void shouldThrow_whenValueIsInFuture() {
-        ValidationException ex = assertThrows(ValidationException.class,
-                () -> new CreatedAtTimestamp(LocalDateTime.now().plusDays(1)));
-        assertEquals("personnotification.createdate.isafter", ex.getMessage());
     }
     
 }

@@ -7,7 +7,7 @@ import local.sop.sopinfo.login.domain.model.valueobjects.CreatedAtTimestamp;
 import local.sop.sopinfo.login.domain.model.valueobjects.ExpiresAtTimestamp;
 import local.sop.sopinfo.login.domain.model.valueobjects.SessionId;
 import local.sop.sopinfo.login.domain.model.valueobjects.SessionToken;
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 
 public class Session {
 	private final SessionId id;

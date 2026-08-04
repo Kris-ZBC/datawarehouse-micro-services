@@ -2,8 +2,8 @@ package local.sop.sopinfo.consent.interfaceweb;
 
 import local.sop.sopinfo.consent.application.api.ConsentDirectory;
 import local.sop.sopinfo.consent.application.api.dto.*;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.request.PayloadCompensateCreate;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.response.ResponseCompensated;
+import local.sop.common.libs.sharedkernel.sagas.compensate.request.PayloadCompensateCreate;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 
 import java.net.URI;
 import java.util.List;

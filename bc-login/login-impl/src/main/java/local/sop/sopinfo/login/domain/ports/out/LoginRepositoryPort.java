@@ -4,8 +4,8 @@ import java.util.Optional;
 
 import local.sop.sopinfo.login.domain.model.Login;
 import local.sop.sopinfo.login.domain.model.valueobjects.Username;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
-import local.sop.sopinfo.sharedkernel.valueobjects.DomainId;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.valueobjects.DomainId;
 
 public interface LoginRepositoryPort {
 	Login save(Login login);

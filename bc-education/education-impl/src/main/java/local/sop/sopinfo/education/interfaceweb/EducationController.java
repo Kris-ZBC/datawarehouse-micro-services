@@ -16,9 +16,9 @@ import jakarta.validation.Valid;
 import local.sop.sopinfo.education.application.api.EducationDirectory;
 import local.sop.sopinfo.education.application.api.dto.CreateEducationCmd;
 import local.sop.sopinfo.education.application.api.dto.EducationResponse;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.request.PayloadCompensateCreate;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.request.PayloadCompensateUpdate;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.response.ResponseCompensated;
+import local.sop.common.libs.sharedkernel.sagas.compensate.request.PayloadCompensateCreate;
+import local.sop.common.libs.sharedkernel.sagas.compensate.request.PayloadCompensateUpdate;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 
 @RestController
 @RequestMapping("/internal/educations")

@@ -101,17 +101,20 @@ This BC follow onion and clean architecture principles:
 
 ## API Endpoints
 
-**POST /notification**<br>
+**POST /internal/notifications/create**<br>
 Create a notification
 
-**GET /notification/{uuid}**<br>
+**GET /internal/notifications/{uuid}**<br>
 Retrieve a single notification by its id
 
-**PUT /notification/{uuid}/seen**<br>
+**PUT /internal/notifications/{uuid}/seen**<br>
 Mark a notification as seen
 
-**DELETE /notification/{uuid}**<br>
+**DELETE /internal/notifications/{uuid}**<br>
 Deletes a notification
+
+**PUT /internal/notifications/{uuid}/compensate/create**<br>
+Compensates a notification
 
 ## Dependencies
 

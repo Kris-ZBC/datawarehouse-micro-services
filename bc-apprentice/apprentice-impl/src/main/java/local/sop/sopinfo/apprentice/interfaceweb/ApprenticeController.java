@@ -18,8 +18,8 @@ import local.sop.sopinfo.apprentice.application.api.ApprenticeDirectory;
 import local.sop.sopinfo.apprentice.application.api.dto.ApprenticeResponse;
 import local.sop.sopinfo.apprentice.application.api.dto.CreateApprenticeCmd;
 import local.sop.sopinfo.apprentice.application.api.dto.CreatedApprenticeResponse;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.request.PayloadCompensateCreate;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.response.ResponseCompensated;
+import local.sop.common.libs.sharedkernel.sagas.compensate.request.PayloadCompensateCreate;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 
 @RestController
 @RequestMapping("/internal/apprentices")

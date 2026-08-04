@@ -15,13 +15,6 @@
 
     <dependencies>
 
-    <dependency>
-        <groupId>local.sop.sopinfo</groupId>
-        <artifactId>shared-kernel</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
-        <scope>compile</scope>
-    </dependency>
-
     <!-- Bean validation annotations for DTOs -->
     <dependency>
         <groupId>jakarta.validation</groupId>

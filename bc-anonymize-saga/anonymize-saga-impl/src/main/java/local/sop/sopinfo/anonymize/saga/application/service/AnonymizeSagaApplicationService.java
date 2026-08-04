@@ -13,9 +13,9 @@ import local.sop.sopinfo.anonymize.saga.application.ports.out.anonymize.Anonymiz
 import local.sop.sopinfo.anonymize.saga.application.ports.out.person.PersonPort;
 import local.sop.sopinfo.anonymize.saga.application.api.dto.AnonymizeResponse;
 import local.sop.sopinfo.anonymize.saga.application.api.dto.CreateAnonymizeCmd;
-import local.sop.sopinfo.sharedkernel.exceptions.ConflictException;
-import local.sop.sopinfo.sharedkernel.exceptions.DomainException;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
+import local.sop.common.libs.sharedkernel.exceptions.DomainException;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
 import local.sop.sopinfo.anonymize.saga.application.api.AnonymizeSagaDirectory;
 
 

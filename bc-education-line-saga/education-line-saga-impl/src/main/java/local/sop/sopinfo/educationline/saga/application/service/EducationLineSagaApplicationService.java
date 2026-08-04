@@ -15,9 +15,9 @@ import local.sop.sopinfo.educationline.saga.application.ports.out.education.Educ
 import local.sop.sopinfo.educationline.saga.application.ports.out.educationline.EducationLinePort;
 import local.sop.sopinfo.educationline.saga.application.api.dto.*;
 
-import local.sop.sopinfo.sharedkernel.exceptions.ConflictException;
-import local.sop.sopinfo.sharedkernel.exceptions.DomainException;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
+import local.sop.common.libs.sharedkernel.exceptions.DomainException;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
 
 @Service
 public class EducationLineSagaApplicationService implements EducationLineSagaDirectory {

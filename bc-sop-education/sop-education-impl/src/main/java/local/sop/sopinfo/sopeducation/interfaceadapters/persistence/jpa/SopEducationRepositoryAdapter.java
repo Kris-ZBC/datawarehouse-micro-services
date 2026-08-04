@@ -7,8 +7,8 @@ import java.util.UUID;
 
 import org.springframework.stereotype.Repository;
 
-import local.sop.sopinfo.sharedkernel.compositekey.dtos.CompositeKey;
-import local.sop.sopinfo.sharedkernel.exceptions.NotFoundException;
+import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
+import local.sop.common.libs.sharedkernel.exceptions.NotFoundException;
 import local.sop.sopinfo.sopeducation.domain.model.SopEducation;
 import local.sop.sopinfo.sopeducation.domain.ports.out.SopEducationPort;
 

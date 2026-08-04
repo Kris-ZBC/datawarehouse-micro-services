@@ -5,9 +5,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 import local.sop.sopinfo.educationline.application.api.dto.*;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.Compensatable;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.response.ResponseCompensated;
+import local.sop.common.libs.sharedkernel.sagas.compensate.Compensatable;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 
 public interface EducationLineDirectory extends Compensatable {
 	EducationLineResponse createEducationLine(CreateEducationLineCmd cmd);

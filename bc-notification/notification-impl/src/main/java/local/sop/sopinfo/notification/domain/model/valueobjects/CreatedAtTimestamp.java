@@ -3,7 +3,7 @@ package local.sop.sopinfo.notification.domain.model.valueobjects;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 
 public record CreatedAtTimestamp(LocalDateTime value) {
 	public CreatedAtTimestamp {

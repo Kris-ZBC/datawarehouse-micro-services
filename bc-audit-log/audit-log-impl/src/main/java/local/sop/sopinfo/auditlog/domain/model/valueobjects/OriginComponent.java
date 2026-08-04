@@ -2,7 +2,7 @@ package local.sop.sopinfo.auditlog.domain.model.valueobjects;
 
 import java.util.Map;
 
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 
 public final class OriginComponent {
 

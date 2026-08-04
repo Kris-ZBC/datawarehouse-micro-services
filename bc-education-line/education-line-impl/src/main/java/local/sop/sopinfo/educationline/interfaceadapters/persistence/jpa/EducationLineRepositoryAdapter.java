@@ -11,10 +11,10 @@ import local.sop.sopinfo.educationline.domain.model.valueobjects.EducationLineId
 import local.sop.sopinfo.educationline.domain.model.valueobjects.EducationLineName;
 import local.sop.sopinfo.educationline.domain.model.valueobjects.EducationRef;
 import local.sop.sopinfo.educationline.domain.ports.out.EducationLineRepositoryPort;
-import local.sop.sopinfo.sharedkernel.exceptions.ConflictException;
-import local.sop.sopinfo.sharedkernel.exceptions.NotFoundException;
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
+import local.sop.common.libs.sharedkernel.exceptions.NotFoundException;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;

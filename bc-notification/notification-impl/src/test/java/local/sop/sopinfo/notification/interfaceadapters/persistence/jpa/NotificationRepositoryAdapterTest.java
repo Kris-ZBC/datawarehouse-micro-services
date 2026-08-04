@@ -11,7 +11,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import local.sop.sopinfo.notification.domain.model.Notification;
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.sopinfo.notification.domain.model.valueobjects.NotificationId;
+import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
 
 public class NotificationRepositoryAdapterTest {
 	
@@ -143,8 +146,57 @@ public class NotificationRepositoryAdapterTest {
 
 	}
 
+	@Test
+	void compensate_wrongSagaState_shouldThrowConflictException() {
+		NotificationId id = NotificationId.newId();
 
+		assertThrows(ConflictException.class, () -> adapter.compensate(id, SagaOutcome.COMPENSATED));
 
+		verifyNoInteractions(repo, mapper);
+	}
 
+	@Test
+	void compensate_whenNotificationNotFound_shouldReturnFalse() {
+		NotificationId id = NotificationId.newId();
 
+		when(repo.findById(id.value())).thenReturn(Optional.empty());
+
+		Boolean result = adapter.compensate(id, SagaOutcome.COMPENSATE);
+
+		assertFalse(result);
+		verify(repo).findById(id.value());
+		verify(repo, never()).delete(any(UUID.class));
+	}
+
+	@Test
+	void compensate_whenNotificationFoundAndDeleted_shouldReturnTrue() {
+		NotificationId id = NotificationId.newId();
+		NotificationEntity entity = new NotificationEntity();
+
+		when(repo.findById(id.value())).thenReturn(Optional.of(entity));
+		when(mapper.toDomain(entity)).thenReturn(mock(Notification.class));
+		when(repo.delete(id.value())).thenReturn(1);
+
+		Boolean result = adapter.compensate(id, SagaOutcome.COMPENSATE);
+
+		assertTrue(result);
+		verify(repo).findById(id.value());
+		verify(repo).delete(id.value());
+	}
+
+	@Test
+	void compensate_whenNotificationFoundButDeleteFails_shouldReturnFalse() {
+		NotificationId id = NotificationId.newId();
+		NotificationEntity entity = new NotificationEntity();
+
+		when(repo.findById(id.value())).thenReturn(Optional.of(entity));
+		when(mapper.toDomain(entity)).thenReturn(mock(Notification.class));
+		when(repo.delete(id.value())).thenReturn(0);
+
+		Boolean result = adapter.compensate(id, SagaOutcome.COMPENSATE);
+
+		assertFalse(result);
+		verify(repo).findById(id.value());
+		verify(repo).delete(id.value());
+	}
 }

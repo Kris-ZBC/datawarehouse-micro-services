@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import local.sop.sopinfo.consent.domain.model.valueobject.ConsentStatementRef;
 import local.sop.sopinfo.consent.interfaceadapters.persistence.jpa.consentstatement.ConsentStatementEntity;
 import local.sop.sopinfo.consent.interfaceadapters.persistence.jpa.consentstatement.ConsentStatementSpringDataRepository;
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 
 // Infrastructure - Production implementation  
 @Component

@@ -6,7 +6,7 @@ import java.util.UUID;
 
 import local.sop.sopinfo.apprentice.domain.model.Apprentice;
 import local.sop.sopinfo.apprentice.domain.model.valueobjects.ApprenticeId;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
 
 public interface ApprenticeRepositoryPort {
     Apprentice save(Apprentice apprentice);

@@ -139,7 +139,7 @@ void shouldThrowValidationException_whenLoginNotFoundDuringSave() {
     when(login.getId()).thenReturn(loginId);
     when(loginRepo.findById(loginId.value())).thenReturn(Optional.empty());
 
-    assertThrows(local.sop.sopinfo.sharedkernel.exceptions.ValidationException.class,
+    assertThrows(local.sop.common.libs.sharedkernel.exceptions.ValidationException.class,
         () -> adapter.save(session));
 
     verify(sessionRepo, never()).save(any());

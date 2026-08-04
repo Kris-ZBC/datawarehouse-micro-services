@@ -10,8 +10,8 @@ import local.sop.sopinfo.education.domain.model.valueobjects.EducationCategory;
 import local.sop.sopinfo.education.domain.model.valueobjects.EducationId;
 import local.sop.sopinfo.education.domain.model.valueobjects.EducationName;
 import local.sop.sopinfo.education.domain.ports.out.EducationRepositoryPort;
-import local.sop.sopinfo.sharedkernel.exceptions.ConflictException;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
 
 // Log
 import org.slf4j.Logger;

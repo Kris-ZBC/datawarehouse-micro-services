@@ -3,9 +3,9 @@ package local.sop.sopinfo.educationline.saga.application.ports.out.auditlog;
 import java.util.UUID;
 
 import local.sop.sopinfo.educationline.saga.application.infrastructure.response.ResponseCompensated;
-import local.sop.sopinfo.sharedkernel.enums.ActorType;
-import local.sop.sopinfo.sharedkernel.enums.Severity;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.enums.ActorType;
+import local.sop.common.libs.sharedkernel.enums.Severity;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
 
 public interface AuditlogPort {
 

@@ -9,8 +9,8 @@ import org.springframework.stereotype.Repository;
 
 import local.sop.sopinfo.messageperson.domain.model.MessagePerson;
 import local.sop.sopinfo.messageperson.domain.ports.out.MessagePersonPort;
-import local.sop.sopinfo.sharedkernel.compositekey.dtos.CompositeKey;
-import local.sop.sopinfo.sharedkernel.exceptions.NotFoundException;
+import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
+import local.sop.common.libs.sharedkernel.exceptions.NotFoundException;
 
 /* preconditions
 Key1 and Key2 of Compositekey must be non-null and valid UUIDs strings that correspond to messageRef and personRef respectively in the MessagePersonEntity

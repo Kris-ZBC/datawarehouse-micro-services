@@ -11,7 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.client.RestClient;
 
-import local.sop.sopinfo.infrastructure.security.config.MtlsClientFactory;
+import local.sop.common.libs.infrastructure.security.config.MtlsClientFactory;
 
 @ExtendWith(MockitoExtension.class)
 class ServiceClientConfigTest {

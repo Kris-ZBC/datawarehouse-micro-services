@@ -8,9 +8,9 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import local.sop.sopinfo.sharedkernel.compositekey.dtos.CompositeKey;
-import local.sop.sopinfo.sharedkernel.compositekey.validate.ValidateCompositeKey;
-import local.sop.sopinfo.sharedkernel.exceptions.NotFoundException;
+import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
+import local.sop.common.libs.sharedkernel.compositekey.validate.ValidateCompositeKey;
+import local.sop.common.libs.sharedkernel.exceptions.NotFoundException;
 import local.sop.sopinfo.messageperson.application.api.MessagePersonDirectory;
 import local.sop.sopinfo.messageperson.application.api.dto.CreateMessagePersonCmd;
 import local.sop.sopinfo.messageperson.application.api.dto.CreatedMessagePersonResult;

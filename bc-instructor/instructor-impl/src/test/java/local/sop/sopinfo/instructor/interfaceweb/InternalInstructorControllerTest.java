@@ -1,28 +1,30 @@
 package local.sop.sopinfo.instructor.interfaceweb;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import java.util.List;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import local.sop.sopinfo.instructor.application.api.InstructorDirectory;
 import local.sop.sopinfo.instructor.application.api.dto.CreateInstructorCmd;
 import local.sop.sopinfo.instructor.application.api.dto.CreatedInstructorResponse;
 import local.sop.sopinfo.instructor.application.api.dto.InstructorResponse;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 
 @WebMvcTest(controllers = InternalInstructorController.class)
 @AutoConfigureMockMvc(addFilters = false)
@@ -95,5 +97,52 @@ class InternalInstructorControllerTest {
                 .andExpect(jsonPath("$.id").value(createdId.toString()));
 
         verify(instructorDirectory).createInstructor(any(CreateInstructorCmd.class));
+    }
+
+    @Test
+    void pingShould_returnPing() throws Exception {
+        mockMvc.perform(get("/internal/instructors/ping"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void compensateShouldReturnOk_whenResultIsNotNull() throws Exception{
+        UUID id = UUID.randomUUID();
+
+        ResponseCompensated response = new ResponseCompensated(SagaOutcome.COMPENSATED, true);
+
+        when(instructorDirectory.compensate(any(), any(), any())).thenReturn(response);
+
+        String requestBody = """
+                {
+                  "sagaOutcome": "COMPENSATED"
+                }
+                """.formatted(UUID.randomUUID());
+        mockMvc.perform(put("/internal/instructors/{id}/compensate/create", id)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
+                .andExpect(status().isOk());
+        
+        verify(instructorDirectory).compensate(any(), any(), any());
+    }
+
+    @Test
+    void compensateShouldReturnNoContent_whenResultIsNull() throws Exception {
+        UUID id = UUID.randomUUID();
+
+        when(instructorDirectory.compensate(any(), any(), any())).thenReturn(null);
+
+        String requestBody = """
+                {
+                  "sagaOutcome": "COMPENSATED"
+                }
+                """.formatted(UUID.randomUUID());
+
+        mockMvc.perform(put("/internal/instructors/{id}/compensate/create", id)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
+                .andExpect(status().isNoContent());
+
+        verify(instructorDirectory).compensate(any(), any(), any());
     }
 }

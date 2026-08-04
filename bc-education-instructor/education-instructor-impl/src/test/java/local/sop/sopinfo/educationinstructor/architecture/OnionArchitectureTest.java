@@ -8,7 +8,7 @@ import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
 
 @AnalyzeClasses(
-    packages = {"local.sop.sopinfo.educationinstructor", "local.sop.sopinfo.sharedkernel", "local.sop.sopinfo.infrastructure"},
+    packages = {"local.sop.sopinfo.educationinstructor", "local.sop.common.libs.sharedkernel", "local.sop.common.libs.infrastructure"},
     importOptions = { ImportOption.DoNotIncludeTests.class }
 )
 public class OnionArchitectureTest {

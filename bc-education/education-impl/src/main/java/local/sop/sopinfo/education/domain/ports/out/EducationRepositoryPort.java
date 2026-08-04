@@ -7,7 +7,7 @@ import local.sop.sopinfo.education.domain.model.Education;
 import local.sop.sopinfo.education.domain.model.valueobjects.EducationCategory;
 import local.sop.sopinfo.education.domain.model.valueobjects.EducationId;
 import local.sop.sopinfo.education.domain.model.valueobjects.EducationName;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
 
 public interface EducationRepositoryPort {
     boolean existsByName(EducationName name);

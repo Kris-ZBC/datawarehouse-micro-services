@@ -19,26 +19,23 @@
   <!-- shared-kernel inherited-->
   
   <dependency>
-    <groupId>local.sop.sopinfo</groupId>
+    <groupId>local.sop.common.libs</groupId>
     <artifactId>common-web</artifactId>
-    <version>${revision}</version>
   </dependency>
+
   <dependency>
-    <groupId>local.sop.sopinfo</groupId>
+    <groupId>local.sop.common.libs</groupId>
     <artifactId>common-core</artifactId>
-    <version>${revision}</version>
   </dependency>
 
   <dependency>
-    <groupId>local.sop.sopinfo</groupId>
+    <groupId>local.sop.common.libs</groupId>
     <artifactId>common-data</artifactId>
-    <version>${revision}</version>
   </dependency>
 
   <dependency>
-    <groupId>local.sop.sopinfo</groupId>
+    <groupId>local.sop.common.libs</groupId>
     <artifactId>common-security</artifactId>
-    <version>${revision}</version>
   </dependency>
   
   <dependency>
@@ -100,9 +97,8 @@
   </dependency>
 
   <dependency>
-    <groupId>local.sop.sopinfo</groupId>
+    <groupId>local.sop.common.libs</groupId>
     <artifactId>common-validation</artifactId>
-    <version>${revision}</version>
   </dependency>
 
   <dependency>
@@ -118,13 +114,6 @@
 
 
   <!-- H2 Database -->
-  <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-      <scope>test</scope>
-  </dependency>
-
-   <!-- H2 Database -->
   <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>

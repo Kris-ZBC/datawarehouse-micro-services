@@ -9,8 +9,8 @@ import local.sop.sopinfo.anonymize.domain.model.Anonymize;
 import local.sop.sopinfo.anonymize.domain.model.valueobjects.AnonymizeId;
 import local.sop.sopinfo.anonymize.domain.model.valueobjects.PersonRef;
 import local.sop.sopinfo.anonymize.domain.ports.out.AnonymizeRepositoryPort;
-import local.sop.sopinfo.sharedkernel.exceptions.ConflictException;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
 
 
 @Repository

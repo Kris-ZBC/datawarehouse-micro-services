@@ -18,7 +18,7 @@ import org.springframework.web.client.RestClient;
 
 import local.sop.sopinfo.login.saga.application.infrastructure.request.PayloadCompensate;
 import local.sop.sopinfo.login.saga.application.infrastructure.response.ResponseCompensated;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
 
 @ExtendWith(MockitoExtension.class)
 class ConsentHttpAdapterTest {

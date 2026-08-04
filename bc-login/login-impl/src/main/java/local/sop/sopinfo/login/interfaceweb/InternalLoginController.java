@@ -23,8 +23,8 @@ import local.sop.sopinfo.login.application.api.dto.LoginResult;
 import local.sop.sopinfo.login.application.api.dto.LogoutCmd;
 import local.sop.sopinfo.login.application.api.dto.SessionValidationResult;
 import local.sop.sopinfo.login.application.api.dto.ValidateSessionCmd;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.response.ResponseCompensated;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 
 @RestController
 @RequestMapping("/internal/logins")

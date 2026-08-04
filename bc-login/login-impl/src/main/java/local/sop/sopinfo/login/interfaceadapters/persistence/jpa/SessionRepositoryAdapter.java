@@ -13,7 +13,7 @@ import local.sop.sopinfo.login.domain.model.Session;
 import local.sop.sopinfo.login.domain.model.valueobjects.LoginId;
 import local.sop.sopinfo.login.domain.model.valueobjects.SessionToken;
 import local.sop.sopinfo.login.domain.ports.out.SessionRepositoryPort;
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 
 @Repository
 public class SessionRepositoryAdapter implements SessionRepositoryPort {

@@ -19,6 +19,7 @@ class EducationHttpAdapterTest {
     private final RestClient educationClient = mock(RestClient.class);
     private final EducationHttpAdapter adapter = new EducationHttpAdapter(educationClient);
 
+    @SuppressWarnings("unchecked")
     @Test
     void existsById_shouldReturnEducationResponseFromDownstream() {
         // Given

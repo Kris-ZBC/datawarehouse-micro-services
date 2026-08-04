@@ -24,8 +24,8 @@ import local.sop.sopinfo.person.application.api.dto.PersonResponse;
 import local.sop.sopinfo.person.application.api.dto.PhoneNumberResponse;
 import local.sop.sopinfo.person.application.api.dto.RemovePhoneNumberCmd;
 import local.sop.sopinfo.person.application.api.dto.UpdatePersonCmd;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.request.PayloadCompensateCreate;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.response.ResponseCompensated;
+import local.sop.common.libs.sharedkernel.sagas.compensate.request.PayloadCompensateCreate;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

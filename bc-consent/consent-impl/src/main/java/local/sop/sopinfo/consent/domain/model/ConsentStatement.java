@@ -7,8 +7,8 @@ import java.util.Set;
 
 import local.sop.sopinfo.consent.domain.model.valueobject.ConsentStatementRef;
 import local.sop.sopinfo.consent.domain.model.valueobject.ConsentStatementValue;
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
-import local.sop.sopinfo.sharedkernel.valueobjects.DomainId;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.valueobjects.DomainId;
 
 /* aggregate root */
 

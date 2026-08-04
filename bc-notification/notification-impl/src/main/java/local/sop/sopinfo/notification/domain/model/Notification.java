@@ -3,8 +3,8 @@ package local.sop.sopinfo.notification.domain.model;
 import java.time.LocalDateTime;
 import java.util.Map;
 
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
-import local.sop.sopinfo.sharedkernel.valueobjects.DomainId;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.valueobjects.DomainId;
 import local.sop.sopinfo.notification.domain.model.valueobjects.*;
 
 public class Notification {

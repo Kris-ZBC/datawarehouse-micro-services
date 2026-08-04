@@ -11,11 +11,11 @@ import org.springframework.stereotype.Repository;
 
 import local.sop.sopinfo.auditlog.domain.model.Log;
 import local.sop.sopinfo.auditlog.domain.ports.out.AuditlogRepositoryPort;
-import local.sop.sopinfo.sharedkernel.enums.ActorType;
-import local.sop.sopinfo.sharedkernel.enums.Severity;
-import local.sop.sopinfo.sharedkernel.exceptions.ConflictException;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
-import local.sop.sopinfo.sharedkernel.valueobjects.DomainId;
+import local.sop.common.libs.sharedkernel.enums.ActorType;
+import local.sop.common.libs.sharedkernel.enums.Severity;
+import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.valueobjects.DomainId;
 
 @Repository
 @Qualifier("JpaAuditlogRepository")

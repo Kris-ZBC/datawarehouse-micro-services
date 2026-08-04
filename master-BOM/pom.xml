@@ -24,9 +24,10 @@
 		</mockito.agent.argLine>
 		<test.jvm.args.extra>-Xshare:off</test.jvm.args.extra>
         <revision>0.0.1-SNAPSHOT</revision>
+        <sop.common.libs.version>1.0.0-SNAPSHOT</sop.common.libs.version>
         <maven.compiler.plugin.version>3.14.1</maven.compiler.plugin.version>
         <java.version>21</java.version>
-        <spring.boot.version>3.5.15</spring.boot.version>
+        <spring.boot.version>3.5.16</spring.boot.version>
         <spring-boot.run.skip>true</spring-boot.run.skip>
         <junit.version>5.11.0</junit.version>
         <archunit.version>1.4.1</archunit.version>
@@ -89,6 +90,14 @@
 				<artifactId>mockito-core</artifactId>
 				<version>${mockito.version}</version>
 			</dependency>
+
+            <dependency>
+                <groupId>local.sop.common.libs</groupId>
+                <artifactId>common-libs-bom</artifactId>
+                <version>${sop.common.libs.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
 
         </dependencies>
     </dependencyManagement>
@@ -178,6 +187,16 @@
             </plugins>
         </pluginManagement>
     </build>
+
+    <repositories>
+        <repository>
+            <id>gitlab-maven</id>
+            <url>https://gitlab.sop.local/api/v4/projects/86/packages/maven</url>
+            <releases><enabled>true</enabled></releases>
+            <snapshots><enabled>true</enabled></snapshots>
+        </repository>
+    </repositories>
+
 </project>
 
 

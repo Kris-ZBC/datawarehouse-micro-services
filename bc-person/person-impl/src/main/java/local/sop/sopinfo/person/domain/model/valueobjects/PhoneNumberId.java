@@ -3,8 +3,8 @@ package local.sop.sopinfo.person.domain.model.valueobjects;
 import java.util.Map;
 import java.util.UUID;
 
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
-import local.sop.sopinfo.sharedkernel.valueobjects.DomainId;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.valueobjects.DomainId;
 
 public record PhoneNumberId(UUID value) implements DomainId {
 

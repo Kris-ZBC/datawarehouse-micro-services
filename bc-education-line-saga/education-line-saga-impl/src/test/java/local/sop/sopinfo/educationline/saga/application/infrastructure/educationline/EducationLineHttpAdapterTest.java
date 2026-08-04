@@ -32,8 +32,8 @@ import local.sop.sopinfo.educationline.saga.application.infrastructure.request.P
 import local.sop.sopinfo.educationline.saga.application.infrastructure.request.PayloadEducationLineDurationUpdate;
 import local.sop.sopinfo.educationline.saga.application.infrastructure.request.PayloadEducationLineNameUpdate;
 import local.sop.sopinfo.educationline.saga.application.infrastructure.response.ResponseCompensated;
-import local.sop.sopinfo.sharedkernel.exceptions.ConflictException;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
 //#endregion
 
 @ExtendWith(MockitoExtension.class)

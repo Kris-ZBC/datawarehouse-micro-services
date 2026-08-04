@@ -14,9 +14,9 @@ import local.sop.sopinfo.login.saga.application.infrastructure.response.Response
 import local.sop.sopinfo.login.saga.application.ports.out.auditlog.AuditlogPort;
 import local.sop.sopinfo.login.saga.application.ports.out.consent.ConsentPort;
 import local.sop.sopinfo.login.saga.application.ports.out.login.LoginPort;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
-import local.sop.sopinfo.sharedkernel.exceptions.ConflictException;
-import local.sop.sopinfo.sharedkernel.exceptions.DomainException;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
+import local.sop.common.libs.sharedkernel.exceptions.DomainException;
 
 
 @Service

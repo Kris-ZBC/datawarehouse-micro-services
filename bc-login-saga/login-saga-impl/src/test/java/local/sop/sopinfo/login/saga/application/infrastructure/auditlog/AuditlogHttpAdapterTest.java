@@ -20,9 +20,9 @@ import local.sop.sopinfo.login.saga.application.api.dto.AuditlogResponse;
 import local.sop.sopinfo.login.saga.application.infrastructure.request.PayloadAuditLogCreate;
 import local.sop.sopinfo.login.saga.application.infrastructure.request.PayloadCompensate;
 import local.sop.sopinfo.login.saga.application.infrastructure.response.ResponseCompensated;
-import local.sop.sopinfo.sharedkernel.enums.ActorType;
-import local.sop.sopinfo.sharedkernel.enums.Severity;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.enums.ActorType;
+import local.sop.common.libs.sharedkernel.enums.Severity;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
 
 @ExtendWith(MockitoExtension.class)
 class AuditlogHttpAdapterTest {

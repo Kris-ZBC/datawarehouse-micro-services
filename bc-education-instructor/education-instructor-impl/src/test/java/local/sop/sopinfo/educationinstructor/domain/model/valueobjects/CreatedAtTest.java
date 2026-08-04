@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 
 import org.junit.jupiter.api.Test;
 
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 
 class CreatedAtTimestampTest {
 
@@ -20,12 +20,6 @@ class CreatedAtTimestampTest {
     }
 
     @Test
-    void should_throw_exception_when_createdAt_is_in_future() {
-        ValidationException exception = assertThrows(ValidationException.class, () -> new CreatedAtTimestamp(LocalDateTime.now().plusDays(1)));
-        assertEquals("educationinstructor.createdat.isafter", exception.getMessage());
-    }
-
-        @Test
     void shouldCreate_whenValueIsValid() {
         LocalDateTime past = LocalDateTime.now().minusDays(1);
         CreatedAtTimestamp ts = new CreatedAtTimestamp(past);
@@ -48,10 +42,4 @@ class CreatedAtTimestampTest {
         assertEquals("educationinstructor.createdat.required", ex.getMessage());
     }
 
-    @Test
-    void shouldThrow_whenValueIsInFuture() {
-        ValidationException ex = assertThrows(ValidationException.class,
-                () -> new CreatedAtTimestamp(LocalDateTime.now().plusDays(1)));
-        assertEquals("educationinstructor.createdat.isafter", ex.getMessage());
-    }
 }

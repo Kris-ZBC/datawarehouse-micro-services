@@ -4,7 +4,7 @@ import java.util.UUID;
 
 import local.sop.sopinfo.educationline.saga.application.api.dto.EducationLineResponse;
 import local.sop.sopinfo.educationline.saga.application.infrastructure.response.ResponseCompensated;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
 
 public interface EducationLinePort {
     UUID createEducationLine(String name, int durationYears, int durationMonths, int durationDays, UUID educationRef);

@@ -2,10 +2,10 @@ package local.sop.sopinfo.registration.saga.application.ports.out.instructor;
 
 import java.util.UUID;
 
-import local.sop.sopinfo.sharedkernel.sagas.compensate.response.ResponseCompensated;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 import local.sop.sopinfo.registration.saga.application.api.dto.instructor.CreateInstructorCmd;
 import local.sop.sopinfo.registration.saga.application.api.dto.instructor.InstructorResponse;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
 
 public interface InstructorPort {
 	UUID create(CreateInstructorCmd cmd);

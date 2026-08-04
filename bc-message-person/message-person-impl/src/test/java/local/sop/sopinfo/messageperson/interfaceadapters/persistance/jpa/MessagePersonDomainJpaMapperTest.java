@@ -12,7 +12,7 @@ import local.sop.sopinfo.messageperson.domain.model.valueobjects.CreatedAtTimest
 import local.sop.sopinfo.messageperson.interfaceadapters.persistence.jpa.MessagePersonDomainJpaMapper;
 import local.sop.sopinfo.messageperson.interfaceadapters.persistence.jpa.MessagePersonEntity;
 import local.sop.sopinfo.messageperson.interfaceadapters.persistence.jpa.MessagePersonId;
-import local.sop.sopinfo.sharedkernel.compositekey.dtos.CompositeKey;
+import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
 
 class MessagePersonDomainJpaMapperTest {
 

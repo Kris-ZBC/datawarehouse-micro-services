@@ -11,7 +11,7 @@ import org.springframework.web.client.RestClient;
 import local.sop.sopinfo.message.saga.application.api.dto.MessagePersonResponse;
 import local.sop.sopinfo.message.saga.application.infrastructure.request.PayloadMessagePersonCreate;
 import local.sop.sopinfo.message.saga.application.ports.out.messageperson.MessagePersonPort;
-import local.sop.sopinfo.sharedkernel.compositekey.dtos.CompositeKey;
+import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
 
 @Component
 public class MessagePersonHttpAdapter implements MessagePersonPort {

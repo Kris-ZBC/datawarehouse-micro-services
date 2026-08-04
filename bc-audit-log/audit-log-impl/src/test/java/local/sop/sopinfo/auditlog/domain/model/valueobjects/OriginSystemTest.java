@@ -1,6 +1,6 @@
 package local.sop.sopinfo.auditlog.domain.model.valueobjects;
 
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 
 import org.junit.jupiter.api.Test;
 

@@ -3,9 +3,9 @@ package local.sop.sopinfo.education.domain.model.valueobjects;
 import java.util.Map;
 import java.util.UUID;
 
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
-import local.sop.sopinfo.sharedkernel.valueobjects.DomainId;
-import local.sop.sopinfo.sharedkernel.valueobjects.utils.UUIDUtil;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.valueobjects.DomainId;
+import local.sop.common.libs.sharedkernel.valueobjects.utils.UUIDUtil;
 
 
 public record EducationId(UUID value) implements DomainId{

@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import local.sop.sopinfo.sop.application.api.dto.*;
 import local.sop.sopinfo.sop.interfaceadapters.persistence.jpa.SOPEntity;
 import local.sop.sopinfo.sop.interfaceadapters.persistence.jpa.SOPSpringDataRepository;
-import local.sop.sopinfo.sharedkernel.exceptions.NotFoundException;
+import local.sop.common.libs.sharedkernel.exceptions.NotFoundException;
 import java.util.Optional;
 import java.util.UUID;
 

@@ -22,8 +22,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import local.sop.sopinfo.sharedkernel.compositekey.dtos.CompositeKey;
-import local.sop.sopinfo.sharedkernel.exceptions.NotFoundException;
+import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
+import local.sop.common.libs.sharedkernel.exceptions.NotFoundException;
 import local.sop.sopinfo.sopeducation.application.api.dto.CreateSopEducationCmd;
 import local.sop.sopinfo.sopeducation.application.api.dto.CreatedSopEducationResult;
 import local.sop.sopinfo.sopeducation.application.api.dto.SopEducationResponse;

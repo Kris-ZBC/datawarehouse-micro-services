@@ -10,9 +10,9 @@ import local.sop.sopinfo.registration.saga.application.api.dto.instructor.Create
 import local.sop.sopinfo.registration.saga.application.api.dto.instructor.InstructorResponse;
 import local.sop.sopinfo.registration.saga.application.ports.out.instructor.InstructorPort;
 
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.request.PayloadCompensateCreate;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.response.ResponseCompensated;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.request.PayloadCompensateCreate;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 
 @Component
 public class InstructorHttpAdapter implements InstructorPort {

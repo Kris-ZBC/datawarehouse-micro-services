@@ -15,7 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import local.sop.sopinfo.anonymize.domain.model.Anonymize;
 import local.sop.sopinfo.anonymize.domain.model.valueobjects.AnonymizeId;
 import local.sop.sopinfo.anonymize.domain.model.valueobjects.PersonRef;
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 
 @ExtendWith(MockitoExtension.class)
 public class AnonymizeJpaMapperTest {

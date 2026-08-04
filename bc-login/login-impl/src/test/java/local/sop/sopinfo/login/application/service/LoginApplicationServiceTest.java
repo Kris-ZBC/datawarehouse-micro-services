@@ -26,11 +26,11 @@ import local.sop.sopinfo.login.domain.model.valueobjects.*;
 import local.sop.sopinfo.login.domain.ports.out.LoginRepositoryPort;
 import local.sop.sopinfo.login.domain.ports.out.SessionRepositoryPort;
 import local.sop.sopinfo.login.domain.service.LoginDomain;
-import local.sop.sopinfo.sharedkernel.enums.LoginStatus;
-import local.sop.sopinfo.sharedkernel.exceptions.NotFoundException;
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.response.ResponseCompensated;
+import local.sop.common.libs.sharedkernel.enums.LoginStatus;
+import local.sop.common.libs.sharedkernel.exceptions.NotFoundException;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 
 @ExtendWith(MockitoExtension.class)
 class LoginApplicationServiceTest {

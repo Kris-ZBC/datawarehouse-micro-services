@@ -3,7 +3,7 @@ package local.sop.sopinfo.auditlog.domain.model.valueobjects;
 import java.time.Instant;
 import java.util.Map;
 
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 
 /**
  * Timestamp captured at log creation time.

@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import local.sop.sopinfo.message.domain.model.Message;
 import local.sop.sopinfo.message.domain.model.valueobjects.MessageId;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
 
 public interface MessageRepositoryPort {
 

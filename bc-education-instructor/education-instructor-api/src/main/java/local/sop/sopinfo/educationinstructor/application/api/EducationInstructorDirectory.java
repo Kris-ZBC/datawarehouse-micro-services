@@ -8,9 +8,9 @@ import local.sop.sopinfo.educationinstructor.application.api.dto.CreateEducation
 import local.sop.sopinfo.educationinstructor.application.api.dto.CreatedEducationInstructorResult;
 import local.sop.sopinfo.educationinstructor.application.api.dto.EducationInstructorResponse;
 import local.sop.sopinfo.educationinstructor.application.api.dto.ToggleActivateEducationInstructorCmd;
-import local.sop.sopinfo.sharedkernel.compositekey.dtos.CompositeKey;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.response.ResponseCompensated;
+import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 
 public interface EducationInstructorDirectory {
 	CreatedEducationInstructorResult create(CreateEducationInstructorCmd cmd);

@@ -16,11 +16,11 @@ import local.sop.sopinfo.educationinstructor.application.api.dto.ToggleActivateE
 import local.sop.sopinfo.educationinstructor.domain.model.EducationInstructor;
 import local.sop.sopinfo.educationinstructor.domain.ports.out.EducationInstructorRepositoryPort;
 import local.sop.sopinfo.educationinstructor.domain.service.EducationInstructorDomain;
-import local.sop.sopinfo.sharedkernel.compositekey.dtos.CompositeKey;
-import local.sop.sopinfo.sharedkernel.compositekey.validate.ValidateCompositeKey;
-import local.sop.sopinfo.sharedkernel.exceptions.NotFoundException;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.response.ResponseCompensated;
+import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
+import local.sop.common.libs.sharedkernel.compositekey.validate.ValidateCompositeKey;
+import local.sop.common.libs.sharedkernel.exceptions.NotFoundException;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

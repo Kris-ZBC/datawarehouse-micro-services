@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import local.sop.sopinfo.education.saga.application.api.EducationSagaDirectory;
 import local.sop.sopinfo.education.saga.application.api.dto.*;
-import local.sop.sopinfo.sharedkernel.compositekey.dtos.CompositeKey;
+import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
 
 @RestController
 @RequestMapping("/internal/saga/educations")

@@ -1,6 +1,6 @@
 package local.sop.sopinfo.institution.application.service;
 
-import local.sop.sopinfo.sharedkernel.exceptions.NotFoundException;
+import local.sop.common.libs.sharedkernel.exceptions.NotFoundException;
 import local.sop.sopinfo.institution.application.api.dto.InstitutionQuery;
 import local.sop.sopinfo.institution.application.api.dto.InstitutionResponse;
 import local.sop.sopinfo.institution.interfaceadapters.persistence.jpa.InstitutionEntity;

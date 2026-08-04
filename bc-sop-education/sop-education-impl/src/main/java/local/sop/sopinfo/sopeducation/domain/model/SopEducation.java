@@ -4,8 +4,8 @@ package local.sop.sopinfo.sopeducation.domain.model;
 
 import java.util.Map;
 
-import local.sop.sopinfo.sharedkernel.compositekey.dtos.CompositeKey;
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 import local.sop.sopinfo.sopeducation.domain.model.valueobjects.CreatedAtTimestamp;
 
 

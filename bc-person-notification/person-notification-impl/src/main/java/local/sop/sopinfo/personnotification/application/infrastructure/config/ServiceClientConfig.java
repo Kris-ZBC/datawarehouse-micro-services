@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestClient;
 
-import local.sop.sopinfo.infrastructure.security.config.MtlsClientFactory;
+import local.sop.common.libs.infrastructure.security.config.MtlsClientFactory;
 
 @Configuration
 @EnableConfigurationProperties({PersonProps.class, NotificationProps.class})

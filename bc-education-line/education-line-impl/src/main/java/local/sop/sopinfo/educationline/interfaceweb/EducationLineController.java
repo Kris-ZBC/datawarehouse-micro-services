@@ -20,8 +20,8 @@ import local.sop.sopinfo.educationline.application.api.dto.CreateEducationLineCm
 import local.sop.sopinfo.educationline.application.api.dto.EducationLineResponse;
 import local.sop.sopinfo.educationline.application.api.dto.UpdateEducationLineDurationCmd;
 import local.sop.sopinfo.educationline.application.api.dto.UpdateEducationLineNameCmd;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.request.PayloadCompensateCreate;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.response.ResponseCompensated;
+import local.sop.common.libs.sharedkernel.sagas.compensate.request.PayloadCompensateCreate;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 
 
 @RestController

@@ -7,7 +7,7 @@ import local.sop.sopinfo.anonymize.application.api.dto.FetchByParamsQuery;
 import local.sop.sopinfo.anonymize.application.api.dto.AnonymizeResponse;
 import local.sop.sopinfo.anonymize.application.api.dto.CreateAnonymizeCmd;
 import local.sop.sopinfo.anonymize.application.api.dto.FetchByIdQuery;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.Compensatable;
+import local.sop.common.libs.sharedkernel.sagas.compensate.Compensatable;
 
 public interface AnonymizeDirectory extends Compensatable {
 

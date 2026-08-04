@@ -8,12 +8,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 import local.sop.sopinfo.organisation.application.api.OrganisationDirectory;
 import local.sop.sopinfo.organisation.application.api.dto.OrganisationQuery;
 import local.sop.sopinfo.organisation.interfaceadapters.persistence.jpa.OrganisationEntity;
 import local.sop.sopinfo.organisation.interfaceadapters.persistence.jpa.OrganisationSpringDataRepository;
-import local.sop.sopinfo.sharedkernel.exceptions.NotFoundException;
+import local.sop.common.libs.sharedkernel.exceptions.NotFoundException;
 
 public class OrganisationApplicationServiceTest {
 

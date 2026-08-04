@@ -4,8 +4,8 @@ import java.util.Map;
 import java.util.StringJoiner;
 
 import local.sop.sopinfo.apprentice.domain.model.valueobjects.*;
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
-import local.sop.sopinfo.sharedkernel.valueobjects.DomainId;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.valueobjects.DomainId;
 
 public class Apprentice {
     private final DomainId apprenticeId;

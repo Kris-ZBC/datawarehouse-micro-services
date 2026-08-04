@@ -15,8 +15,8 @@ import org.junit.jupiter.api.Test;
 
 import local.sop.sopinfo.message.domain.model.Message;
 import local.sop.sopinfo.message.domain.model.valueobjects.MessageId;
-import local.sop.sopinfo.sharedkernel.exceptions.ConflictException;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
 
 class MessageRepositoryJpaAdapterTest {
 

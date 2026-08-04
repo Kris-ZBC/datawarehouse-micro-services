@@ -234,7 +234,7 @@ folder "Education Line BC" #LightGrey {
 	}
 
 	package "sharedkernel" #LightBlue {
-		package "local.sop.sopinfo.sharedkernel" as SharedKernelRoot {
+		package "local.sop.common.libs.sharedkernel" as SharedKernelRoot {
 			package "exceptions" {
 				class ValidationException
 				class NotFoundException

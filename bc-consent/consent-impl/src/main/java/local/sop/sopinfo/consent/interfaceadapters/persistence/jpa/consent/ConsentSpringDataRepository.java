@@ -9,9 +9,9 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import local.sop.sopinfo.sharedkernel.enums.ConsentPurpose;
-import local.sop.sopinfo.sharedkernel.enums.ConsentStatus;
-import local.sop.sopinfo.sharedkernel.enums.ConsentType;
+import local.sop.common.libs.sharedkernel.enums.ConsentPurpose;
+import local.sop.common.libs.sharedkernel.enums.ConsentStatus;
+import local.sop.common.libs.sharedkernel.enums.ConsentType;
 
 public interface ConsentSpringDataRepository extends JpaRepository<ConsentEntity, UUID> {
 

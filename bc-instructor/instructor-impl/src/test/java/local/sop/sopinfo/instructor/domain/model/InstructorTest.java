@@ -1,16 +1,16 @@
 package local.sop.sopinfo.instructor.domain.model;
 
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-
-import java.util.UUID;
-
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 import local.sop.sopinfo.instructor.domain.model.valueobjects.InstructorId;
 import local.sop.sopinfo.instructor.domain.model.valueobjects.PersonRef;
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 
 class InstructorTest {
 
@@ -81,6 +81,23 @@ class InstructorTest {
         assertEquals(newPersonRef, updated.getPersonRef());
         assertEquals(originalPersonRef, original.getPersonRef());
     }
+
+    @Test
+    void toString_should_return_string_representation() {
+        UUID id = UUID.randomUUID();
+        UUID personRef = UUID.randomUUID();
+
+        Instructor instructor = Instructor.builder()
+                .id(InstructorId.of(id))
+                .personRef(PersonRef.of(personRef))
+                .build();
+
+        String result = instructor.toString();
+
+        assertTrue(result.contains("id=InstructorId[value=" + id + "]"));
+        assertTrue(result.contains("personRef=PersonRef[value=" + personRef + "]"));
+    }
+
 
     @Test
     void withPersonRef_shouldThrowValidationException_whenNull() {

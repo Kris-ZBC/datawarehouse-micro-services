@@ -2,8 +2,8 @@ package local.sop.sopinfo.auditlog.domain.service;
 
 import local.sop.sopinfo.auditlog.domain.model.Log;
 import local.sop.sopinfo.auditlog.domain.model.valueobjects.*;
-import local.sop.sopinfo.sharedkernel.enums.ActorType;
-import local.sop.sopinfo.sharedkernel.enums.Severity;
+import local.sop.common.libs.sharedkernel.enums.ActorType;
+import local.sop.common.libs.sharedkernel.enums.Severity;
 
 import org.junit.jupiter.api.Test;
 

@@ -9,9 +9,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import local.sop.sopinfo.sharedkernel.sagas.compensate.response.ResponseCompensated;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
-import local.sop.sopinfo.sharedkernel.exceptions.NotFoundException;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.exceptions.NotFoundException;
 import local.sop.sopinfo.educationline.application.api.EducationLineDirectory;
 import local.sop.sopinfo.educationline.application.api.dto.CreateEducationLineCmd;
 import local.sop.sopinfo.educationline.application.api.dto.EducationLineResponse;

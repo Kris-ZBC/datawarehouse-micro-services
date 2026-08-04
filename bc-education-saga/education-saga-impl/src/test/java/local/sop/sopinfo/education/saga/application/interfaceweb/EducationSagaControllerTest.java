@@ -26,7 +26,7 @@ import local.sop.sopinfo.education.saga.application.api.dto.EducationInstructorR
 import local.sop.sopinfo.education.saga.application.api.dto.EducationResponse;
 import local.sop.sopinfo.education.saga.application.api.dto.UpdateEducationCategoryCmd;
 import local.sop.sopinfo.education.saga.application.api.dto.UpdateEducationNameCmd;
-import local.sop.sopinfo.sharedkernel.compositekey.dtos.CompositeKey;
+import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
 
 @ExtendWith(MockitoExtension.class)
 class EducationSagaControllerTest {

@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
 
-import local.sop.sopinfo.sharedkernel.enums.Severity;
+import local.sop.common.libs.sharedkernel.enums.Severity;
 
 class SeverityConverterTest {
 

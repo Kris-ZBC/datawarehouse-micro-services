@@ -4,11 +4,11 @@ import java.util.UUID;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import local.sop.sopinfo.sharedkernel.enums.ActorType;
-import local.sop.sopinfo.sharedkernel.enums.ConsentPurpose;
-import local.sop.sopinfo.sharedkernel.enums.ConsentStatus;
-import local.sop.sopinfo.sharedkernel.enums.ConsentType;
-import local.sop.sopinfo.sharedkernel.enums.Severity;
+import local.sop.common.libs.sharedkernel.enums.ActorType;
+import local.sop.common.libs.sharedkernel.enums.ConsentPurpose;
+import local.sop.common.libs.sharedkernel.enums.ConsentStatus;
+import local.sop.common.libs.sharedkernel.enums.ConsentType;
+import local.sop.common.libs.sharedkernel.enums.Severity;
 
 public record GrantConsentCmd(
         @NotNull(message = "{saga.sessionid.required}") UUID sessionId,

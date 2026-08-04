@@ -25,8 +25,8 @@ import local.sop.sopinfo.messageperson.interfaceadapters.persistence.jpa.Message
 import local.sop.sopinfo.messageperson.interfaceadapters.persistence.jpa.MessagePersonEntity;
 import local.sop.sopinfo.messageperson.interfaceadapters.persistence.jpa.MessagePersonId;
 import local.sop.sopinfo.messageperson.interfaceadapters.persistence.jpa.MessagePersonRepositoryAdapter;
-import local.sop.sopinfo.sharedkernel.compositekey.dtos.CompositeKey;
-import local.sop.sopinfo.sharedkernel.exceptions.NotFoundException;
+import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
+import local.sop.common.libs.sharedkernel.exceptions.NotFoundException;
 
 @DataJpaTest
 @TestPropertySource(properties = {

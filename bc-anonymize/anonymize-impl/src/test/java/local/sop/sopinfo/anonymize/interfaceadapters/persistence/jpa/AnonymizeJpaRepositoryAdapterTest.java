@@ -22,6 +22,8 @@ import org.springframework.test.context.TestPropertySource;
 import local.sop.sopinfo.anonymize.domain.model.Anonymize;
 import local.sop.sopinfo.anonymize.domain.model.valueobjects.AnonymizeId;
 import local.sop.sopinfo.anonymize.domain.model.valueobjects.PersonRef;
+import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
 
 @DataJpaTest
 @TestPropertySource(properties = {
@@ -374,6 +376,30 @@ public class AnonymizeJpaRepositoryAdapterTest {
                 a2.getPersonRef().equals(a1.getPersonRef())
             )
         ));
+    }
+
+    @Test
+    void compensate_WhenSagaStateIsNotCompensate_ShouldThrowConflictException() {
+        // When / Then
+        assertThrows(
+                ConflictException.class,
+                () -> adapter.compensate(
+                        AnonymizeId.of(testId1),
+                        SagaOutcome.COMPENSATED));
+    }
+
+    @Test
+    void compensate_WhenEntityDoesNotExist_ShouldReturnFalse() {
+        // Given
+        AnonymizeId nonExistingId = AnonymizeId.of(UUID.randomUUID());
+
+        // When
+        Boolean result = adapter.compensate(
+                nonExistingId,
+                SagaOutcome.COMPENSATE);
+
+        // Then
+        assertFalse(result);
     }
 
 }

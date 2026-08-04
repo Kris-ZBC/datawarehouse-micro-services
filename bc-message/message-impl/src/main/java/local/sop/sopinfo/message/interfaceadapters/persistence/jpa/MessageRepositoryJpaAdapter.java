@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component;
 import local.sop.sopinfo.message.domain.model.Message;
 import local.sop.sopinfo.message.domain.model.valueobjects.MessageId;
 import local.sop.sopinfo.message.domain.ports.out.MessageRepositoryPort;
-import local.sop.sopinfo.sharedkernel.exceptions.ConflictException;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
 
 @Component
 public class MessageRepositoryJpaAdapter implements MessageRepositoryPort {

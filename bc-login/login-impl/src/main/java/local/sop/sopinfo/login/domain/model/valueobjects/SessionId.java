@@ -2,8 +2,8 @@ package local.sop.sopinfo.login.domain.model.valueobjects;
 
 import java.util.UUID;
 
-import local.sop.sopinfo.sharedkernel.valueobjects.DomainId;
-import local.sop.sopinfo.sharedkernel.valueobjects.utils.UUIDUtil;
+import local.sop.common.libs.sharedkernel.valueobjects.DomainId;
+import local.sop.common.libs.sharedkernel.valueobjects.utils.UUIDUtil;
 
 public record SessionId(UUID value) implements DomainId {
 	public SessionId {

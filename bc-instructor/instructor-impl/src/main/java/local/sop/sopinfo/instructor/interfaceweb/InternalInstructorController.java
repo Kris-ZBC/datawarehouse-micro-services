@@ -11,8 +11,8 @@ import local.sop.sopinfo.instructor.application.api.InstructorDirectory;
 import local.sop.sopinfo.instructor.application.api.dto.CreateInstructorCmd;
 import local.sop.sopinfo.instructor.application.api.dto.CreatedInstructorResponse;
 import local.sop.sopinfo.instructor.application.api.dto.InstructorResponse;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.request.PayloadCompensateCreate;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.response.ResponseCompensated;
+import local.sop.common.libs.sharedkernel.sagas.compensate.request.PayloadCompensateCreate;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

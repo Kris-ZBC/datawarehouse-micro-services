@@ -8,7 +8,7 @@ import local.sop.sopinfo.educationline.domain.model.valueobjects.EducationRef;
 import local.sop.sopinfo.educationline.domain.model.valueobjects.EducationLineDuration;
 import local.sop.sopinfo.educationline.domain.model.valueobjects.EducationLineId;
 import local.sop.sopinfo.educationline.domain.model.valueobjects.EducationLineName;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
 
 public interface EducationLineRepositoryPort {
 	public EducationLine save(EducationLine educationLine);

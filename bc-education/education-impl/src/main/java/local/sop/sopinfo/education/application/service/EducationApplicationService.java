@@ -18,10 +18,10 @@ import local.sop.sopinfo.education.domain.model.valueobjects.EducationId;
 import local.sop.sopinfo.education.domain.model.valueobjects.EducationName;
 import local.sop.sopinfo.education.domain.ports.out.EducationRepositoryPort;
 import local.sop.sopinfo.education.domain.service.EducationDomain;
-import local.sop.sopinfo.sharedkernel.exceptions.NotFoundException;
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.response.ResponseCompensated;
+import local.sop.common.libs.sharedkernel.exceptions.NotFoundException;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

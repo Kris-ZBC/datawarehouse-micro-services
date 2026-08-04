@@ -8,7 +8,7 @@ import static com.tngtech.archunit.library.Architectures.onionArchitecture;
 
 
 
-@AnalyzeClasses(packages = {"local.sop.sopinfo.sopeducation", "local.sop.sopinfo.sharedkernel", "local.sop.sopinfo.infrastructure"},
+@AnalyzeClasses(packages = {"local.sop.sopinfo.sopeducation", "local.sop.common.libs.sharedkernel", "local.sop.common.libs.infrastructure"},
 importOptions = {
     ImportOption.DoNotIncludeTests.class,   // <-- excludes target/test-classes
 })  

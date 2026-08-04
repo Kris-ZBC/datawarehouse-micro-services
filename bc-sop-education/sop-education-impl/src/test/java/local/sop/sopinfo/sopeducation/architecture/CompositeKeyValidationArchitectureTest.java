@@ -21,7 +21,7 @@ class CompositeKeyValidationArchitectureTest {
     static final ArchRule validateCompositeKey_portsMustImplementCompositeKeyValidator =
         classes()
             .that().implement(
-                local.sop.sopinfo.sharedkernel.compositekey.validate.CompositeKeyValidator.class)
+                local.sop.common.libs.sharedkernel.compositekey.validate.CompositeKeyValidator.class)
             .should().beAnnotatedWith(
                 org.springframework.stereotype.Component.class)
             .because("Composite key validators must be registered as Spring beans " +
@@ -33,7 +33,7 @@ class CompositeKeyValidationArchitectureTest {
     static final ArchRule compositeKeyValidator_mustOverrideExistsMethod =
         classes()
             .that().implement(
-                local.sop.sopinfo.sharedkernel.compositekey.validate.CompositeKeyValidator.class)
+                local.sop.common.libs.sharedkernel.compositekey.validate.CompositeKeyValidator.class)
             .should(new ArchCondition<JavaClass>("override exists(UUID id) from CompositeKeyValidator") {
                 @Override
                 public void check(JavaClass clazz, ConditionEvents events) {
@@ -42,7 +42,7 @@ class CompositeKeyValidationArchitectureTest {
                     // Verify CompositeKeyValidator declares exists(UUID)
                     boolean interfaceHasExists = clazz.getAllRawInterfaces().stream()
                         .filter(i -> i.getName().equals(
-                            "local.sop.sopinfo.sharedkernel.compositekey.validate.CompositeKeyValidator"))
+                            "local.sop.common.libs.sharedkernel.compositekey.validate.CompositeKeyValidator"))
                         .flatMap(i -> i.getMethods().stream())
                         .anyMatch(m -> m.getName().equals("exists")
                             && m.getRawParameterTypes().size() == 1
@@ -71,9 +71,9 @@ class CompositeKeyValidationArchitectureTest {
         classes()
             .that().areInterfaces()
             .and().areAssignableTo(
-                local.sop.sopinfo.sharedkernel.compositekey.validate.CompositeKeyValidator.class)
+                local.sop.common.libs.sharedkernel.compositekey.validate.CompositeKeyValidator.class)
             .should().beAssignableTo(
-                local.sop.sopinfo.sharedkernel.compositekey.validate.CompositeKeyValidator.class)
+                local.sop.common.libs.sharedkernel.compositekey.validate.CompositeKeyValidator.class)
             .because("Port interfaces used in @ValidateCompositeKey must extend CompositeKeyValidator");
 
     // ── Rule 4: Methods annotated with @ValidateCompositeKey must be in application.service ─
@@ -82,7 +82,7 @@ class CompositeKeyValidationArchitectureTest {
     static final ArchRule validateCompositeKey_mustOnlyBeUsedInApplicationService =
         methods()
             .that().areAnnotatedWith(
-                local.sop.sopinfo.sharedkernel.compositekey.validate.ValidateCompositeKey.class)
+                local.sop.common.libs.sharedkernel.compositekey.validate.ValidateCompositeKey.class)
             .should().beDeclaredInClassesThat()
             .resideInAPackage("..application.service..")
             .because("@ValidateCompositeKey is an application layer concern and must only " +

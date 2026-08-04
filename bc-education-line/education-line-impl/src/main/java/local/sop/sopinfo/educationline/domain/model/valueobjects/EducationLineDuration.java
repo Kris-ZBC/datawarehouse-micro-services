@@ -2,7 +2,7 @@ package local.sop.sopinfo.educationline.domain.model.valueobjects;
 
 import java.util.Map;
 
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 
 public record EducationLineDuration(int years, int months, int days) {
 	public EducationLineDuration {

@@ -6,7 +6,7 @@ import java.util.Optional;
 import local.sop.sopinfo.person.domain.model.Person;
 import local.sop.sopinfo.person.domain.model.valueobjects.Email;
 import local.sop.sopinfo.person.domain.model.valueobjects.PersonId;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
 
 public interface PersonRepositoryPort {
     Person save(Person person);

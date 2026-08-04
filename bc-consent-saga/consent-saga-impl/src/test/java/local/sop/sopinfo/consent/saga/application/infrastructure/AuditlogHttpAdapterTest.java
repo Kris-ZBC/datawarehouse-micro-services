@@ -19,11 +19,11 @@ import org.springframework.web.client.RestClient;
 import local.sop.sopinfo.consent.saga.application.api.dto.ResponseAuditlog;
 import local.sop.sopinfo.consent.saga.application.infrastructure.auditlog.AuditlogHttpAdapter;
 import local.sop.sopinfo.consent.saga.application.infrastructure.request.PayloadAuditlogCreate;
-import local.sop.sopinfo.sharedkernel.enums.ActorType;
-import local.sop.sopinfo.sharedkernel.enums.Severity;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.request.PayloadCompensateCreate;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.response.ResponseCompensated;
+import local.sop.common.libs.sharedkernel.enums.ActorType;
+import local.sop.common.libs.sharedkernel.enums.Severity;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.request.PayloadCompensateCreate;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 
 @ExtendWith(MockitoExtension.class)
 public class AuditlogHttpAdapterTest {

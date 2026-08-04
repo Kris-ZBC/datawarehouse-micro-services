@@ -2,7 +2,7 @@ package local.sop.sopinfo.personnotification.application.infrastructure.response
 
 import java.util.UUID;
 
-import local.sop.sopinfo.sharedkernel.enums.PhoneUserType;
+import local.sop.common.libs.sharedkernel.enums.PhoneUserType;
 
 public record PhoneNumberResponse(
     

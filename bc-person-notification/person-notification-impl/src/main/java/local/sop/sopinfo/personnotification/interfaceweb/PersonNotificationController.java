@@ -21,7 +21,7 @@ import local.sop.sopinfo.personnotification.application.api.dto.CreatePersonNoti
 import local.sop.sopinfo.personnotification.application.api.dto.CreatedPersonNotificationResult;
 import local.sop.sopinfo.personnotification.application.api.dto.PersonNotificationResponse;
 import local.sop.sopinfo.personnotification.application.api.dto.ToggleActivatePersonNotificationCmd;
-import local.sop.sopinfo.sharedkernel.compositekey.dtos.CompositeKey;
+import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
 
 @RestController
 @RequestMapping("/internal/person-notifications")

@@ -3,7 +3,7 @@ package local.sop.sopinfo.person.domain.model.valueobjects;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 import org.junit.jupiter.api.Test;
 
 class EmailTest {

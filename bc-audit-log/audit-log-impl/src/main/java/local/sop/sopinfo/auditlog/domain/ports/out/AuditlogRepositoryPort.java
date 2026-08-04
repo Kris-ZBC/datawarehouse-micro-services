@@ -5,10 +5,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 import local.sop.sopinfo.auditlog.domain.model.Log;
-import local.sop.sopinfo.sharedkernel.enums.ActorType;
-import local.sop.sopinfo.sharedkernel.enums.Severity;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
-import local.sop.sopinfo.sharedkernel.valueobjects.DomainId;
+import local.sop.common.libs.sharedkernel.enums.ActorType;
+import local.sop.common.libs.sharedkernel.enums.Severity;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.valueobjects.DomainId;
 
 public interface AuditlogRepositoryPort {
     Log save(Log log);

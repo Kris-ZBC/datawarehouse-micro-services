@@ -12,7 +12,7 @@ import local.sop.sopinfo.sopinstructor.domain.model.valueobjects.CreatedAtTimest
 import local.sop.sopinfo.sopinstructor.interfaceadapters.persistence.jpa.SopInstructorDomainJpaMapper;
 import local.sop.sopinfo.sopinstructor.interfaceadapters.persistence.jpa.SopInstructorEntity;
 import local.sop.sopinfo.sopinstructor.interfaceadapters.persistence.jpa.SopInstructorId;
-import local.sop.sopinfo.sharedkernel.compositekey.dtos.CompositeKey;
+import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
 
 class SopInstructorDomainJpaMapperTest {
 

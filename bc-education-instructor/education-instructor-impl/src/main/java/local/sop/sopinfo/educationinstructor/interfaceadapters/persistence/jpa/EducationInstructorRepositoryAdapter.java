@@ -7,10 +7,10 @@ import java.util.UUID;
 
 import local.sop.sopinfo.educationinstructor.domain.model.EducationInstructor;
 import local.sop.sopinfo.educationinstructor.domain.ports.out.EducationInstructorRepositoryPort;
-import local.sop.sopinfo.sharedkernel.compositekey.dtos.CompositeKey;
-import local.sop.sopinfo.sharedkernel.exceptions.ConflictException;
-import local.sop.sopinfo.sharedkernel.exceptions.NotFoundException;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
+import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
+import local.sop.common.libs.sharedkernel.exceptions.NotFoundException;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
 
 import org.springframework.stereotype.Repository;
 

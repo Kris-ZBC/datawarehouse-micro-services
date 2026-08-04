@@ -1,15 +1,15 @@
 package local.sop.sopinfo.person.application;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 import local.sop.sopinfo.person.application.api.dto.AddPhoneNumberCmd;
@@ -31,11 +31,12 @@ import local.sop.sopinfo.person.domain.model.valueobjects.PhoneNumberId;
 import local.sop.sopinfo.person.domain.model.valueobjects.PhoneNumberValue;
 import local.sop.sopinfo.person.domain.ports.out.PersonRepositoryPort;
 import local.sop.sopinfo.person.domain.service.PersonDomain;
-import local.sop.sopinfo.sharedkernel.enums.PhoneUserType;
-import local.sop.sopinfo.sharedkernel.exceptions.ConflictException;
-import local.sop.sopinfo.sharedkernel.exceptions.NotFoundException;
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.enums.PhoneUserType;
+import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
+import local.sop.common.libs.sharedkernel.exceptions.NotFoundException;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 
 class PersonApplicationServiceTest {
 
@@ -519,6 +520,7 @@ class PersonApplicationServiceTest {
         private final List<Person> savedPersons = new ArrayList<>();
         private Optional<Person> personByEmail = Optional.empty();
         private String lastSearchName;
+        private Boolean compensateResult = false;
 
         @Override
         public Person save(Person person) {
@@ -560,7 +562,61 @@ class PersonApplicationServiceTest {
 
         @Override
         public Boolean compensate(PersonId id, SagaOutcome state) {
-                throw new UnsupportedOperationException("Unimplemented method 'compensate'");
-        }
+                return compensateResult;
+                // throw new UnsupportedOperationException("Unimplemented method 'compensate'");
+        }        
     }
+
+    @Test
+        void compensate_should_return_idempotent_false_when_person_not_found() {
+        InMemoryPersonRepository repository = new InMemoryPersonRepository();
+        PersonApplicationService service = new PersonApplicationService(new CapturingPersonDomain(), repository);
+
+        ResponseCompensated result = service.compensate(UUID.randomUUID(), Person.class, SagaOutcome.COMPENSATE);
+
+        assertEquals(SagaOutcome.IDEMPOTENT, result.sagaState());
+        assertFalse(result.success());
+        }
+
+        @Test
+        void compensate_should_return_compensated_true_when_compensation_succeeds() {
+        UUID personId = UUID.randomUUID();
+        InMemoryPersonRepository repository = new InMemoryPersonRepository();
+        repository.savedPersons.add(Person.builder()
+                .id(new PersonId(personId))
+                .firstName(new FirstName("John"))
+                .lastName(new LastName("Doe"))
+                .email(new Email("john@doe.com"))
+                .organizationRef(new OrganizationRef(UUID.randomUUID()))
+                .build());
+        repository.compensateResult = true;
+
+        PersonApplicationService service = new PersonApplicationService(new CapturingPersonDomain(), repository);
+
+        ResponseCompensated result = service.compensate(personId, Person.class, SagaOutcome.COMPENSATE);
+
+        assertEquals(SagaOutcome.COMPENSATED, result.sagaState());
+        assertTrue(result.success());
+        }
+
+        @Test
+        void compensate_should_return_idempotent_true_when_compensation_fails() {
+                UUID personId = UUID.randomUUID();
+                InMemoryPersonRepository repository = new InMemoryPersonRepository();
+                repository.savedPersons.add(Person.builder()
+                        .id(new PersonId(personId))
+                        .firstName(new FirstName("John"))
+                        .lastName(new LastName("Doe"))
+                        .email(new Email("john@doe.com"))
+                        .organizationRef(new OrganizationRef(UUID.randomUUID()))
+                        .build());
+                repository.compensateResult = false;
+
+                PersonApplicationService service = new PersonApplicationService(new CapturingPersonDomain(), repository);
+
+                ResponseCompensated result = service.compensate(personId, Person.class, SagaOutcome.COMPENSATE);
+
+                assertEquals(SagaOutcome.IDEMPOTENT, result.sagaState());
+                assertTrue(result.success());
+        }
 }

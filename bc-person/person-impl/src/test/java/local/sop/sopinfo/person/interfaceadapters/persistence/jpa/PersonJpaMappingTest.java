@@ -16,7 +16,7 @@ import local.sop.sopinfo.person.domain.model.valueobjects.OrganizationRef;
 import local.sop.sopinfo.person.domain.model.valueobjects.PersonId;
 import local.sop.sopinfo.person.domain.model.valueobjects.PhoneNumberId;
 import local.sop.sopinfo.person.domain.model.valueobjects.PhoneNumberValue;
-import local.sop.sopinfo.sharedkernel.enums.PhoneUserType;
+import local.sop.common.libs.sharedkernel.enums.PhoneUserType;
 
 class PersonJpaMappingTest {
 

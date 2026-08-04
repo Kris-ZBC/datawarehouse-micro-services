@@ -10,7 +10,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
-import local.sop.sopinfo.sharedkernel.sagas.concurrency.locks.SagaStatus;
+import local.sop.common.libs.sharedkernel.sagas.concurrency.locks.SagaStatus;
 
 @Entity
 @Table(name = "consent_saga_lock")

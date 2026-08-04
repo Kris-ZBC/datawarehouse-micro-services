@@ -9,9 +9,9 @@ import org.springframework.web.client.RestClient;
 import local.sop.sopinfo.anonymize.saga.application.api.dto.AnonymizeResponse;
 import local.sop.sopinfo.anonymize.saga.application.infrastructure.request.PayloadAnonymizeCreate;
 import local.sop.sopinfo.anonymize.saga.application.ports.out.anonymize.AnonymizePort;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.request.PayloadCompensateCreate;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.response.ResponseCompensated;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.request.PayloadCompensateCreate;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 
 
 @Component

@@ -2,8 +2,8 @@ package local.sop.sopinfo.education.saga.application.infrastructure.request;
 
 import java.util.UUID;
 
-import local.sop.sopinfo.sharedkernel.enums.ActorType;
-import local.sop.sopinfo.sharedkernel.enums.Severity;
+import local.sop.common.libs.sharedkernel.enums.ActorType;
+import local.sop.common.libs.sharedkernel.enums.Severity;
 
 public record PayloadAuditlogCreate(
     UUID actor, ActorType type, Severity severity, String originSystem, String originService,

@@ -5,7 +5,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import local.sop.sopinfo.personnotification.domain.model.PersonNotification;
-import local.sop.sopinfo.sharedkernel.compositekey.dtos.CompositeKey;
+import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
 
 public interface PersonNotificationPort {
     Optional<PersonNotification> findById(CompositeKey id);

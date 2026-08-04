@@ -11,8 +11,8 @@ import org.springframework.stereotype.Repository;
 import local.sop.sopinfo.apprentice.domain.model.Apprentice;
 import local.sop.sopinfo.apprentice.domain.model.valueobjects.ApprenticeId;
 import local.sop.sopinfo.apprentice.domain.ports.out.ApprenticeRepositoryPort;
-import local.sop.sopinfo.sharedkernel.exceptions.ConflictException;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

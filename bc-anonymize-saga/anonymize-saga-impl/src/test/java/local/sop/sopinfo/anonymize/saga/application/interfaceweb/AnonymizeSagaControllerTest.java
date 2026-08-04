@@ -9,8 +9,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.UUID;
 import java.util.Map;
 
-import local.sop.sopinfo.sharedkernel.enums.ActorType;
-import local.sop.sopinfo.sharedkernel.enums.Severity;
+import local.sop.common.libs.sharedkernel.enums.ActorType;
+import local.sop.common.libs.sharedkernel.enums.Severity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -26,12 +26,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 import local.sop.sopinfo.anonymize.saga.application.api.AnonymizeSagaDirectory;
-import local.sop.sopinfo.infrastructure.security.DisableSecurity;
-import local.sop.sopinfo.infrastructure.web.exception.EndpointExceptionHandler;
+import local.sop.common.libs.infrastructure.security.DisableSecurity;
+import local.sop.common.libs.infrastructure.web.exception.EndpointExceptionHandler;
 import local.sop.sopinfo.anonymize.saga.application.api.dto.AnonymizeResponse;
 import local.sop.sopinfo.anonymize.saga.application.api.dto.CreateAnonymizeCmd;
 
-import local.sop.sopinfo.sharedkernel.exceptions.ConflictException;
+import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
 
 @WebMvcTest(AnonymizeSagaController.class)
 @Import(EndpointExceptionHandler.class)

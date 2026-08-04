@@ -31,13 +31,13 @@ import local.sop.sopinfo.educationinstructor.application.api.dto.CreateEducation
 import local.sop.sopinfo.educationinstructor.application.api.dto.CreatedEducationInstructorResult;
 import local.sop.sopinfo.educationinstructor.application.api.dto.EducationInstructorResponse;
 import local.sop.sopinfo.educationinstructor.application.api.dto.ToggleActivateEducationInstructorCmd;
-import local.sop.sopinfo.infrastructure.security.DisableSecurity;
-import local.sop.sopinfo.infrastructure.web.exception.EndpointExceptionHandler;
-import local.sop.sopinfo.sharedkernel.compositekey.dtos.CompositeKey;
-import local.sop.sopinfo.sharedkernel.exceptions.NotFoundException;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.request.PayloadCompensateCreate;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.response.ResponseCompensated;
+import local.sop.common.libs.infrastructure.security.DisableSecurity;
+import local.sop.common.libs.infrastructure.web.exception.EndpointExceptionHandler;
+import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
+import local.sop.common.libs.sharedkernel.exceptions.NotFoundException;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.request.PayloadCompensateCreate;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 
 
 @WebMvcTest(EducationInstructorController.class)

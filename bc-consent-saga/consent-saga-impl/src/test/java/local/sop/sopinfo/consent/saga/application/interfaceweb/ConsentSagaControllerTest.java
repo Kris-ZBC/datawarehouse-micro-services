@@ -23,12 +23,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  
 import local.sop.sopinfo.consent.saga.application.api.ConsentSagaDirectory;
 import local.sop.sopinfo.consent.saga.application.api.dto.ConsentStatementResponse;
+import local.sop.sopinfo.consent.saga.application.api.dto.ConsentResponse;
 import local.sop.sopinfo.consent.saga.application.api.dto.CreateConsentStatementCmd;
-import local.sop.sopinfo.infrastructure.security.DisableSecurity;
-import local.sop.sopinfo.infrastructure.web.exception.EndpointExceptionHandler;
-import local.sop.sopinfo.sharedkernel.enums.ActorType;
-import local.sop.sopinfo.sharedkernel.enums.Severity;
-import local.sop.sopinfo.sharedkernel.exceptions.ConflictException;
+import local.sop.sopinfo.consent.saga.application.api.dto.GrantConsentCmd;
+import local.sop.sopinfo.consent.saga.application.api.dto.RevokeConsentCmd;
+import local.sop.common.libs.infrastructure.security.DisableSecurity;
+import local.sop.common.libs.infrastructure.web.exception.EndpointExceptionHandler;
+import local.sop.common.libs.sharedkernel.enums.ActorType;
+import local.sop.common.libs.sharedkernel.enums.ConsentPurpose;
+import local.sop.common.libs.sharedkernel.enums.ConsentStatus;
+import local.sop.common.libs.sharedkernel.enums.ConsentType;
+import local.sop.common.libs.sharedkernel.enums.Severity;
+import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
  
 @WebMvcTest(ConsentSagaController.class)
 @Import(EndpointExceptionHandler.class)
@@ -46,14 +52,18 @@ class ConsentSagaControllerTest {
  
     @MockitoBean
     private ConsentSagaDirectory consentDirectory;
- 
+    private UUID consentId;
     private UUID consentStatementId;
     private CreateConsentStatementCmd validCmd;
     private ConsentStatementResponse consentStatementResponse;
+    private GrantConsentCmd validGrantCmd;
+    private RevokeConsentCmd validRevokeCmd;
  
     @BeforeEach
     void setUp() {
         consentStatementId = UUID.randomUUID();
+        consentId = UUID.randomUUID();
+
  
         validCmd = new CreateConsentStatementCmd(
         UUID.randomUUID(), // sessionId
@@ -68,6 +78,36 @@ class ConsentSagaControllerTest {
         "someData",
         "someDescription"
         );
+        validGrantCmd = new GrantConsentCmd(
+        UUID.randomUUID(), // sessionId
+        UUID.randomUUID(), // personRef
+        UUID.randomUUID(), // consentStatementRef
+        ConsentPurpose.MARKETING,
+        ConsentType.REQUIRED,
+        ConsentStatus.ACTIVE,
+        UUID.randomUUID(),
+        ActorType.USER,
+        Severity.INFO,
+        "originSystem",
+        "originService",
+        "originComponent",
+        "someData",
+        "someDescription"
+        );
+
+        validRevokeCmd = new RevokeConsentCmd(
+        UUID.randomUUID(), // sessionId
+        UUID.randomUUID(), // personRef
+        UUID.randomUUID(), // consentStatementRef
+        ActorType.USER,
+        Severity.INFO,
+        "originSystem",
+        "originService",
+        "originComponent",
+        "someData",
+        "someDescription"
+        );
+
  
         consentStatementResponse = new ConsentStatementResponse(
         consentStatementId,
@@ -86,6 +126,26 @@ class ConsentSagaControllerTest {
         @BeforeEach
         void directoryReturnsOk() {
             when(consentDirectory.createConsentStatement(any())).thenReturn(consentStatementResponse);
+            when(consentDirectory.grant(any())).thenReturn(new ConsentResponse(
+                    consentId,
+                    UUID.randomUUID(),
+                    "ACTIVE",
+                    consentStatementId,
+                    consentStatementResponse.statementText(),
+                    "MARKETING",
+                    "REQUIRED",
+                    true
+            ));
+            when(consentDirectory.withdraw(any())).thenReturn(new ConsentResponse(
+                    consentId,
+                    UUID.randomUUID(),
+                    "WITHDRAWN",
+                    consentStatementId,
+                    consentStatementResponse.statementText(),
+                    "MARKETING",
+                    "REQUIRED",
+                    false
+            ));
         }
  
         @Test
@@ -144,6 +204,84 @@ class ConsentSagaControllerTest {
                     .content(objectMapper.writeValueAsString(validCmd)));
  
             verify(consentDirectory).createConsentStatement(any(CreateConsentStatementCmd.class));
+        }
+
+        @Test
+        void grant_shouldReturn201_whenRequestIsValid() throws Exception {
+                mockMvc.perform(post("/internal/saga/consents/consent/grant")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(validGrantCmd)))
+                                .andExpect(status().isCreated());
+        }
+
+        @Test
+        void grant_shouldReturnLocationHeader_whenRequestIsValid() throws Exception {
+
+                mockMvc.perform(post("/internal/saga/consents/consent/grant")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(validGrantCmd)))
+                                .andExpect(header().string("Location",
+                                                "/internal/saga/consents/consent/grant/" + consentId));
+        }
+
+        @Test
+        void grant_shouldReturnResponseBody_whenRequestIsValid() throws Exception {
+
+                mockMvc.perform(post("/internal/saga/consents/consent/grant")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(validGrantCmd)))
+                                .andExpect(status().isCreated())
+                                .andExpect(jsonPath("$.consentId")
+                                                .value(consentId.toString()));
+        }
+
+        @Test
+        void grant_shouldDelegateToDirectory_whenRequestIsValid() throws Exception {
+
+                mockMvc.perform(post("/internal/saga/consents/consent/grant")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(validGrantCmd)));
+
+                verify(consentDirectory).grant(any(GrantConsentCmd.class));
+        }
+
+        @Test
+        void withdraw_shouldReturn200_whenRequestIsValid() throws Exception {
+
+                mockMvc.perform(post("/internal/saga/consents/consent/withdraw")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(validRevokeCmd)))
+                                .andExpect(status().isOk());
+        }
+
+        @Test
+        void withdraw_shouldReturnResponseBody_whenRequestIsValid() throws Exception {
+
+                mockMvc.perform(post("/internal/saga/consents/consent/withdraw")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(validRevokeCmd)))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.consentId")
+                                                .value(consentId.toString()));
+        }
+
+        @Test
+        void withdraw_shouldReturnApplicationJson_whenRequestIsValid() throws Exception {
+
+                mockMvc.perform(post("/internal/saga/consents/consent/withdraw")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(validRevokeCmd)))
+                                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
+        }
+
+        @Test
+        void withdraw_shouldDelegateToDirectory_whenRequestIsValid() throws Exception {
+
+                mockMvc.perform(post("/internal/saga/consents/consent/withdraw")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(validRevokeCmd)));
+
+                verify(consentDirectory).withdraw(any(RevokeConsentCmd.class));
         }
     }
  

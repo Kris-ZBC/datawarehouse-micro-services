@@ -8,7 +8,7 @@ import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 
 @Entity
 @Table(name = "person_notification")
@@ -86,6 +86,7 @@ public class PersonNotificationEntity {
             if (active == null) {
                 throw new ValidationException("personnotification.active.required", Map.of("field", "active" ));
             }
+
 
             return new PersonNotificationEntity(id, active);
         }

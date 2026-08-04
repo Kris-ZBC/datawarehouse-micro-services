@@ -35,13 +35,13 @@ import local.sop.sopinfo.consent.domain.model.valueobject.ConsentStatementValue;
 import local.sop.sopinfo.consent.domain.model.valueobject.PersonRef;
 import local.sop.sopinfo.consent.domain.ports.out.ConsentRepositoryPort;
 import local.sop.sopinfo.consent.domain.ports.out.ConsentStatementRepositoryPort;
-import local.sop.sopinfo.sharedkernel.enums.ConsentPurpose;
-import local.sop.sopinfo.sharedkernel.enums.ConsentStatus;
-import local.sop.sopinfo.sharedkernel.enums.ConsentType;
-import local.sop.sopinfo.sharedkernel.exceptions.NotFoundException;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.response.ResponseCompensated;
-import local.sop.sopinfo.sharedkernel.valueobjects.DomainId;
+import local.sop.common.libs.sharedkernel.enums.ConsentPurpose;
+import local.sop.common.libs.sharedkernel.enums.ConsentStatus;
+import local.sop.common.libs.sharedkernel.enums.ConsentType;
+import local.sop.common.libs.sharedkernel.exceptions.NotFoundException;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
+import local.sop.common.libs.sharedkernel.valueobjects.DomainId;
 import local.sop.sopinfo.consent.application.api.dto.*;
 
 
@@ -552,6 +552,7 @@ class ConsentApplicationServiceTest {
         verify(consentStatementRepository, never()).compensate(any(), any());
     }
 
+
     @Test
     void compensateConsentStatement_WhenCompensateFails_ShouldReturnIdempotentTrue() {
         // Given
@@ -576,4 +577,216 @@ class ConsentApplicationServiceTest {
         verify(consentStatementRepository).findById(ConsentStatementRef.of(statementId));
         verify(consentStatementRepository).compensate(ConsentStatementRef.of(statementId), cmd.sagaState());
     }
+
+    @Test
+    void testGetConsentForPersonAndPurpose_ShouldReturnConsentResponse() {
+
+        // Given
+
+        FetchConsentForPersonAndPurposeQuery query = new FetchConsentForPersonAndPurposeQuery(
+                personId,
+                ConsentPurpose.MARKETING);
+
+        when(consentRepositoryPort.findByPersonAndPurpose(
+                PersonRef.of(personId),
+                ConsentPurpose.MARKETING))
+                .thenReturn(Optional.of(testConsent));
+
+        when(consentStatementRepository.findById(
+                ConsentStatementRef.of(statementId)))
+                .thenReturn(Optional.of(testStatement));
+
+        // When
+        Optional<ConsentResponse> result = service.getConsentForPersonAndPurpose(query);
+
+        // Then
+        assertTrue(result.isPresent());
+
+        ConsentResponse response = result.get();
+
+        assertEquals(consentId, response.consentId());
+        assertEquals(personId, response.personReference());
+        assertEquals("ACTIVE", response.status());
+        assertEquals(statementId, response.consentStatementId());
+        assertEquals("Test statement", response.consentStatementText());
+        assertEquals("MARKETING", response.consentPurpose());
+        assertEquals("ONE_TIME", response.consentType());
+        assertEquals(false, response.active());
+    }
+
+    @Test
+    void testGetConsentForPersonAndPurpose_WhenConsentNotFound_ShouldThrowNotFoundException() {
+
+        // Given
+
+        var query = new FetchConsentForPersonAndPurposeQuery(
+                personId,
+                ConsentPurpose.MARKETING);
+
+        when(consentRepositoryPort.findByPersonAndPurpose(
+                PersonRef.of(personId),
+                ConsentPurpose.MARKETING))
+                .thenReturn(Optional.empty());
+
+        // When and Then
+        assertThrows(NotFoundException.class,
+                () -> service.getConsentForPersonAndPurpose(query));
+
+    }
+
+    @Test
+    void testGetConsentForPersonAndPurpose_WhenStatementNotFound_ShouldThrowNotFoundException() {
+        // Given
+        var query = new FetchConsentForPersonAndPurposeQuery(
+                personId,
+                ConsentPurpose.MARKETING);
+
+        when(consentRepositoryPort.findByPersonAndPurpose(
+                PersonRef.of(personId),
+                ConsentPurpose.MARKETING))
+                .thenReturn(Optional.of(testConsent));
+
+        when(consentStatementRepository.findById(
+                ConsentStatementRef.of(statementId)))
+                .thenReturn(Optional.empty());
+
+        // When & Then
+        assertThrows(NotFoundException.class,
+                () -> service.getConsentForPersonAndPurpose(query));
+    }
+
+   
+    @Test
+    void compensateConsent_WhenConsentExistsAndCompensateSucceeds_ShouldReturnCompensated() {
+        // Given
+        UUID id = UUID.randomUUID();
+
+        when(consentRepositoryPort.findById(ConsentId.of(id)))
+                .thenReturn(Optional.of(testConsent));
+
+        when(consentRepositoryPort.compensate(ConsentId.of(id), SagaOutcome.COMPENSATE))
+                .thenReturn(true);
+
+        // When
+        ResponseCompensated result = service.compensateConsent(id, String.class, SagaOutcome.COMPENSATE);
+
+        // Then
+        assertEquals(SagaOutcome.COMPENSATED, result.sagaState());
+        assertTrue(result.success());
+
+        verify(consentRepositoryPort).findById(ConsentId.of(id));
+        verify(consentRepositoryPort).compensate(ConsentId.of(id), SagaOutcome.COMPENSATE);
+    }
+
+    @Test
+    void compensateConsent_WhenConsentDoesNotExist_ShouldReturnIdempotentFalse() {
+        // Given
+        UUID id = UUID.randomUUID();
+
+        when(consentRepositoryPort.findById(ConsentId.of(id)))
+                .thenReturn(null);
+
+        // When
+        ResponseCompensated result = service.compensateConsent(id, String.class, SagaOutcome.COMPENSATE);
+
+        // Then
+        assertEquals(SagaOutcome.IDEMPOTENT, result.sagaState());
+        assertFalse(result.success());
+
+        verify(consentRepositoryPort).findById(ConsentId.of(id));
+        verify(consentRepositoryPort, never())
+                .compensate(any(), any());
+    }
+
+    @Test
+    void compensateConsent_WhenCompensateFails_ShouldReturnIdempotentTrue() {
+        // Given
+        UUID id = UUID.randomUUID();
+
+        when(consentRepositoryPort.findById(ConsentId.of(id)))
+                .thenReturn(Optional.of(testConsent));
+
+        when(consentRepositoryPort.compensate(ConsentId.of(id), SagaOutcome.COMPENSATE))
+                .thenReturn(false);
+
+        // When
+        ResponseCompensated result = service.compensateConsent(id, String.class, SagaOutcome.COMPENSATE);
+
+        // Then
+        assertEquals(SagaOutcome.IDEMPOTENT, result.sagaState());
+        assertTrue(result.success());
+
+        verify(consentRepositoryPort).findById(ConsentId.of(id));
+        verify(consentRepositoryPort).compensate(ConsentId.of(id), SagaOutcome.COMPENSATE);
+    }
+
+    @Test
+    void compensateConsentWithdrawal_WhenConsentNotFound_ShouldReturnIdempotentFalse() {
+        // Given
+        UUID id = UUID.randomUUID();
+
+        when(consentRepositoryPort.findById(ConsentId.of(id)))
+                .thenReturn(Optional.empty());
+
+        // When
+        ResponseCompensated result = service.compensateConsentWithdrawalUpdate(id, String.class,
+                SagaOutcome.COMPENSATE);
+
+        // Then
+        assertEquals(SagaOutcome.IDEMPOTENT, result.sagaState());
+        assertFalse(result.success());
+
+        verify(consentRepositoryPort).findById(ConsentId.of(id));
+        verify(consentRepositoryPort, never()).update(any());
+    }
+
+    @Test
+    void compensateConsentWithdrawal_WhenConsentNotWithdrawn_ShouldReturnIdempotentTrue() {
+        // Given
+        UUID id = UUID.randomUUID();
+
+        Consent consent = testConsent.withStatus(ConsentStatus.ACTIVE);
+
+        when(consentRepositoryPort.findById(ConsentId.of(id)))
+                .thenReturn(Optional.of(consent));
+
+        // When
+        ResponseCompensated result = service.compensateConsentWithdrawalUpdate(id, String.class,
+                SagaOutcome.COMPENSATE);
+
+        // Then
+        assertEquals(SagaOutcome.IDEMPOTENT, result.sagaState());
+        assertTrue(result.success());
+
+        verify(consentRepositoryPort).findById(ConsentId.of(id));
+        verify(consentRepositoryPort, never()).update(any());
+    }
+
+    @Test
+    void compensateConsentWithdrawal_WhenConsentWithdrawn_ShouldRestoreAndCompensate() {
+        // Given
+        UUID id = UUID.randomUUID();
+
+        Consent withdrawnConsent = testConsent.withStatus(ConsentStatus.WITHDRAWN);
+
+        Consent restoredConsent = withdrawnConsent.withStatus(ConsentStatus.ACTIVE);
+
+        when(consentRepositoryPort.findById(ConsentId.of(id)))
+                .thenReturn(Optional.of(withdrawnConsent));
+
+        when(consentRepositoryPort.update(any(Consent.class)))
+                .thenReturn(restoredConsent);
+
+        // When
+        ResponseCompensated result = service.compensateConsentWithdrawalUpdate(id, String.class,
+                SagaOutcome.COMPENSATE);
+
+        // Then
+        assertEquals(SagaOutcome.COMPENSATED, result.sagaState());
+        assertTrue(result.success());
+
+        verify(consentRepositoryPort).findById(ConsentId.of(id));
+        verify(consentRepositoryPort).update(any(Consent.class));
+    }
+
 }

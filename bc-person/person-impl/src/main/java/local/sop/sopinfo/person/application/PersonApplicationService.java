@@ -5,8 +5,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-
 import org.springframework.transaction.annotation.Transactional;
 
 import local.sop.sopinfo.person.application.api.PersonDirectory;
@@ -16,6 +17,7 @@ import local.sop.sopinfo.person.application.api.dto.PersonResponse;
 import local.sop.sopinfo.person.application.api.dto.PhoneNumberResponse;
 import local.sop.sopinfo.person.application.api.dto.RemovePhoneNumberCmd;
 import local.sop.sopinfo.person.application.api.dto.UpdatePersonCmd;
+import local.sop.sopinfo.person.application.mapper.PersonResponseMapper;
 import local.sop.sopinfo.person.domain.model.Person;
 import local.sop.sopinfo.person.domain.model.PhoneNumber;
 import local.sop.sopinfo.person.domain.model.PhoneNumberDraft;
@@ -28,16 +30,12 @@ import local.sop.sopinfo.person.domain.model.valueobjects.PhoneNumberId;
 import local.sop.sopinfo.person.domain.model.valueobjects.PhoneNumberValue;
 import local.sop.sopinfo.person.domain.ports.out.PersonRepositoryPort;
 import local.sop.sopinfo.person.domain.service.PersonDomain;
-import local.sop.sopinfo.sharedkernel.exceptions.ConflictException;
-import local.sop.sopinfo.sharedkernel.exceptions.NotFoundException;
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.response.ResponseCompensated;
-import local.sop.sopinfo.sharedkernel.valueobjects.DomainId;
-import local.sop.sopinfo.person.application.mapper.PersonResponseMapper;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
+import local.sop.common.libs.sharedkernel.exceptions.NotFoundException;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
+import local.sop.common.libs.sharedkernel.valueobjects.DomainId;
 
 @Service
 public class PersonApplicationService implements PersonDirectory {
@@ -248,7 +246,7 @@ public class PersonApplicationService implements PersonDirectory {
 	public ResponseCompensated compensate(UUID id, Class<?> clazz, SagaOutcome sagaState) {
         log.info("Compensate called from class {}", clazz.getSimpleName());
         var person = personRepositoryPort.findById(PersonId.of(id));
-        if(person == null) {
+        if(person.isEmpty()) {
                 return new ResponseCompensated(SagaOutcome.IDEMPOTENT, false);
         }
         boolean result = personRepositoryPort.compensate(PersonId.of(id), sagaState);

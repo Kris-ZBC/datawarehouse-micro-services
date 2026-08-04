@@ -15,9 +15,9 @@ import local.sop.sopinfo.login.domain.model.valueobjects.HashedPassword;
 import local.sop.sopinfo.login.domain.model.valueobjects.LoginId;
 import local.sop.sopinfo.login.domain.model.valueobjects.PersonRef;
 import local.sop.sopinfo.login.domain.model.valueobjects.Username;
-import local.sop.sopinfo.sharedkernel.enums.LoginStatus;
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
-import local.sop.sopinfo.sharedkernel.valueobjects.utils.UUIDUtil;
+import local.sop.common.libs.sharedkernel.enums.LoginStatus;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.valueobjects.utils.UUIDUtil;
 
 public class LoginTest {
 

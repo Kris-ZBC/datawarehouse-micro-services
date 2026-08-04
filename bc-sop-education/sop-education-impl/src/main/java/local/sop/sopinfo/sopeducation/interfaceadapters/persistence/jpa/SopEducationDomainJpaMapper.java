@@ -2,7 +2,7 @@ package local.sop.sopinfo.sopeducation.interfaceadapters.persistence.jpa;
 
 import org.springframework.stereotype.Component;
 
-import local.sop.sopinfo.sharedkernel.compositekey.dtos.CompositeKey;
+import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
 import local.sop.sopinfo.sopeducation.domain.model.SopEducation;
 import local.sop.sopinfo.sopeducation.domain.model.valueobjects.CreatedAtTimestamp;
 

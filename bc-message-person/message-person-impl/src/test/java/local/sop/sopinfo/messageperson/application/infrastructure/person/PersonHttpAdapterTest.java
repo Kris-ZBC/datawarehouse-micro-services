@@ -20,7 +20,7 @@ import org.springframework.web.client.RestClient;
 
 import local.sop.sopinfo.messageperson.application.infrastructure.response.PersonResponse;
 import local.sop.sopinfo.messageperson.application.infrastructure.response.PhoneNumberResponse;
-import local.sop.sopinfo.sharedkernel.enums.PhoneUserType;
+import local.sop.common.libs.sharedkernel.enums.PhoneUserType;
 
 @ExtendWith(MockitoExtension.class)
 public class PersonHttpAdapterTest {

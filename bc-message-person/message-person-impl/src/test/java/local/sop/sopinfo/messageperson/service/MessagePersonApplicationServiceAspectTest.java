@@ -27,7 +27,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import local.sop.sopinfo.infrastructure.validation.compositekeys.CompositeKeyValidationAspect;
+import local.sop.common.libs.infrastructure.validation.compositekeys.CompositeKeyValidationAspect;
 import local.sop.sopinfo.messageperson.application.api.MessagePersonDirectory;
 import local.sop.sopinfo.messageperson.application.api.dto.CreateMessagePersonCmd;
 import local.sop.sopinfo.messageperson.application.api.dto.ToggleActivateMessagePersonCmd;
@@ -36,9 +36,9 @@ import local.sop.sopinfo.messageperson.domain.model.MessagePerson;
 import local.sop.sopinfo.messageperson.domain.model.valueobjects.CreatedAtTimestamp;
 import local.sop.sopinfo.messageperson.domain.ports.out.MessagePersonPort;
 import local.sop.sopinfo.messageperson.domain.service.MessagePersonDomain;
-import local.sop.sopinfo.sharedkernel.compositekey.dtos.CompositeKey;
-import local.sop.sopinfo.sharedkernel.compositekey.validate.CompositeKeyValidator;
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
+import local.sop.common.libs.sharedkernel.compositekey.validate.CompositeKeyValidator;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {MessagePersonApplicationServiceAspectTest.TestConfig.class})

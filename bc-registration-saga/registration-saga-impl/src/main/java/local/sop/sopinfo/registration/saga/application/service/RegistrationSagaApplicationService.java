@@ -28,7 +28,7 @@ import local.sop.sopinfo.registration.saga.application.api.dto.organization.Orga
 import local.sop.sopinfo.registration.saga.application.api.dto.person.CreatePersonCmd;
 import local.sop.sopinfo.registration.saga.application.api.dto.person.PersonResponse;
 import local.sop.sopinfo.registration.saga.application.infrastructure.response.ResponseLoginCreated;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.response.ResponseCompensated;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 import local.sop.sopinfo.registration.saga.application.ports.out.apprentice.ApprenticePort;
 import local.sop.sopinfo.registration.saga.application.ports.out.auditlog.AuditlogPort;
 import local.sop.sopinfo.registration.saga.application.ports.out.consent.ConsentPort;
@@ -37,9 +37,9 @@ import local.sop.sopinfo.registration.saga.application.ports.out.instructor.Inst
 import local.sop.sopinfo.registration.saga.application.ports.out.login.LoginPort;
 import local.sop.sopinfo.registration.saga.application.ports.out.organization.OrganizationPort;
 import local.sop.sopinfo.registration.saga.application.ports.out.person.PersonPort;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
-import local.sop.sopinfo.sharedkernel.exceptions.ConflictException;
-import local.sop.sopinfo.sharedkernel.exceptions.NotFoundException;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
+import local.sop.common.libs.sharedkernel.exceptions.NotFoundException;
 
 @Service
 public class RegistrationSagaApplicationService implements RegistrationDirectory {
@@ -272,8 +272,8 @@ public class RegistrationSagaApplicationService implements RegistrationDirectory
         try {
             auditlogId = auditlogs.create(new CreateAuditlogCmd(
                     personId,
-                    local.sop.sopinfo.sharedkernel.enums.ActorType.SERVICE,
-                    local.sop.sopinfo.sharedkernel.enums.Severity.INFO,
+                    local.sop.common.libs.sharedkernel.enums.ActorType.SERVICE,
+                    local.sop.common.libs.sharedkernel.enums.Severity.INFO,
                     "registration-saga",
                     "RegistrationSagaApplicationService",
                     "registerApprentice",
@@ -526,8 +526,8 @@ public class RegistrationSagaApplicationService implements RegistrationDirectory
         try {
             auditlogId = auditlogs.create(new CreateAuditlogCmd(
                     personId,
-                    local.sop.sopinfo.sharedkernel.enums.ActorType.SERVICE,
-                    local.sop.sopinfo.sharedkernel.enums.Severity.INFO,
+                    local.sop.common.libs.sharedkernel.enums.ActorType.SERVICE,
+                    local.sop.common.libs.sharedkernel.enums.Severity.INFO,
                     "registration-saga",
                     "RegistrationSagaApplicationService",
                     "registerInstructor",

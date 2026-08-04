@@ -15,7 +15,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 import local.sop.sopinfo.consent.interfaceadapters.persistence.jpa.consent.ConsentEntity;
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 
 @Entity
 @Table(name = "consent_statement")

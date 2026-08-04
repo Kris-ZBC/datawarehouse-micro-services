@@ -19,6 +19,8 @@ import local.sop.sopinfo.notification.application.api.NotificationDirectory;
 import local.sop.sopinfo.notification.application.api.dto.CreateNotificationCmd;
 import local.sop.sopinfo.notification.application.api.dto.CreateNotificationResult;
 import local.sop.sopinfo.notification.application.api.dto.NotificationResponse;
+import local.sop.common.libs.sharedkernel.sagas.compensate.request.PayloadCompensateCreate;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 
 
 @RestController
@@ -58,6 +60,12 @@ public class InternalNotificationController {
 	@GetMapping("/ping")
 	public ResponseEntity<String> ping() {
 		return ResponseEntity.ok("pong");
+	}
+
+	@PutMapping(path="/{id}/compensate/create", produces = "application/json")
+	public ResponseEntity<ResponseCompensated> compensate(@PathVariable UUID id, @Valid @RequestBody PayloadCompensateCreate cmd) {
+		var result = notification.compensate(id, cmd.clazz(), cmd.sagaState());
+		return result != null ? ResponseEntity.ok(result) : ResponseEntity.noContent().build();
 	}
 
 }

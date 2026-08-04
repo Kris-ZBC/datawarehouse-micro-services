@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
-import local.sop.sopinfo.sharedkernel.compositekey.dtos.CompositeKey;
+import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
 import local.sop.sopinfo.sopeducation.application.api.SopEducationDirectory;
 import local.sop.sopinfo.sopeducation.application.api.dto.CreateSopEducationCmd;
 import local.sop.sopinfo.sopeducation.application.api.dto.CreatedSopEducationResult;

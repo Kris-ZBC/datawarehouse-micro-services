@@ -20,9 +20,9 @@ import org.junit.jupiter.api.Test;
 import local.sop.sopinfo.registration.saga.application.api.dto.auditlog.AuditlogResponse;
 import local.sop.sopinfo.registration.saga.application.api.dto.auditlog.CreateAuditlogCmd;
 import local.sop.sopinfo.registration.saga.application.infrastructure.auditlog.AuditlogHttpAdapter;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.request.PayloadCompensateCreate;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.response.ResponseCompensated;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.request.PayloadCompensateCreate;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 
 @ExtendWith(MockitoExtension.class)
 class AuditHttpAdapterTest {

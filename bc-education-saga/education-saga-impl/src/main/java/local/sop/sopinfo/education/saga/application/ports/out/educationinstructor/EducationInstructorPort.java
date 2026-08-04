@@ -4,9 +4,9 @@ import java.util.Optional;
 
 import local.sop.sopinfo.education.saga.application.api.dto.CreateEducationInstructorCmd;
 import local.sop.sopinfo.education.saga.application.api.dto.EducationInstructorResponse;
-import local.sop.sopinfo.sharedkernel.compositekey.dtos.CompositeKey;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.response.ResponseCompensated;
+import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 public interface EducationInstructorPort {
     EducationInstructorResponse createEducationInstructor(CreateEducationInstructorCmd cmd);
 	Optional<EducationInstructorResponse> findById(CompositeKey id);

@@ -10,7 +10,7 @@ import local.sop.sopinfo.messageperson.application.api.dto.CreateMessagePersonCm
 import local.sop.sopinfo.messageperson.application.api.dto.CreatedMessagePersonResult;
 import local.sop.sopinfo.messageperson.application.api.dto.MessagePersonResponse;
 import local.sop.sopinfo.messageperson.application.api.dto.ToggleActivateMessagePersonCmd;
-import local.sop.sopinfo.sharedkernel.compositekey.dtos.CompositeKey;
+import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
 
 import java.net.URI;
 import java.util.List;

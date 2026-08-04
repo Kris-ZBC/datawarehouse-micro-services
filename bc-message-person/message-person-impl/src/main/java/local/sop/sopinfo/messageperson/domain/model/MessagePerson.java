@@ -5,8 +5,8 @@ package local.sop.sopinfo.messageperson.domain.model;
 import java.util.Map;
 
 import local.sop.sopinfo.messageperson.domain.model.valueobjects.CreatedAtTimestamp;
-import local.sop.sopinfo.sharedkernel.compositekey.dtos.CompositeKey;
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 
 public class MessagePerson {
     private final CompositeKey id;

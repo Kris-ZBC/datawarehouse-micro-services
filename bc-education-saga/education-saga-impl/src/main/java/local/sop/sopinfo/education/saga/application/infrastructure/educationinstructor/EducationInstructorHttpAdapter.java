@@ -7,14 +7,14 @@ import org.springframework.web.client.RestClient;
 
 import local.sop.sopinfo.education.saga.application.api.dto.CreateEducationInstructorCmd;
 import local.sop.sopinfo.education.saga.application.api.dto.EducationInstructorResponse;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.request.PayloadCompensateCreate;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.request.PayloadCompensateUpdate;
+import local.sop.common.libs.sharedkernel.sagas.compensate.request.PayloadCompensateCreate;
+import local.sop.common.libs.sharedkernel.sagas.compensate.request.PayloadCompensateUpdate;
 import local.sop.sopinfo.education.saga.application.infrastructure.request.PayloadCreateEducationInstructor;
 import local.sop.sopinfo.education.saga.application.ports.out.educationinstructor.EducationInstructorPort;
-import local.sop.sopinfo.sharedkernel.compositekey.dtos.CompositeKey;
-import local.sop.sopinfo.sharedkernel.exceptions.ConflictException;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.response.ResponseCompensated;
+import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
+import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 
 public class EducationInstructorHttpAdapter implements EducationInstructorPort {
     

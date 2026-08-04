@@ -49,14 +49,14 @@ import local.sop.sopinfo.message.saga.application.ports.out.notification.Notific
 import local.sop.sopinfo.message.saga.application.ports.out.person.PersonPort;
 import local.sop.sopinfo.message.saga.application.ports.out.personnotification.PersonNotificationPort;
 import local.sop.sopinfo.message.saga.application.ports.out.saga.MessageSagaStatePort;
-import local.sop.sopinfo.sharedkernel.compositekey.dtos.CompositeKey;
-import local.sop.sopinfo.sharedkernel.enums.ActorType;
-import local.sop.sopinfo.sharedkernel.enums.Severity;
-import local.sop.sopinfo.sharedkernel.exceptions.ConflictException;
-import local.sop.sopinfo.sharedkernel.exceptions.DomainException;
-import local.sop.sopinfo.sharedkernel.exceptions.ErrorCode;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.response.ResponseCompensated;
+import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
+import local.sop.common.libs.sharedkernel.enums.ActorType;
+import local.sop.common.libs.sharedkernel.enums.Severity;
+import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
+import local.sop.common.libs.sharedkernel.exceptions.DomainException;
+import local.sop.common.libs.sharedkernel.exceptions.ErrorCode;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 
 @ExtendWith(MockitoExtension.class)
 public class MessageSagaApplicationServiceTest {

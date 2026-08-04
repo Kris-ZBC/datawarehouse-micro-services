@@ -12,9 +12,9 @@ import local.sop.sopinfo.education.saga.application.infrastructure.request.Paylo
 import local.sop.sopinfo.education.saga.application.infrastructure.request.PayloadUpdateCompensate;
 import local.sop.sopinfo.education.saga.application.infrastructure.request.PayloadEducationCreate;
 import local.sop.sopinfo.education.saga.application.ports.out.education.EducationPort;
-import local.sop.sopinfo.sharedkernel.exceptions.ConflictException;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.response.ResponseCompensated;
+import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 
 public class EducationHttpAdapter implements EducationPort {
 

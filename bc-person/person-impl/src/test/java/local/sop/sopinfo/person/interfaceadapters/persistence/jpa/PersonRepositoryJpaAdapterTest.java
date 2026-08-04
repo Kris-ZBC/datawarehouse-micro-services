@@ -1,13 +1,13 @@
 package local.sop.sopinfo.person.interfaceadapters.persistence.jpa;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +23,9 @@ import local.sop.sopinfo.person.domain.model.valueobjects.OrganizationRef;
 import local.sop.sopinfo.person.domain.model.valueobjects.PersonId;
 import local.sop.sopinfo.person.domain.model.valueobjects.PhoneNumberId;
 import local.sop.sopinfo.person.domain.model.valueobjects.PhoneNumberValue;
-import local.sop.sopinfo.sharedkernel.enums.PhoneUserType;
+import local.sop.common.libs.sharedkernel.enums.PhoneUserType;
+import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
 
 @DataJpaTest
 @TestPropertySource(properties = {
@@ -270,4 +272,42 @@ class PersonRepositoryJpaAdapterTest {
         assertEquals(1, result.size());
         assertEquals("Johnson", result.getFirst().getLastName().value());
     }
+
+
+    @Test
+        void compensate_should_throw_when_wrong_state() {
+        UUID id = UUID.randomUUID();
+
+        assertThrows(ConflictException.class, () ->
+                adapter.compensate(new PersonId(id), SagaOutcome.SUCCEEDED)
+        );
+        }
+
+        @Test
+        void compensate_should_return_false_when_person_not_found() {
+        UUID id = UUID.randomUUID();
+
+        Boolean result = adapter.compensate(new PersonId(id), SagaOutcome.COMPENSATE);
+
+        assertFalse(result);
+        }
+
+        @Test
+        void compensate_should_return_true_when_person_deleted_successfully() {
+        UUID personId = UUID.randomUUID();
+
+        PersonEntity entity = new PersonEntity(
+                personId,
+                "John",
+                "Doe",
+                "john@doe.com",
+                UUID.randomUUID()
+        );
+
+        personSpringDataRepository.save(entity);
+
+        Boolean result = adapter.compensate(new PersonId(personId), SagaOutcome.COMPENSATE);
+
+        assertTrue(result);
+        }
 }

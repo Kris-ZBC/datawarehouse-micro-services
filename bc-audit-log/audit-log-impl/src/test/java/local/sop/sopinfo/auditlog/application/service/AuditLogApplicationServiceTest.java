@@ -32,11 +32,11 @@ import local.sop.sopinfo.auditlog.domain.model.valueobjects.OriginService;
 import local.sop.sopinfo.auditlog.domain.model.valueobjects.OriginSystem;
 import local.sop.sopinfo.auditlog.domain.ports.out.AuditlogRepositoryPort;
 import local.sop.sopinfo.auditlog.domain.service.AuditLogDomain;
-import local.sop.sopinfo.sharedkernel.enums.ActorType;
-import local.sop.sopinfo.sharedkernel.enums.Severity;
-import local.sop.sopinfo.sharedkernel.exceptions.ConflictException;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.response.ResponseCompensated;
+import local.sop.common.libs.sharedkernel.enums.ActorType;
+import local.sop.common.libs.sharedkernel.enums.Severity;
+import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 
 @ExtendWith(MockitoExtension.class)
 class AuditLogApplicationServiceTest {

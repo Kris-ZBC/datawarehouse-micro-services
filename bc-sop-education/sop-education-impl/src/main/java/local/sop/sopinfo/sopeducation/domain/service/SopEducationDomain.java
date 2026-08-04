@@ -2,7 +2,7 @@ package local.sop.sopinfo.sopeducation.domain.service;
 
 import java.time.LocalDateTime;
 
-import local.sop.sopinfo.sharedkernel.compositekey.dtos.CompositeKey;
+import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
 import local.sop.sopinfo.sopeducation.domain.model.SopEducation;
 
 public interface SopEducationDomain {

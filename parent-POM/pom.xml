@@ -18,14 +18,7 @@ Parent pom for multi-module project aggregator and BOM (dependency management)
     <packaging>pom</packaging>
     
     <modules>       
-        <!-- Other modules -->
-        <module>../shared-kernel</module>
-        <module>../common-data</module>
-        <module>../common-security</module>
-        <module>../common-web</module>
-        <module>../common-core</module>
         <module>../coverage-report</module>
-        <module>../common-validation</module>
         
         <!-- Bounded Context -->
         <module>../bc-apprentice/apprentice-api</module>
@@ -86,8 +79,26 @@ Parent pom for multi-module project aggregator and BOM (dependency management)
         <module>../bc-sop-instructor/sop-instructor-impl</module>
 
         <!-- SAGA -->
+        <module>../bc-auth_handler/auth_handler-api</module>
+        <module>../bc-auth_handler/auth_handler-impl</module>
+        
+        <module>../bc-check_in_handler/check_in_handler-api</module>
+        <module>../bc-check_in_handler/check_in_handler-impl</module>
+
+        <module>../bc-communication_handler/communication_handler-api</module>
+        <module>../bc-communication_handler/communication_handler-impl</module>
+        
+        <module>../bc-organisation_handler/organisation_handler-api</module>
+        <module>../bc-organisation_handler/organisation_handler-impl</module>
+        
+        <module>../bc-user_handler/user_handler-api</module>
+        <module>../bc-user_handler/user_handler-impl</module>
+       
         <module>../bc-organisation/organisation-api</module>
         <module>../bc-organisation/organisation-impl</module>
+
+        <module>../bc-sop_handler/sop_handler-api</module>
+        <module>../bc-sop_handler/sop_handler-impl</module>
 
         <module>../bc-consent-saga/consent-saga-api</module>
         <module>../bc-consent-saga/consent-saga-impl</module>
@@ -118,15 +129,6 @@ Parent pom for multi-module project aggregator and BOM (dependency management)
     <dependencyManagement>
         <!-- master-BOM (this is were version are controlled) -->
         <dependencies>
-            <!--
-            <dependency>
-                <groupId>local.sop.sopinfo</groupId>
-                <artifactId>bom</artifactId>
-                <version>${revision}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-            -->
         </dependencies>
     </dependencyManagement>
 
@@ -152,6 +154,12 @@ Parent pom for multi-module project aggregator and BOM (dependency management)
           <artifactId>mockito-core</artifactId>
           <scope>test</scope>
         </dependency>
+
+        <dependency>
+          <groupId>local.sop.common.libs</groupId>
+          <artifactId>shared-kernel</artifactId>
+        </dependency>
+
     </dependencies>
 
   <build>
@@ -316,7 +324,6 @@ Parent pom for multi-module project aggregator and BOM (dependency management)
                 <enforceBytecodeVersion>
                   <maxJdkVersion>${java.version}</maxJdkVersion>
                 </enforceBytecodeVersion>
-                <requireNoRepositories/>
               </rules>
             </configuration>
           </execution>
@@ -339,24 +346,4 @@ Parent pom for multi-module project aggregator and BOM (dependency management)
     </plugin>
     </plugins>
   </build>
-  <!-- ===== Profiles ===== -->
-  <profiles>
-    <!-- Auto-add shared-kernel where marker file exists -->
-    <profile>
-      <id>shared-kernel-auto</id>
-      <activation>
-        <file>
-          <exists>.uses-shared-kernel</exists>
-        </file>
-      </activation>
-      <dependencies>
-        <dependency>
-          <groupId>local.sop.sopinfo</groupId>
-          <artifactId>shared-kernel</artifactId>
-          <version>${revision}</version>
-        </dependency>
-      </dependencies>
-    </profile>
-    </profiles>
-
 </project>

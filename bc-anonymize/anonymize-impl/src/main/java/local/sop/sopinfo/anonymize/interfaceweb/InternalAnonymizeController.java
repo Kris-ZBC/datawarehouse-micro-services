@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-import local.sop.sopinfo.sharedkernel.sagas.compensate.response.ResponseCompensated;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

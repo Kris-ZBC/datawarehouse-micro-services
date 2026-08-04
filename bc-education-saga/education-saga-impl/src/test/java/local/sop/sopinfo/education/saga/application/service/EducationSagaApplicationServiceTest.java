@@ -26,12 +26,12 @@ import local.sop.sopinfo.education.saga.application.ports.out.auditlog.AuditlogP
 import local.sop.sopinfo.education.saga.application.ports.out.education.EducationPort;
 import local.sop.sopinfo.education.saga.application.ports.out.educationinstructor.EducationInstructorPort;
 import local.sop.sopinfo.education.saga.application.ports.out.saga.EducationSagaStatePort;
-import local.sop.sopinfo.sharedkernel.compositekey.dtos.CompositeKey;
-import local.sop.sopinfo.sharedkernel.enums.ActorType;
-import local.sop.sopinfo.sharedkernel.enums.Severity;
-import local.sop.sopinfo.sharedkernel.exceptions.ConflictException;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
-import local.sop.sopinfo.sharedkernel.sagas.concurrency.locks.SagaStatus;
+import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
+import local.sop.common.libs.sharedkernel.enums.ActorType;
+import local.sop.common.libs.sharedkernel.enums.Severity;
+import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.concurrency.locks.SagaStatus;
 
 @ExtendWith(MockitoExtension.class)
 public class EducationSagaApplicationServiceTest {

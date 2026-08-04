@@ -24,9 +24,9 @@ import local.sop.sopinfo.consent.domain.model.valueobject.ConsentStatementRef;
 import local.sop.sopinfo.consent.domain.model.valueobject.ConsentStatementValue;
 import local.sop.sopinfo.consent.domain.model.valueobject.PersonRef;
 import local.sop.sopinfo.consent.interfaceadapters.persistence.jpa.consent.ConsentEntity;
-import local.sop.sopinfo.sharedkernel.enums.ConsentPurpose;
-import local.sop.sopinfo.sharedkernel.enums.ConsentStatus;
-import local.sop.sopinfo.sharedkernel.enums.ConsentType;
+import local.sop.common.libs.sharedkernel.enums.ConsentPurpose;
+import local.sop.common.libs.sharedkernel.enums.ConsentStatus;
+import local.sop.common.libs.sharedkernel.enums.ConsentType;
 
 @ExtendWith(MockitoExtension.class)
 class ConsentStatementJpaMapperTest {

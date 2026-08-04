@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import local.sop.sopinfo.sopinstructor.interfaceadapters.persistence.jpa.SopInstructorEntity;
 import local.sop.sopinfo.sopinstructor.interfaceadapters.persistence.jpa.SopInstructorId;
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 
 class SopInstructorEntityTest {
 

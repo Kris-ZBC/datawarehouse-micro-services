@@ -24,8 +24,8 @@ import local.sop.sopinfo.personnotification.domain.model.PersonNotification;
 import local.sop.sopinfo.personnotification.domain.model.valueobjects.CreatedAtTimestamp;
 import local.sop.sopinfo.personnotification.domain.ports.out.PersonNotificationPort;
 import local.sop.sopinfo.personnotification.domain.service.PersonNotificationDomain;
-import local.sop.sopinfo.sharedkernel.compositekey.dtos.CompositeKey;
-import local.sop.sopinfo.sharedkernel.exceptions.NotFoundException;
+import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
+import local.sop.common.libs.sharedkernel.exceptions.NotFoundException;
 
 import java.util.Optional;
 

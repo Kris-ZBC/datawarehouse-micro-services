@@ -11,7 +11,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Version;
 import local.sop.sopinfo.instructor.domain.model.valueobjects.InstructorId;
 import local.sop.sopinfo.instructor.domain.model.valueobjects.PersonRef;
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 
 @Entity
 @Table(name = "instructor")

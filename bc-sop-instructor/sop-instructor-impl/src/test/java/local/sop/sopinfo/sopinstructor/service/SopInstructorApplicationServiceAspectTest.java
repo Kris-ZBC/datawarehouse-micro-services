@@ -27,7 +27,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import local.sop.sopinfo.infrastructure.validation.compositekeys.CompositeKeyValidationAspect;
+import local.sop.common.libs.infrastructure.validation.compositekeys.CompositeKeyValidationAspect;
 import local.sop.sopinfo.sopinstructor.application.api.SopInstructorDirectory;
 import local.sop.sopinfo.sopinstructor.application.api.dto.CreateSopInstructorCmd;
 import local.sop.sopinfo.sopinstructor.application.api.dto.ToggleActivateSopInstructorCmd;
@@ -36,9 +36,9 @@ import local.sop.sopinfo.sopinstructor.domain.model.SopInstructor;
 import local.sop.sopinfo.sopinstructor.domain.model.valueobjects.CreatedAtTimestamp;
 import local.sop.sopinfo.sopinstructor.domain.ports.out.SopInstructorPort;
 import local.sop.sopinfo.sopinstructor.domain.service.SopInstructorDomain;
-import local.sop.sopinfo.sharedkernel.compositekey.dtos.CompositeKey;
-import local.sop.sopinfo.sharedkernel.compositekey.validate.CompositeKeyValidator;
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
+import local.sop.common.libs.sharedkernel.compositekey.validate.CompositeKeyValidator;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {SopInstructorApplicationServiceAspectTest.TestConfig.class})

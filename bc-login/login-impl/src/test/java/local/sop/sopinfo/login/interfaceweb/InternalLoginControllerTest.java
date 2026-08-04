@@ -24,14 +24,14 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import local.sop.sopinfo.infrastructure.security.DisableSecurity;
-import local.sop.sopinfo.infrastructure.web.exception.EndpointExceptionHandler;
+import local.sop.common.libs.infrastructure.security.DisableSecurity;
+import local.sop.common.libs.infrastructure.web.exception.EndpointExceptionHandler;
 import local.sop.sopinfo.login.application.api.LoginDirectory;
 import local.sop.sopinfo.login.application.api.dto.*;
-import local.sop.sopinfo.sharedkernel.exceptions.NotFoundException;
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.response.ResponseCompensated;
+import local.sop.common.libs.sharedkernel.exceptions.NotFoundException;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 
 @WebMvcTest(controllers = InternalLoginController.class)
 @Import(EndpointExceptionHandler.class)

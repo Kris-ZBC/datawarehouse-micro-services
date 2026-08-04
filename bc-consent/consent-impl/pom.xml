@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-            <groupId>local.sop.sopinfo</groupId>
+          <groupId>local.sop.sopinfo</groupId>
           <artifactId>parent</artifactId>
           <version>${revision}</version>
           <relativePath>../../parent-POM/pom.xml</relativePath>
@@ -25,27 +25,24 @@
   </dependency>
 
   <dependency>
-    <groupId>local.sop.sopinfo</groupId>
+    <groupId>local.sop.common.libs</groupId>
     <artifactId>common-web</artifactId>
-    <version>${revision}</version>
   </dependency>
-
+  
   <dependency>
-    <groupId>local.sop.sopinfo</groupId>
+    <groupId>local.sop.common.libs</groupId>
     <artifactId>common-data</artifactId>
-    <version>${revision}</version>
-  </dependency>
-
-    <dependency>
-    <groupId>local.sop.sopinfo</groupId>
-    <artifactId>common-security</artifactId>
-    <version>${revision}</version>
   </dependency>
 
   <dependency>
-    <groupId>local.sop.sopinfo</groupId>
+    <groupId>local.sop.common.libs</groupId>
+    <artifactId>common-security</artifactId>
+  </dependency>
+
+
+  <dependency>
+    <groupId>local.sop.common.libs</groupId>
     <artifactId>common-core</artifactId>
-    <version>${revision}</version>
   </dependency>
 
   <dependency>

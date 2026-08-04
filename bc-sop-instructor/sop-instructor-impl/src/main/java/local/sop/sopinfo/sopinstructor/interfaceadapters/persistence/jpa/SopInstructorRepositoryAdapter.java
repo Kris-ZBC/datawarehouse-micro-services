@@ -9,8 +9,8 @@ import org.springframework.stereotype.Repository;
 
 import local.sop.sopinfo.sopinstructor.domain.model.SopInstructor;
 import local.sop.sopinfo.sopinstructor.domain.ports.out.SopInstructorPort;
-import local.sop.sopinfo.sharedkernel.compositekey.dtos.CompositeKey;
-import local.sop.sopinfo.sharedkernel.exceptions.NotFoundException;
+import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
+import local.sop.common.libs.sharedkernel.exceptions.NotFoundException;
 
 /* preconditions
 Key1 and Key2 of Compositekey must be non-null and valid UUIDs strings that correspond to sopRef and instructorRef respectively in the SopInstructorEntity

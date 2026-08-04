@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 import local.sop.sopinfo.sopinstructor.domain.model.SopInstructor;
 import local.sop.sopinfo.sopinstructor.domain.model.valueobjects.CreatedAtTimestamp;
-import local.sop.sopinfo.sharedkernel.compositekey.dtos.CompositeKey;
+import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
 
 public class SopInstructorDomainService implements SopInstructorDomain{
 

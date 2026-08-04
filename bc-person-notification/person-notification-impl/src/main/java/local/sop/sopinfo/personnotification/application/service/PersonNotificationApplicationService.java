@@ -16,9 +16,9 @@ import local.sop.sopinfo.personnotification.application.api.dto.ToggleActivatePe
 import local.sop.sopinfo.personnotification.domain.model.PersonNotification;
 import local.sop.sopinfo.personnotification.domain.ports.out.PersonNotificationPort;
 import local.sop.sopinfo.personnotification.domain.service.PersonNotificationDomain;
-import local.sop.sopinfo.sharedkernel.compositekey.dtos.CompositeKey;
-import local.sop.sopinfo.sharedkernel.compositekey.validate.ValidateCompositeKey;
-import local.sop.sopinfo.sharedkernel.exceptions.NotFoundException;
+import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
+import local.sop.common.libs.sharedkernel.compositekey.validate.ValidateCompositeKey;
+import local.sop.common.libs.sharedkernel.exceptions.NotFoundException;
 
 @Service
 @Transactional

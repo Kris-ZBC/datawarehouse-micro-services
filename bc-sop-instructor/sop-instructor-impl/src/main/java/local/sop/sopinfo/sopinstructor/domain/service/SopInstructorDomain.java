@@ -3,7 +3,7 @@ package local.sop.sopinfo.sopinstructor.domain.service;
 import java.time.LocalDateTime;
 
 import local.sop.sopinfo.sopinstructor.domain.model.SopInstructor;
-import local.sop.sopinfo.sharedkernel.compositekey.dtos.CompositeKey;
+import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
 
 public interface SopInstructorDomain {
     public SopInstructor createSopInstructor(CompositeKey id, Boolean active);

@@ -10,8 +10,8 @@ import local.sop.sopinfo.person.domain.model.Person;
 import local.sop.sopinfo.person.domain.model.valueobjects.Email;
 import local.sop.sopinfo.person.domain.model.valueobjects.PersonId;
 import local.sop.sopinfo.person.domain.ports.out.PersonRepositoryPort;
-import local.sop.sopinfo.sharedkernel.exceptions.ConflictException;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
 
 @Repository
 public class PersonRepositoryJpaAdapter implements PersonRepositoryPort{
@@ -73,7 +73,7 @@ public class PersonRepositoryJpaAdapter implements PersonRepositoryPort{
         if(sagaState != SagaOutcome.COMPENSATE)
             throw new ConflictException("compensate.wrong_state", Map.of("compensate", sagaState.name()));
         var found = findById(id);
-        if(found == null) {
+        if(found.isEmpty()) {
             return false;
         }
         return (personSpringDataRepository.delete(id.value()) == 1? true: false);

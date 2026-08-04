@@ -3,7 +3,7 @@ package local.sop.sopinfo.login.domain.model.valueobjects;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 
 public record Username(String value) {
 	private static final Pattern USERNAME_PATTERN = Pattern.compile("^[a-zA-Z0-9._-]+@zbc\\.dk$");

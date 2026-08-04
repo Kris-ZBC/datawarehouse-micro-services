@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 
 import local.sop.sopinfo.messageperson.domain.model.MessagePerson;
 import local.sop.sopinfo.messageperson.domain.model.valueobjects.CreatedAtTimestamp;
-import local.sop.sopinfo.sharedkernel.compositekey.dtos.CompositeKey;
+import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
 
 @Component
 public class MessagePersonDomainJpaMapper {

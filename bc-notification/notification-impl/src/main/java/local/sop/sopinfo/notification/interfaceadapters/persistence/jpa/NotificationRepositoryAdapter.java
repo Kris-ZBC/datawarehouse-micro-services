@@ -9,8 +9,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 import local.sop.sopinfo.notification.domain.model.Notification;
+import local.sop.sopinfo.notification.domain.model.valueobjects.NotificationId;
 import local.sop.sopinfo.notification.domain.ports.out.NotificationRepositoryPort;
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
 
 
 @Repository
@@ -59,5 +62,17 @@ public class NotificationRepositoryAdapter implements NotificationRepositoryPort
 		}
 		repo.deleteById(id);
 		log.info("deleted notification with id {}", id);	
+	}
+
+	@Override
+	public Boolean compensate(NotificationId id, SagaOutcome sagaState) {
+		if(sagaState != SagaOutcome.COMPENSATE) {
+			throw new ConflictException("compensate.wrong_state", Map.of("compensate", sagaState.name()));
+		}
+		var found = findById(id.value());
+		if (found.isEmpty()) {
+			return false;
+		}
+		return repo.delete(id.value()) == 1;
 	}
 }

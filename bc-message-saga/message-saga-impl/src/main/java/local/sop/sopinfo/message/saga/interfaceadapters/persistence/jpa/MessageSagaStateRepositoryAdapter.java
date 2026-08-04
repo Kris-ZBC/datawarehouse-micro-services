@@ -6,8 +6,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 
 import local.sop.sopinfo.message.saga.application.ports.out.saga.MessageSagaStatePort;
-import local.sop.sopinfo.sharedkernel.sagas.concurrency.locks.SagaConcurrencyLock;
-import local.sop.sopinfo.sharedkernel.sagas.concurrency.locks.SagaStatus;
+import local.sop.common.libs.sharedkernel.sagas.concurrency.locks.SagaConcurrencyLock;
+import local.sop.common.libs.sharedkernel.sagas.concurrency.locks.SagaStatus;
 
 @Component
 public class MessageSagaStateRepositoryAdapter implements MessageSagaStatePort {

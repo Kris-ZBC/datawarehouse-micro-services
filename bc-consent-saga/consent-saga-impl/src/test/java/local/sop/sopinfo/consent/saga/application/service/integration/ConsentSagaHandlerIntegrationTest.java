@@ -22,11 +22,11 @@ import local.sop.sopinfo.consent.saga.application.ports.out.auditlog.AuditlogPor
 import local.sop.sopinfo.consent.saga.application.ports.out.consent.ConsentPort;
 import local.sop.sopinfo.consent.saga.application.ports.out.saga.ConsentSagaStatePort;
 import local.sop.sopinfo.consent.saga.application.service.ConsentSagaApplicationService;
-import local.sop.sopinfo.sharedkernel.enums.ActorType;
-import local.sop.sopinfo.sharedkernel.enums.Severity;
-import local.sop.sopinfo.sharedkernel.exceptions.ConflictException;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.response.ResponseCompensated;
+import local.sop.common.libs.sharedkernel.enums.ActorType;
+import local.sop.common.libs.sharedkernel.enums.Severity;
+import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 
 /**
  * Integration test mimicking consent-handler behaviour:

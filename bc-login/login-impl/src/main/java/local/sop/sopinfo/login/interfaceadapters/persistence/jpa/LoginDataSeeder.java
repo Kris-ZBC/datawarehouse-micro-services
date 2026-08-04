@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import local.sop.sopinfo.sharedkernel.enums.LoginStatus;
+import local.sop.common.libs.sharedkernel.enums.LoginStatus;
 
 @Component 
 @Profile("!test") // don't seed in tests

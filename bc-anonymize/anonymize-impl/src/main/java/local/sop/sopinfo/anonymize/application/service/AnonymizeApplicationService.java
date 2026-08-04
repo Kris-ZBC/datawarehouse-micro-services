@@ -5,8 +5,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.response.ResponseCompensated;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -22,7 +22,7 @@ import local.sop.sopinfo.anonymize.domain.model.valueobjects.AnonymizeId;
 import local.sop.sopinfo.anonymize.domain.model.valueobjects.PersonRef;
 import local.sop.sopinfo.anonymize.domain.ports.out.AnonymizeRepositoryPort;
 import local.sop.sopinfo.anonymize.domain.service.AnonymizeDomain;
-import local.sop.sopinfo.sharedkernel.exceptions.NotFoundException;
+import local.sop.common.libs.sharedkernel.exceptions.NotFoundException;
 
 @Service
 public class AnonymizeApplicationService implements AnonymizeDirectory {

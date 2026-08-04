@@ -19,7 +19,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import local.sop.sopinfo.infrastructure.web.exception.EndpointExceptionHandler;
+import local.sop.common.libs.infrastructure.web.exception.EndpointExceptionHandler;
 import local.sop.sopinfo.sop.application.api.SOPDirectory;
 import local.sop.sopinfo.sop.application.api.dto.SOPQuery;
 import local.sop.sopinfo.sop.application.api.dto.SopResponse;

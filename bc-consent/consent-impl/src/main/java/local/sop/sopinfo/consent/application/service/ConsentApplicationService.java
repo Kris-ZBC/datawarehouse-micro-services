@@ -10,10 +10,10 @@ import local.sop.sopinfo.consent.domain.model.valueobject.ConsentStatementValue;
 import local.sop.sopinfo.consent.domain.model.valueobject.PersonRef;
 import local.sop.sopinfo.consent.domain.ports.out.ConsentRepositoryPort;
 import local.sop.sopinfo.consent.domain.ports.out.ConsentStatementRepositoryPort;
-import local.sop.sopinfo.sharedkernel.enums.ConsentStatus;
-import local.sop.sopinfo.sharedkernel.exceptions.NotFoundException;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.response.ResponseCompensated;
+import local.sop.common.libs.sharedkernel.enums.ConsentStatus;
+import local.sop.common.libs.sharedkernel.exceptions.NotFoundException;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 
 import org.springframework.transaction.annotation.Transactional;
 

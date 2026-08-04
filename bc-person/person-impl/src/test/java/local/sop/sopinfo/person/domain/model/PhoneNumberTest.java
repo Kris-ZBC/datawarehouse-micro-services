@@ -4,13 +4,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 import local.sop.sopinfo.person.domain.model.valueobjects.PhoneNumberId;
 import local.sop.sopinfo.person.domain.model.valueobjects.PhoneNumberValue;
-import local.sop.sopinfo.sharedkernel.enums.PhoneUserType;
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.enums.PhoneUserType;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 
 class PhoneNumberTest {
 
@@ -39,6 +39,19 @@ class PhoneNumberTest {
 
         assertNotNull(phoneNumber.getId());
         assertNotNull(phoneNumber.getId().value());
+    }
+
+    @Test
+    void toString_shouldContainAllFields() {
+        PhoneNumber phoneNumber = PhoneNumber.builder()
+                .type(PhoneUserType.SELF)
+                .value(new PhoneNumberValue("12345678"))
+                .build();
+
+        String result = phoneNumber.toString();
+
+        assertTrue(result.contains("SELF"));
+        assertTrue(result.contains("12345678"));
     }
 
     @Test

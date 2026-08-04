@@ -1,6 +1,6 @@
 package local.sop.sopinfo.anonymize.saga.application.config;
 
-import local.sop.sopinfo.infrastructure.security.config.MtlsClientFactory;
+import local.sop.common.libs.infrastructure.security.config.MtlsClientFactory;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Bean;

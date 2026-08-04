@@ -26,13 +26,13 @@ import local.sop.sopinfo.registration.saga.application.api.RegistrationDirectory
 import local.sop.sopinfo.registration.saga.application.api.dto.CreateApprenticeRegistrationCmd;
 import local.sop.sopinfo.registration.saga.application.api.dto.apprentice.CreatedApprenticeResponse;
 import local.sop.sopinfo.registration.saga.application.api.dto.person.CreatePhoneNumberCmd;
-import local.sop.sopinfo.infrastructure.security.DisableSecurity;
-import local.sop.sopinfo.infrastructure.web.exception.EndpointExceptionHandler;
-import local.sop.sopinfo.sharedkernel.enums.ConsentPurpose;
-import local.sop.sopinfo.sharedkernel.enums.ConsentStatus;
-import local.sop.sopinfo.sharedkernel.enums.ConsentType;
-import local.sop.sopinfo.sharedkernel.exceptions.ConflictException;
-import local.sop.sopinfo.sharedkernel.enums.PhoneUserType;
+import local.sop.common.libs.infrastructure.security.DisableSecurity;
+import local.sop.common.libs.infrastructure.web.exception.EndpointExceptionHandler;
+import local.sop.common.libs.sharedkernel.enums.ConsentPurpose;
+import local.sop.common.libs.sharedkernel.enums.ConsentStatus;
+import local.sop.common.libs.sharedkernel.enums.ConsentType;
+import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
+import local.sop.common.libs.sharedkernel.enums.PhoneUserType;
 
 @WebMvcTest(RegistrationSagaController.class)
 @Import(EndpointExceptionHandler.class)

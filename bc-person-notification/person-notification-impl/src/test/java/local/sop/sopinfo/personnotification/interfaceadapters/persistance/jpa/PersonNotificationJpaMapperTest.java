@@ -12,7 +12,7 @@ import local.sop.sopinfo.personnotification.domain.model.valueobjects.CreatedAtT
 import local.sop.sopinfo.personnotification.interfaceadapters.persistence.jpa.PersonNotificationJpaMapper;
 import local.sop.sopinfo.personnotification.interfaceadapters.persistence.jpa.PersonNotificationEntity;
 import local.sop.sopinfo.personnotification.interfaceadapters.persistence.jpa.PersonNotificationId;
-import local.sop.sopinfo.sharedkernel.compositekey.dtos.CompositeKey;
+import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
 
 class PersonNotificationJpaMapperTest {
 

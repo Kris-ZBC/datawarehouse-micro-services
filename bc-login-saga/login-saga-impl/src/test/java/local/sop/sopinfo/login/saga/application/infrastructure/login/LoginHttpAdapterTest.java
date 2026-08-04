@@ -21,7 +21,7 @@ import local.sop.sopinfo.login.saga.application.api.dto.LoginResult;
 import local.sop.sopinfo.login.saga.application.infrastructure.request.PayloadCompensate;
 import local.sop.sopinfo.login.saga.application.infrastructure.request.PayloadLogin;
 import local.sop.sopinfo.login.saga.application.infrastructure.response.ResponseCompensated;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
 
 @ExtendWith(MockitoExtension.class)
 class LoginHttpAdapterTest {

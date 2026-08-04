@@ -17,11 +17,11 @@ import local.sop.sopinfo.consent.saga.application.api.dto.RevokeConsentCmd;
 import local.sop.sopinfo.consent.saga.application.ports.out.auditlog.AuditlogPort;
 import local.sop.sopinfo.consent.saga.application.ports.out.consent.ConsentPort;
 import local.sop.sopinfo.consent.saga.application.ports.out.saga.ConsentSagaStatePort;
-import local.sop.sopinfo.sharedkernel.exceptions.ConflictException;
-import local.sop.sopinfo.sharedkernel.exceptions.DomainException;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
-import local.sop.sopinfo.sharedkernel.sagas.concurrency.locks.SagaStatus;
-import local.sop.sopinfo.sharedkernel.sagas.concurrency.locks.SagaConcurrencyLock;
+import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
+import local.sop.common.libs.sharedkernel.exceptions.DomainException;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.concurrency.locks.SagaStatus;
+import local.sop.common.libs.sharedkernel.sagas.concurrency.locks.SagaConcurrencyLock;
 
 @Service
 public class ConsentSagaApplicationService implements ConsentSagaDirectory {
@@ -211,17 +211,18 @@ public class ConsentSagaApplicationService implements ConsentSagaDirectory {
             ConsentResponse sanityCheck = consents.getConsent(response.consentId());
             if (sanityCheck == null) {
                 sagaLock.updateStatus(sessionId, SagaStatus.COMPENSATING);
-                compensateConsent(sessionId, response.consentId());
                 throw new ConflictException("consent.not.granted",
                     Map.of("object", "consent"));
             }
         } catch (DomainException ex) {
+            sagaLock.updateStatus(sessionId, SagaStatus.COMPENSATING);
+            compensateConsentUpdate(sessionId, response.consentId());
             throw ex;
         } catch (RuntimeException ex) {
             sagaLock.updateStatus(sessionId, SagaStatus.COMPENSATING);
             log.warn("SAGA [{}]: consent get failed for {}, compensating",
                 sessionId, response.consentId());
-            compensateConsent(sessionId, response.consentId());
+            compensateConsentUpdate(sessionId, response.consentId());
             throw new ConflictException("consent.read.failed",
                 Map.of("id", response.consentId().toString()));
         }
@@ -313,11 +314,12 @@ public class ConsentSagaApplicationService implements ConsentSagaDirectory {
             ConsentResponse sanityCheck = consents.getConsent(response.consentId());
             if (sanityCheck == null) {
                 sagaLock.updateStatus(sessionId, SagaStatus.COMPENSATING);
-                compensateConsentUpdate(sessionId, response.consentId());
                 throw new ConflictException("consent.not.withdrawn",
                     Map.of("object", "consent"));
             }
         } catch (DomainException ex) {
+            sagaLock.updateStatus(sessionId, SagaStatus.COMPENSATING);
+            compensateConsentUpdate(sessionId, response.consentId());
             throw ex;
         } catch (RuntimeException ex) {
             sagaLock.updateStatus(sessionId, SagaStatus.COMPENSATING);

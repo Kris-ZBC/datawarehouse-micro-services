@@ -5,7 +5,7 @@ import java.util.Optional;
 
 import local.sop.sopinfo.instructor.domain.model.Instructor;
 import local.sop.sopinfo.instructor.domain.model.valueobjects.InstructorId;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
 
 public interface InstructorRepositoryPort {
 

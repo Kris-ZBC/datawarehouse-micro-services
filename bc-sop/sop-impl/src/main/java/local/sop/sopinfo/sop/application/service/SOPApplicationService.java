@@ -4,7 +4,7 @@ import local.sop.sopinfo.sop.application.api.SOPDirectory;
 import local.sop.sopinfo.sop.application.api.dto.SOPQuery;
 import local.sop.sopinfo.sop.application.api.dto.SopResponse;
 import local.sop.sopinfo.sop.interfaceadapters.persistence.jpa.SOPSpringDataRepository;
-import local.sop.sopinfo.sharedkernel.exceptions.NotFoundException;
+import local.sop.common.libs.sharedkernel.exceptions.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;

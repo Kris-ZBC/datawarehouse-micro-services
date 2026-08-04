@@ -11,7 +11,7 @@ import local.sop.sopinfo.login.saga.application.infrastructure.request.PayloadCo
 import local.sop.sopinfo.login.saga.application.infrastructure.request.PayloadLogin;
 import local.sop.sopinfo.login.saga.application.infrastructure.response.ResponseCompensated;
 import local.sop.sopinfo.login.saga.application.ports.out.login.LoginPort;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
 
 @Component
 public class LoginHttpAdapter implements LoginPort {

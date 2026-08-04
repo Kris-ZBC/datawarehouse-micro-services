@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,12 +17,9 @@ import local.sop.sopinfo.instructor.domain.model.Instructor;
 import local.sop.sopinfo.instructor.domain.model.valueobjects.InstructorId;
 import local.sop.sopinfo.instructor.domain.model.valueobjects.PersonRef;
 import local.sop.sopinfo.instructor.domain.ports.out.InstructorRepositoryPort;
-import local.sop.sopinfo.sharedkernel.exceptions.NotFoundException;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.response.ResponseCompensated;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import local.sop.common.libs.sharedkernel.exceptions.NotFoundException;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 
 @Service
 public class InstructorApplicationService implements InstructorDirectory {
@@ -87,7 +86,7 @@ public class InstructorApplicationService implements InstructorDirectory {
     public ResponseCompensated compensate (UUID id, Class<?> clazz, SagaOutcome sagaState) {
         log.info("Compensate called from class {}", clazz.getSimpleName());
         var instructor = repository.findById(InstructorId.of(id));
-        if(instructor == null) {
+        if(instructor.isEmpty()) {
                 return new ResponseCompensated(SagaOutcome.IDEMPOTENT, false);
         }
         boolean result = repository.compensate(InstructorId.of(id), sagaState);

@@ -2,7 +2,7 @@ package local.sop.sopinfo.personnotification.domain.service;
 
 import java.time.LocalDateTime;
 import local.sop.sopinfo.personnotification.domain.model.PersonNotification;
-import local.sop.sopinfo.sharedkernel.compositekey.dtos.CompositeKey;
+import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
 
 
 public interface PersonNotificationDomain {

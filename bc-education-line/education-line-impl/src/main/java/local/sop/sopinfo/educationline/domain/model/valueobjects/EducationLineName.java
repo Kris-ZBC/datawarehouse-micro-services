@@ -2,7 +2,7 @@ package local.sop.sopinfo.educationline.domain.model.valueobjects;
 
 import java.util.Map;
 
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 
 public record EducationLineName(String value) {
 	private static final int MAX_LENGTH = 100;

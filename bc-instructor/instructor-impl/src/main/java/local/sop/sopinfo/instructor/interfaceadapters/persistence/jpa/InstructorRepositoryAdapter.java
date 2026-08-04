@@ -10,8 +10,8 @@ import org.springframework.stereotype.Repository;
 import local.sop.sopinfo.instructor.domain.model.Instructor;
 import local.sop.sopinfo.instructor.domain.model.valueobjects.InstructorId;
 import local.sop.sopinfo.instructor.domain.ports.out.InstructorRepositoryPort;
-import local.sop.sopinfo.sharedkernel.exceptions.ConflictException;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
 
 
 @Repository
@@ -49,10 +49,11 @@ public class InstructorRepositoryAdapter implements InstructorRepositoryPort {
     public Boolean compensate(InstructorId id, SagaOutcome sagaState) {
         if(sagaState != SagaOutcome.COMPENSATE)
             throw new ConflictException("compensate.wrong_state", Map.of("compensate", sagaState.name()));
+
         var found = findById(id);
-        if(found == null) {
+        if(found.isEmpty()) {
             return false;
         }
-        return (jpaRepository.delete(id.value()) == 1? true: false);
+        return (jpaRepository.delete(id.value()) == 1);
     }
 }

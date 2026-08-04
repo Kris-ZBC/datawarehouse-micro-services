@@ -15,9 +15,9 @@ import local.sop.sopinfo.apprentice.application.api.dto.CreatedApprenticeRespons
 import local.sop.sopinfo.apprentice.domain.model.valueobjects.*;
 import local.sop.sopinfo.apprentice.domain.ports.out.ApprenticeRepositoryPort;
 import local.sop.sopinfo.apprentice.domain.service.ApprenticeDomain;
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.response.ResponseCompensated;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

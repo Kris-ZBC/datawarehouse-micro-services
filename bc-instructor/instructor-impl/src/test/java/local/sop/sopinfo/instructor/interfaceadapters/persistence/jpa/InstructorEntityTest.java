@@ -1,12 +1,13 @@
 package local.sop.sopinfo.instructor.interfaceadapters.persistence.jpa;
 
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-
-import java.util.UUID;
-
 import org.junit.jupiter.api.Test;
+
+import local.sop.sopinfo.instructor.domain.model.valueobjects.PersonRef;
 
 class InstructorEntityTest {
 
@@ -29,5 +30,17 @@ class InstructorEntityTest {
     void protected_constructor_should_be_invokable() {
         InstructorEntity entity = new InstructorEntity();
         assertNotNull(entity);
+    }
+
+    @Test
+    void build_should_generate_id_when_id_is_not_provided() {
+        UUID personRef = UUID.randomUUID();
+
+        InstructorEntity entity = new InstructorEntity.Builder()
+                .personRef(PersonRef.of(personRef))
+                .Build();
+
+        assertNotNull(entity.getId());
+        assertEquals(personRef, entity.getPersonRef());
     }
 }

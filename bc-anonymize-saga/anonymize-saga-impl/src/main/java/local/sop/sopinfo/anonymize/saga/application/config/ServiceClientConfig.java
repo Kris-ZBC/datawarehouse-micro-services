@@ -1,6 +1,6 @@
 package local.sop.sopinfo.anonymize.saga.application.config;
 
-import local.sop.sopinfo.infrastructure.security.config.MtlsClientFactory;
+import local.sop.common.libs.infrastructure.security.config.MtlsClientFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;

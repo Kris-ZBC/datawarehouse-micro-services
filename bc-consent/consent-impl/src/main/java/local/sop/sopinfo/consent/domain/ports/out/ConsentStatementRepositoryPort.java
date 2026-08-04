@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Optional;
 
 import local.sop.sopinfo.consent.domain.model.ConsentStatement;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
-import local.sop.sopinfo.sharedkernel.valueobjects.DomainId;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.valueobjects.DomainId;
 
 public interface ConsentStatementRepositoryPort {
 

@@ -1,11 +1,13 @@
 package local.sop.sopinfo.person.domain.model;
 
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-
-import java.util.UUID;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.junit.jupiter.api.Test;
 
 import local.sop.sopinfo.person.domain.model.valueobjects.Email;
 import local.sop.sopinfo.person.domain.model.valueobjects.FirstName;
@@ -14,11 +16,9 @@ import local.sop.sopinfo.person.domain.model.valueobjects.OrganizationRef;
 import local.sop.sopinfo.person.domain.model.valueobjects.PersonId;
 import local.sop.sopinfo.person.domain.model.valueobjects.PhoneNumberId;
 import local.sop.sopinfo.person.domain.model.valueobjects.PhoneNumberValue;
-import local.sop.sopinfo.sharedkernel.enums.PhoneUserType;
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
-import local.sop.sopinfo.sharedkernel.valueobjects.DomainId;
-
-import org.junit.jupiter.api.Test;
+import local.sop.common.libs.sharedkernel.enums.PhoneUserType;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.valueobjects.DomainId;
 
 class PersonTest {
 
@@ -193,5 +193,27 @@ class PersonTest {
                 .organizationRef(new OrganizationRef(UUID.randomUUID()))
                 .addPhoneNumber(PhoneUserType.SELF, new PhoneNumberValue("12345678"))
                 .build();
+    }
+    
+
+
+    @Test
+    void toString_should_contain_all_fields() {
+        UUID id = UUID.randomUUID();
+        UUID organizationRef = UUID.randomUUID();
+
+        Person person = Person.builder()
+                .id(PersonId.of(id))
+                .firstName(new FirstName("John"))
+                .lastName(new LastName("Doe"))
+                .email(new Email("john.doe@example.com"))
+                .organizationRef(new OrganizationRef(organizationRef))
+                .build();
+
+        String result = person.toString();
+
+        assertTrue(result.contains("John"));
+        assertTrue(result.contains("Doe"));
+        assertTrue(result.contains("john.doe@example.com"));
     }
 }

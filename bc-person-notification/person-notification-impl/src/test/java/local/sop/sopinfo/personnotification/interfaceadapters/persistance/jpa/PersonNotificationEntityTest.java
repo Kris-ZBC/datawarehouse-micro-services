@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import local.sop.sopinfo.personnotification.interfaceadapters.persistence.jpa.PersonNotificationEntity;
 import local.sop.sopinfo.personnotification.interfaceadapters.persistence.jpa.PersonNotificationId;
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 
 class PersonNotificationEntityTest {
 

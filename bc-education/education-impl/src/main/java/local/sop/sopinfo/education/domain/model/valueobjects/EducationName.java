@@ -1,7 +1,7 @@
 package local.sop.sopinfo.education.domain.model.valueobjects;
 
 import java.util.Map;
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 
 public record EducationName(String value) {
     private static final int MAX_LENGTH = 100;

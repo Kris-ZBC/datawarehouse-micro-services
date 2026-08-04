@@ -26,32 +26,28 @@
   </dependency>
 
   <dependency>
-    <groupId>local.sop.sopinfo</groupId>
+    <groupId>local.sop.common.libs</groupId>
     <artifactId>common-web</artifactId>
-    <version>${revision}</version>
   </dependency>
+
   <dependency>
-    <groupId>local.sop.sopinfo</groupId>
+    <groupId>local.sop.common.libs</groupId>
     <artifactId>common-core</artifactId>
-    <version>${revision}</version>
   </dependency>
 
   <dependency>
-    <groupId>local.sop.sopinfo</groupId>
+    <groupId>local.sop.common.libs</groupId>
     <artifactId>common-data</artifactId>
-    <version>${revision}</version>
   </dependency>
 
   <dependency>
-    <groupId>local.sop.sopinfo</groupId>
+    <groupId>local.sop.common.libs</groupId>
     <artifactId>common-security</artifactId>
-    <version>${revision}</version>
   </dependency>
 
   <dependency>
-    <groupId>local.sop.sopinfo</groupId>
+    <groupId>local.sop.common.libs</groupId>
     <artifactId>common-validation</artifactId>
-    <version>${revision}</version>
   </dependency>
 
   <dependency>

@@ -2,7 +2,7 @@ package local.sop.sopinfo.auditlog.domain.model.valueobjects;
 
 import java.util.Map;
 
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 
 /**
  * Arbitrary event payload. Must contain a caller identifier and be valid JSON upstream.

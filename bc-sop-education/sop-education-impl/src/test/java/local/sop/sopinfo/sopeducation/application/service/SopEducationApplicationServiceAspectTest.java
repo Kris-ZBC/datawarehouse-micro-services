@@ -27,10 +27,10 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import local.sop.sopinfo.infrastructure.validation.compositekeys.CompositeKeyValidationAspect;
-import local.sop.sopinfo.sharedkernel.compositekey.dtos.CompositeKey;
-import local.sop.sopinfo.sharedkernel.compositekey.validate.CompositeKeyValidator;
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.infrastructure.validation.compositekeys.CompositeKeyValidationAspect;
+import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
+import local.sop.common.libs.sharedkernel.compositekey.validate.CompositeKeyValidator;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 import local.sop.sopinfo.sopeducation.application.api.SopEducationDirectory;
 import local.sop.sopinfo.sopeducation.application.api.dto.CreateSopEducationCmd;
 import local.sop.sopinfo.sopeducation.application.api.dto.ToggleActivateSopEducationCmd;

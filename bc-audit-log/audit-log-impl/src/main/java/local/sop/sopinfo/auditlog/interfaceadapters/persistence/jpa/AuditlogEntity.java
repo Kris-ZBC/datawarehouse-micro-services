@@ -6,11 +6,11 @@ import java.util.UUID;
 
 import jakarta.persistence.*;
 
-import local.sop.sopinfo.sharedkernel.enums.ActorType;
-import local.sop.sopinfo.sharedkernel.enums.Severity;
+import local.sop.common.libs.sharedkernel.enums.ActorType;
+import local.sop.common.libs.sharedkernel.enums.Severity;
 import local.sop.sopinfo.auditlog.interfaceadapters.persistence.converters.ActorTypeConverter;
 import local.sop.sopinfo.auditlog.interfaceadapters.persistence.converters.SeverityConverter;
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 
 @Entity
 @Table(name = "audit_log")

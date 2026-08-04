@@ -7,7 +7,7 @@ import java.time.Instant;
 import org.junit.jupiter.api.Test;
 
 import local.sop.sopinfo.educationline.domain.model.valueobjects.EducationLineCreatedAt;
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 
 public class EducationLineCreatedAtTest {
 

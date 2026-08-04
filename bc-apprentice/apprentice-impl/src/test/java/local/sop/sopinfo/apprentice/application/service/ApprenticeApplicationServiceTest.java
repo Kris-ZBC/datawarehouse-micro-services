@@ -9,7 +9,7 @@ import local.sop.sopinfo.apprentice.domain.model.valueobjects.EducationLineRef;
 import local.sop.sopinfo.apprentice.domain.model.valueobjects.PersonRef;
 import local.sop.sopinfo.apprentice.domain.ports.out.ApprenticeRepositoryPort;
 import local.sop.sopinfo.apprentice.domain.service.ApprenticeDomain;
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

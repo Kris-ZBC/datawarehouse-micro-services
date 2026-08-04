@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import local.sop.sopinfo.education.domain.model.valueobjects.EducationCategory;
 import local.sop.sopinfo.education.domain.model.valueobjects.EducationId;
 import local.sop.sopinfo.education.domain.model.valueobjects.EducationName;
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 
 class EducationTest {
 

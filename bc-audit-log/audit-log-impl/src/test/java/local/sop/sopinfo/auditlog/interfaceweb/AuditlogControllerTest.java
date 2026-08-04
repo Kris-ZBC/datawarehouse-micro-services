@@ -6,10 +6,10 @@ import local.sop.sopinfo.auditlog.application.api.dto.AuditlogResponse;
 import local.sop.sopinfo.auditlog.application.api.dto.CompensateAuditlogCmd;
 import local.sop.sopinfo.auditlog.application.api.dto.CreateAuditlogCmd;
 import local.sop.sopinfo.auditlog.application.api.dto.CreatedAuditlogResponse;
-import local.sop.sopinfo.sharedkernel.enums.ActorType;
-import local.sop.sopinfo.sharedkernel.enums.Severity;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.response.ResponseCompensated;
+import local.sop.common.libs.sharedkernel.enums.ActorType;
+import local.sop.common.libs.sharedkernel.enums.Severity;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

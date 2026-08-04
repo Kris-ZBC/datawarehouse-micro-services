@@ -22,13 +22,13 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import local.sop.sopinfo.infrastructure.security.DisableSecurity;
-import local.sop.sopinfo.infrastructure.web.exception.EndpointExceptionHandler;
+import local.sop.common.libs.infrastructure.security.DisableSecurity;
+import local.sop.common.libs.infrastructure.web.exception.EndpointExceptionHandler;
 import local.sop.sopinfo.login.saga.application.api.LoginSagaDirectory;
 import local.sop.sopinfo.login.saga.application.api.dto.LoginCmd;
 import local.sop.sopinfo.login.saga.application.api.dto.LoginResult;
-import local.sop.sopinfo.sharedkernel.enums.ActorType;
-import local.sop.sopinfo.sharedkernel.enums.Severity;
+import local.sop.common.libs.sharedkernel.enums.ActorType;
+import local.sop.common.libs.sharedkernel.enums.Severity;
 
 @WebMvcTest(LoginSagaController.class)
 @Import(EndpointExceptionHandler.class)

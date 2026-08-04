@@ -23,12 +23,12 @@ import local.sop.sopinfo.consent.saga.application.infrastructure.consent.Consent
 import local.sop.sopinfo.consent.saga.application.infrastructure.request.PayloadConsentCreate;
 import local.sop.sopinfo.consent.saga.application.infrastructure.request.PayloadGrantConsent;
 import local.sop.sopinfo.consent.saga.application.infrastructure.request.PayloadRevokeConsent;
-import local.sop.sopinfo.sharedkernel.enums.ConsentPurpose;
-import local.sop.sopinfo.sharedkernel.enums.ConsentStatus;
-import local.sop.sopinfo.sharedkernel.enums.ConsentType;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.request.PayloadCompensateCreate;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.response.ResponseCompensated;
+import local.sop.common.libs.sharedkernel.enums.ConsentPurpose;
+import local.sop.common.libs.sharedkernel.enums.ConsentStatus;
+import local.sop.common.libs.sharedkernel.enums.ConsentType;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.request.PayloadCompensateCreate;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 
 @ExtendWith(MockitoExtension.class)
 public class ConsentHttpAdapterTest {
@@ -185,5 +185,141 @@ public class ConsentHttpAdapterTest {
         verify(mockRequestBodyUriSpec).uri("/internal/consents/consent/withdraw");
         verify(mockRequestBodySpec).body(eq(request));
         verify(mockResponseSpec).body(ConsentResponse.class);
+    }
+
+    @Test
+    void consent_compensateConsent_shouldReturnResponseFromDownstream() {
+        UUID id = UUID.randomUUID();
+        SagaOutcome state = SagaOutcome.COMPENSATED;
+        Class<?> clazz = ConsentHttpAdapter.class;
+
+        var expected = new ResponseCompensated(state, true);
+
+        var mockRequestBodyUriSpec = mock(RestClient.RequestBodyUriSpec.class);
+        var mockRequestBodySpec = mock(RestClient.RequestBodySpec.class);
+        var mockResponseSpec = mock(RestClient.ResponseSpec.class);
+
+        when(consentClient.post()).thenReturn(mockRequestBodyUriSpec);
+
+        when(mockRequestBodyUriSpec.uri(
+                "/internal/consents/consent/{id}/compensate/create", id))
+                .thenReturn(mockRequestBodySpec);
+
+        when(mockRequestBodySpec.body(any(PayloadCompensateCreate.class)))
+                .thenReturn(mockRequestBodySpec);
+
+        when(mockRequestBodySpec.retrieve())
+                .thenReturn(mockResponseSpec);
+
+        when(mockResponseSpec.body(ResponseCompensated.class))
+                .thenReturn(expected);
+
+        ResponseCompensated result = consentAdapter.compensateConsent(id, clazz, state);
+
+        assertEquals(expected.sagaState(), result.sagaState());
+        assertEquals(expected.success(), result.success());
+
+        verify(consentClient).post();
+
+        verify(mockRequestBodyUriSpec).uri(
+                "/internal/consents/consent/{id}/compensate/create",
+                id);
+
+        verify(mockRequestBodySpec).body(any(PayloadCompensateCreate.class));
+
+        verify(mockResponseSpec).body(ResponseCompensated.class);
+    }
+
+
+    @SuppressWarnings("unchecked")
+@Test
+    void consent_getConsent_shouldReturnConsentResponseFromDownstream() {
+        UUID id = UUID.randomUUID();
+
+        ConsentResponse expected = new ConsentResponse(
+                id,
+                UUID.randomUUID(),
+                "ACTIVE",
+                UUID.randomUUID(),
+                "statement text",
+                ConsentPurpose.ANALYTICS.name(),
+                ConsentType.ONE_TIME.name(),
+                true);
+
+        var mockRequestHeadersUriSpec = mock(RestClient.RequestHeadersUriSpec.class);
+        var mockRequestHeadersSpec = mock(RestClient.RequestHeadersSpec.class);
+        var mockResponseSpec = mock(RestClient.ResponseSpec.class);
+
+        when(consentClient.get()).thenReturn(mockRequestHeadersUriSpec);
+
+        when(mockRequestHeadersUriSpec.uri(
+                "/internal/consents/consent/{id}", id))
+                .thenReturn(mockRequestHeadersSpec);
+
+        when(mockRequestHeadersSpec.retrieve())
+                .thenReturn(mockResponseSpec);
+
+        when(mockResponseSpec.body(ConsentResponse.class))
+                .thenReturn(expected);
+
+        ConsentResponse result = consentAdapter.getConsent(id);
+
+        assertEquals(expected.consentId(), result.consentId());
+        assertEquals(expected.status(), result.status());
+        assertEquals(expected.consentStatementId(), result.consentStatementId());
+        assertEquals(expected.consentPurpose(), result.consentPurpose());
+        assertEquals(expected.consentType(), result.consentType());
+        assertEquals(expected.active(), result.active());
+
+        verify(consentClient).get();
+
+        verify(mockRequestHeadersUriSpec).uri(
+                "/internal/consents/consent/{id}",
+                id);
+
+        verify(mockResponseSpec).body(ConsentResponse.class);
+    }
+
+    @Test
+    void consent_compensateConsentUpdate_shouldReturnResponseFromDownstream() {
+        UUID id = UUID.randomUUID();
+        SagaOutcome state = SagaOutcome.COMPENSATED;
+        Class<?> clazz = ConsentHttpAdapter.class;
+
+        var expected = new ResponseCompensated(state, true);
+
+        var mockRequestBodyUriSpec = mock(RestClient.RequestBodyUriSpec.class);
+        var mockRequestBodySpec = mock(RestClient.RequestBodySpec.class);
+        var mockResponseSpec = mock(RestClient.ResponseSpec.class);
+
+        when(consentClient.post()).thenReturn(mockRequestBodyUriSpec);
+
+        when(mockRequestBodyUriSpec.uri(
+                "/internal/consents/consent/{id}/compensate/update", id))
+                .thenReturn(mockRequestBodySpec);
+
+        when(mockRequestBodySpec.body(any(PayloadCompensateCreate.class)))
+                .thenReturn(mockRequestBodySpec);
+
+        when(mockRequestBodySpec.retrieve())
+                .thenReturn(mockResponseSpec);
+
+        when(mockResponseSpec.body(ResponseCompensated.class))
+                .thenReturn(expected);
+
+        ResponseCompensated result = consentAdapter.compensateConsentUpdate(id, clazz, state);
+
+        assertEquals(expected.sagaState(), result.sagaState());
+        assertEquals(expected.success(), result.success());
+
+        verify(consentClient).post();
+
+        verify(mockRequestBodyUriSpec).uri(
+                "/internal/consents/consent/{id}/compensate/update",
+                id);
+
+        verify(mockRequestBodySpec).body(any(PayloadCompensateCreate.class));
+
+        verify(mockResponseSpec).body(ResponseCompensated.class);
     }
 }

@@ -18,9 +18,9 @@ import org.springframework.web.client.RestClient;
 import local.sop.sopinfo.registration.saga.application.api.dto.instructor.CreateInstructorCmd;
 import local.sop.sopinfo.registration.saga.application.api.dto.instructor.InstructorResponse;
 import local.sop.sopinfo.registration.saga.application.infrastructure.instructor.InstructorHttpAdapter;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.request.PayloadCompensateCreate;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.response.ResponseCompensated;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.request.PayloadCompensateCreate;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 
 @ExtendWith(MockitoExtension.class)
 class InstructorHttpAdapterTest {

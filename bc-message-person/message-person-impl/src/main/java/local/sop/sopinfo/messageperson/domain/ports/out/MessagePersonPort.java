@@ -5,7 +5,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import local.sop.sopinfo.messageperson.domain.model.MessagePerson;
-import local.sop.sopinfo.sharedkernel.compositekey.dtos.CompositeKey;
+import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
 
 public interface MessagePersonPort {
     Optional<MessagePerson> findById(CompositeKey id);

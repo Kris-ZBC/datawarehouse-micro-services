@@ -1,13 +1,14 @@
 package local.sop.sopinfo.instructor.application.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
 import local.sop.sopinfo.instructor.application.api.dto.CreateInstructorCmd;
@@ -17,9 +18,10 @@ import local.sop.sopinfo.instructor.domain.model.Instructor;
 import local.sop.sopinfo.instructor.domain.model.valueobjects.InstructorId;
 import local.sop.sopinfo.instructor.domain.model.valueobjects.PersonRef;
 import local.sop.sopinfo.instructor.domain.ports.out.InstructorRepositoryPort;
-import local.sop.sopinfo.sharedkernel.exceptions.NotFoundException;
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.exceptions.NotFoundException;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 
 class InstructorApplicationServiceTest {
 
@@ -101,6 +103,8 @@ class InstructorApplicationServiceTest {
         private Instructor lastSaved;
         private List<Instructor> items = List.of();
         private Instructor singleResult;
+        private Boolean compensateResult = false;
+
 
         @Override
         public Instructor save(Instructor instructor) {
@@ -123,7 +127,47 @@ class InstructorApplicationServiceTest {
 
         @Override
         public Boolean compensate(InstructorId id, SagaOutcome sagaState) {
-            throw new UnsupportedOperationException("Unimplemented method 'compensate'");
+            return compensateResult;
         }
+        // @Override
+        // public Boolean compensate(InstructorId id, SagaOutcome sagaState) {
+        //     throw new UnsupportedOperationException("Unimplemented method 'compensate'");
+    }
+
+
+
+    @Test
+    void compensate_should_return_idempotent_false_when_instructor_not_found() {
+        UUID id = UUID.randomUUID();
+        repository.singleResult = null;
+
+        ResponseCompensated result = service.compensate(id, Instructor.class, SagaOutcome.COMPENSATE);
+
+        assertEquals(SagaOutcome.IDEMPOTENT, result.sagaState());
+        assertFalse(result.success());
+    }
+
+    @Test
+    void compensate_should_return_compensated_true_when_compensation_succeeds() {
+        UUID id = UUID.randomUUID();
+        repository.singleResult = Instructor.builder().personRef(PersonRef.of(UUID.randomUUID())).build();
+        repository.compensateResult = true;
+
+        ResponseCompensated result = service.compensate(id, Instructor.class, SagaOutcome.COMPENSATE);
+
+        assertEquals(SagaOutcome.COMPENSATED, result.sagaState());
+        assertTrue(result.success());
+    }
+
+    @Test
+    void compensate_should_return_idempotent_true_when_compensation_fails() {
+        UUID id = UUID.randomUUID();
+        repository.singleResult = Instructor.builder().personRef(PersonRef.of(UUID.randomUUID())).build();
+        repository.compensateResult = false;
+
+        ResponseCompensated result = service.compensate(id, Instructor.class, SagaOutcome.COMPENSATE);
+
+        assertEquals(SagaOutcome.IDEMPOTENT, result.sagaState());
+        assertTrue(result.success());
     }
 }

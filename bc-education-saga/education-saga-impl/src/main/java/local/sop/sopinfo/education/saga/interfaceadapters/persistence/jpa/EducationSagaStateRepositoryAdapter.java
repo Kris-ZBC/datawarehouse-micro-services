@@ -5,8 +5,8 @@ import java.util.UUID;
 import org.springframework.dao.DataIntegrityViolationException;
 
 import local.sop.sopinfo.education.saga.application.ports.out.saga.EducationSagaStatePort;
-import local.sop.sopinfo.sharedkernel.sagas.concurrency.locks.SagaConcurrencyLock;
-import local.sop.sopinfo.sharedkernel.sagas.concurrency.locks.SagaStatus;
+import local.sop.common.libs.sharedkernel.sagas.concurrency.locks.SagaConcurrencyLock;
+import local.sop.common.libs.sharedkernel.sagas.concurrency.locks.SagaStatus;
 
 public class EducationSagaStateRepositoryAdapter implements EducationSagaStatePort {
 

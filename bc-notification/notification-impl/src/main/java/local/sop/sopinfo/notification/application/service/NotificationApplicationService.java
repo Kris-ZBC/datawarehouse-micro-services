@@ -13,9 +13,12 @@ import local.sop.sopinfo.notification.application.api.NotificationDirectory;
 import local.sop.sopinfo.notification.application.api.dto.CreateNotificationCmd;
 import local.sop.sopinfo.notification.application.api.dto.NotificationResponse;
 import local.sop.sopinfo.notification.domain.model.Notification;
+import local.sop.sopinfo.notification.domain.model.valueobjects.NotificationId;
 import local.sop.sopinfo.notification.domain.ports.out.NotificationRepositoryPort;
 import local.sop.sopinfo.notification.domain.service.NotificationDomain;
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 
 @Service
 public class NotificationApplicationService implements NotificationDirectory {
@@ -97,5 +100,19 @@ public class NotificationApplicationService implements NotificationDirectory {
 			log.error("Error in deleteNotification", ex);
 			throw new ValidationException("notification.delete.failed", Map.of("function", "deleteNotification"));
 		}
+	}
+
+	@Override
+	public ResponseCompensated compensate(UUID id, Class<?> clazz, SagaOutcome sagaState) {
+		log.info("Compensate called from class {}", clazz.getSimpleName());
+		var found = repo.findById(id);
+		if(found.isEmpty()) {
+			return new ResponseCompensated(SagaOutcome.IDEMPOTENT, false);
+		}
+		boolean result = repo.compensate(NotificationId.of(id), sagaState);
+		if(result) {
+			return new ResponseCompensated(SagaOutcome.COMPENSATE, true);
+		}
+		return new ResponseCompensated(SagaOutcome.IDEMPOTENT, false);
 	}
 }

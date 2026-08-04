@@ -3,7 +3,7 @@ package local.sop.sopinfo.login.domain.model.valueobjects;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 
 public record PlainPassword(String value) {
 	private static final Pattern HAS_UPPERCASE = Pattern.compile(".*[A-Z].*");

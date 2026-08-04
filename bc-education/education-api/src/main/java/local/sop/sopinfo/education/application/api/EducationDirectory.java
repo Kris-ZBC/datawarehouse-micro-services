@@ -6,8 +6,8 @@ import java.util.UUID;
 
 import local.sop.sopinfo.education.application.api.dto.CreateEducationCmd;
 import local.sop.sopinfo.education.application.api.dto.EducationResponse;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.response.ResponseCompensated;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 
 public interface EducationDirectory {
     EducationResponse createEducation(CreateEducationCmd cmd);

@@ -3,8 +3,8 @@ package local.sop.sopinfo.personnotification.domain.model;
 import java.util.Map;
 
 import local.sop.sopinfo.personnotification.domain.model.valueobjects.CreatedAtTimestamp;
-import local.sop.sopinfo.sharedkernel.compositekey.dtos.CompositeKey;
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 
 public class PersonNotification {
     private final CompositeKey id;
@@ -65,6 +65,8 @@ public class PersonNotification {
             if (active == null) {
                 throw new ValidationException("personnotification.active.required",Map.of("field", "active", "active", active ==null? "null" : active.toString()));
             }
+
+            
 
             return new PersonNotification(this.id, this.active, this.createdAt);
         }

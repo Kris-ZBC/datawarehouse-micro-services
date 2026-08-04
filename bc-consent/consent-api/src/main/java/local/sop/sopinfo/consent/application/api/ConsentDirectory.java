@@ -5,9 +5,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 import local.sop.sopinfo.consent.application.api.dto.*;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.Compensatable;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.response.ResponseCompensated;
+import local.sop.common.libs.sharedkernel.sagas.compensate.Compensatable;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 
 public interface ConsentDirectory extends Compensatable {
 

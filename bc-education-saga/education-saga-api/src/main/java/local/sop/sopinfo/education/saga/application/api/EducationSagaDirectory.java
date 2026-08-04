@@ -3,7 +3,7 @@ package local.sop.sopinfo.education.saga.application.api;
 import java.util.UUID;
 
 import local.sop.sopinfo.education.saga.application.api.dto.*;
-import local.sop.sopinfo.sharedkernel.compositekey.dtos.CompositeKey;
+import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
 
 public interface EducationSagaDirectory {
     

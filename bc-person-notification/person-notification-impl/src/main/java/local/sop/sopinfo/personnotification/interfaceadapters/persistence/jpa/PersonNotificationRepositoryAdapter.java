@@ -9,8 +9,8 @@ import org.springframework.stereotype.Repository;
 
 import local.sop.sopinfo.personnotification.domain.model.PersonNotification;
 import local.sop.sopinfo.personnotification.domain.ports.out.PersonNotificationPort;
-import local.sop.sopinfo.sharedkernel.compositekey.dtos.CompositeKey;
-import local.sop.sopinfo.sharedkernel.exceptions.NotFoundException;
+import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
+import local.sop.common.libs.sharedkernel.exceptions.NotFoundException;
 
 @Repository
 public class PersonNotificationRepositoryAdapter implements PersonNotificationPort {

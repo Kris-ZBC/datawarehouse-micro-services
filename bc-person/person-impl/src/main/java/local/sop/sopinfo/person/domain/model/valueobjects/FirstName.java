@@ -2,7 +2,7 @@ package local.sop.sopinfo.person.domain.model.valueobjects;
 
 import java.util.Map;
 
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 
 public record FirstName(String value) {
     private static final int MIN_LENGTH = 2;

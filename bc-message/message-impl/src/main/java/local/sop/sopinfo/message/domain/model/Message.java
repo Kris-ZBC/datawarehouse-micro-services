@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import local.sop.sopinfo.message.domain.model.valueobjects.MessageId;
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 
 public final class Message {
 

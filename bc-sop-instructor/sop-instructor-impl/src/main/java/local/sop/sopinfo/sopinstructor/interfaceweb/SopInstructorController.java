@@ -10,7 +10,7 @@ import local.sop.sopinfo.sopinstructor.application.api.dto.CreateSopInstructorCm
 import local.sop.sopinfo.sopinstructor.application.api.dto.CreatedSopInstructorResult;
 import local.sop.sopinfo.sopinstructor.application.api.dto.SopInstructorResponse;
 import local.sop.sopinfo.sopinstructor.application.api.dto.ToggleActivateSopInstructorCmd;
-import local.sop.sopinfo.sharedkernel.compositekey.dtos.CompositeKey;
+import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
 
 import java.net.URI;
 import java.util.List;

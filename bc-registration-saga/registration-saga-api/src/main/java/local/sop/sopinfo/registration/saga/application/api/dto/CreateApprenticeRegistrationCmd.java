@@ -5,9 +5,9 @@ import java.util.UUID;
 
 import jakarta.validation.Valid;
 import local.sop.sopinfo.registration.saga.application.api.dto.person.CreatePhoneNumberCmd;
-import local.sop.sopinfo.sharedkernel.enums.ConsentPurpose;
-import local.sop.sopinfo.sharedkernel.enums.ConsentStatus;
-import local.sop.sopinfo.sharedkernel.enums.ConsentType;
+import local.sop.common.libs.sharedkernel.enums.ConsentPurpose;
+import local.sop.common.libs.sharedkernel.enums.ConsentStatus;
+import local.sop.common.libs.sharedkernel.enums.ConsentType;
 
 public record CreateApprenticeRegistrationCmd(
     String firstName,

@@ -20,7 +20,7 @@ import org.springframework.web.client.RestClient;
 
 import local.sop.sopinfo.message.saga.application.api.dto.EducationInstructorResponse;
 import local.sop.sopinfo.message.saga.application.infrastructure.educationinstructor.EducationInstructorHttpAdapter;
-import local.sop.sopinfo.sharedkernel.compositekey.dtos.CompositeKey;
+import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
 
 @ExtendWith(MockitoExtension.class)
 public class EducationInstructorHttpAdapterTest {

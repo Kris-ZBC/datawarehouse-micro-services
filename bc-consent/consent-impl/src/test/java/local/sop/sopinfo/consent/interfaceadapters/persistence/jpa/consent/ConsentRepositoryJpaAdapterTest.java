@@ -1,11 +1,13 @@
 package local.sop.sopinfo.consent.interfaceadapters.persistence.jpa.consent;
 
 import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -30,9 +32,11 @@ import local.sop.sopinfo.consent.interfaceadapters.persistence.jpa.consentstatem
 import local.sop.sopinfo.consent.interfaceadapters.persistence.jpa.consentstatement.factory.ProdStatementEntityFactory;
 import local.sop.sopinfo.consent.interfaceadapters.persistence.jpa.consentstatement.factory.StatementEntityFactory;
 import local.sop.sopinfo.consent.interfaceadapters.persistence.jpa.consentstatement.factory.TestStatementEntityFactory;
-import local.sop.sopinfo.sharedkernel.enums.ConsentPurpose;
-import local.sop.sopinfo.sharedkernel.enums.ConsentStatus;
-import local.sop.sopinfo.sharedkernel.enums.ConsentType;
+import local.sop.common.libs.sharedkernel.enums.ConsentPurpose;
+import local.sop.common.libs.sharedkernel.enums.ConsentStatus;
+import local.sop.common.libs.sharedkernel.enums.ConsentType;
+import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
 
 @DataJpaTest
 @TestPropertySource(properties = {
@@ -548,6 +552,107 @@ public class ConsentRepositoryJpaAdapterTest {
         // Then
         assertNotNull(result);
         assertEquals(testStatement, result.getConsentStatement());
+    }
+
+    
+    @Test
+    void testCompensate_WhenSagaStateIsWrong_ShouldThrowConflictException() {
+        UUID id = UUID.randomUUID();
+
+        assertThrows(ConflictException.class, () -> adapter.compensate(
+                new ConsentId(id),
+                SagaOutcome.IDEMPOTENT));
+    }
+
+    @Test
+    void testCompensate_WhenConsentDoesNotExist_ShouldReturnFalse() {
+        // Given
+        UUID id = UUID.randomUUID();
+
+        // When
+        Boolean result = adapter.compensate(
+                new ConsentId(id),
+                SagaOutcome.COMPENSATE);
+
+        // Then
+        assertFalse(result);
+    }
+
+    @Test
+    void testCompensate_WhenConsentExistsAndDeleteSucceeds_ShouldReturnTrue() {
+        // Given
+        Consent consent = Consent.builder()
+                .personRef(testPersonRef)
+                .consentStatementRef(testStatementRef)
+                .status(ConsentStatus.ACTIVE)
+                .purpose(ConsentPurpose.MARKETING)
+                .type(ConsentType.ONE_TIME)
+                .build();
+
+        Consent saved = adapter.save(consent);
+
+        // When
+        Boolean result = adapter.compensate(
+                saved.getId(),
+                SagaOutcome.COMPENSATE);
+
+        // Then
+        assertTrue(result);
+
+        // Verify DB state (should be deleted)
+        ConsentEntity entity = entityManager.find(ConsentEntity.class, saved.getId().value());
+
+        assertNull(entity);
+    }
+
+    @Test
+    void testCompensate_WhenEntityDoesNotExist_ShouldReturnFalse() {
+        // Given
+        UUID id = UUID.randomUUID();
+
+        // When
+        Boolean result = adapter.compensate(
+                new ConsentId(id),
+                SagaOutcome.COMPENSATE);
+
+        // Then
+        assertFalse(result);
+    }
+
+    @Test
+    void testFindByPersonAndPurposeWhenExists() {
+        // Given
+        Consent consent = Consent.builder()
+                .personRef(testPersonRef)
+                .consentStatementRef(testStatementRef)
+                .status(ConsentStatus.ACTIVE)
+                .purpose(ConsentPurpose.MARKETING)
+                .type(ConsentType.ONE_TIME)
+                .build();
+
+        adapter.save(consent);
+
+        // When
+        Optional<Consent> result = adapter.findByPersonAndPurpose(
+                testPersonRef,
+                ConsentPurpose.MARKETING);
+
+        // Then
+        assertTrue(result.isPresent());
+        assertEquals(testPersonRef, result.get().getPersonRef());
+        assertEquals(ConsentPurpose.MARKETING, result.get().getPurpose());
+        assertEquals(ConsentStatus.ACTIVE, result.get().getStatus());
+    }
+
+    @Test
+    void testFindByPersonAndPurposeWhenNotExists() {
+        // When
+        Optional<Consent> result = adapter.findByPersonAndPurpose(
+                new PersonRef(UUID.randomUUID()),
+                ConsentPurpose.MARKETING);
+
+        // Then
+        assertFalse(result.isPresent());
     }
 
 }

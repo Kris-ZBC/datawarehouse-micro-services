@@ -30,10 +30,10 @@ import local.sop.sopinfo.educationline.domain.model.valueobjects.EducationLineNa
 import local.sop.sopinfo.educationline.domain.model.valueobjects.EducationRef;
 import local.sop.sopinfo.educationline.domain.ports.out.EducationLineRepositoryPort;
 import local.sop.sopinfo.educationline.domain.service.EducationLineDomain;
-import local.sop.sopinfo.sharedkernel.exceptions.NotFoundException;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.request.PayloadCompensateCreate;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.response.ResponseCompensated;
+import local.sop.common.libs.sharedkernel.exceptions.NotFoundException;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.request.PayloadCompensateCreate;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 
 class EducationLineApplicationServiceTest {
 

@@ -32,11 +32,11 @@ import local.sop.sopinfo.registration.saga.application.ports.out.instructor.Inst
 import local.sop.sopinfo.registration.saga.application.ports.out.login.LoginPort;
 import local.sop.sopinfo.registration.saga.application.ports.out.organization.OrganizationPort;
 import local.sop.sopinfo.registration.saga.application.ports.out.person.PersonPort;
-import local.sop.sopinfo.sharedkernel.enums.ConsentPurpose;
-import local.sop.sopinfo.sharedkernel.enums.ConsentStatus;
-import local.sop.sopinfo.sharedkernel.enums.ConsentType;
-import local.sop.sopinfo.sharedkernel.enums.PhoneUserType;
-import local.sop.sopinfo.sharedkernel.exceptions.ConflictException;
+import local.sop.common.libs.sharedkernel.enums.ConsentPurpose;
+import local.sop.common.libs.sharedkernel.enums.ConsentStatus;
+import local.sop.common.libs.sharedkernel.enums.ConsentType;
+import local.sop.common.libs.sharedkernel.enums.PhoneUserType;
+import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
 
 @ExtendWith(MockitoExtension.class)
 class RegistrationDependenciesSagaApplicationTest {

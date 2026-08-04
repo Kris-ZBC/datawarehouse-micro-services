@@ -5,9 +5,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 import local.sop.sopinfo.auditlog.application.api.dto.*;
-import local.sop.sopinfo.sharedkernel.enums.ActorType;
-import local.sop.sopinfo.sharedkernel.enums.Severity;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.Compensatable;
+import local.sop.common.libs.sharedkernel.enums.ActorType;
+import local.sop.common.libs.sharedkernel.enums.Severity;
+import local.sop.common.libs.sharedkernel.sagas.compensate.Compensatable;
 
 public interface AuditlogDirectory extends Compensatable {
 

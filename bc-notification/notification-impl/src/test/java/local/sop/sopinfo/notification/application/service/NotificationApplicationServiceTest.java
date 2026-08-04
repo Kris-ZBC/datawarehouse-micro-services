@@ -1,13 +1,12 @@
 package local.sop.sopinfo.notification.application.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.time.LocalDateTime;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
@@ -26,9 +25,13 @@ import local.sop.sopinfo.notification.application.api.NotificationDirectory;
 import local.sop.sopinfo.notification.application.api.dto.CreateNotificationCmd;
 import local.sop.sopinfo.notification.application.api.dto.NotificationResponse;
 import local.sop.sopinfo.notification.domain.model.Notification;
+import local.sop.sopinfo.notification.domain.model.valueobjects.CreatedAtTimestamp;
 import local.sop.sopinfo.notification.domain.model.valueobjects.MessageRef;
+import local.sop.sopinfo.notification.domain.model.valueobjects.NotificationId;
 import local.sop.sopinfo.notification.domain.ports.out.NotificationRepositoryPort;
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 
 @SpringBootTest
 @TestPropertySource(properties = {
@@ -194,5 +197,65 @@ public class NotificationApplicationServiceTest {
 
 		ValidationException ex = assertThrows(ValidationException.class, () -> directory.deleteNotification(UUID.randomUUID()));
 		assertEquals("Sletning af notifikation mislykkedes", ms.getMessage(Objects.requireNonNull(ex.messageKey()), null, DA));
+	}
+
+	@Test
+	void compensate_whenNotificationNotFound_shouldReturnIdempotentFalse() {
+		UUID id = UUID.randomUUID();
+
+		when(repo.findById(id)).thenReturn(Optional.empty());
+
+		ResponseCompensated result = directory.compensate(id, getClass(),SagaOutcome.COMPENSATE);
+
+		assertEquals(SagaOutcome.IDEMPOTENT, result.sagaState());
+		assertFalse(result.success());
+		verify(repo).findById(id);
+		verify(repo, never()).compensate(any(), any());
+	}
+
+	@Test
+	void compensate_whenNotificationExistsAndCompensateSucceeds_shouldReturnCompensateTrue() {
+		UUID id = UUID.randomUUID();
+		UUID messageRef = UUID.randomUUID();
+
+		Notification notification = Notification.builder()
+    		.id(NotificationId.of(id))
+    		.messageRef(new MessageRef(messageRef))
+    		.seen(false)
+    		.createdAt(new CreatedAtTimestamp(LocalDateTime.now()))
+    		.build();
+
+		when(repo.findById(id)).thenReturn(Optional.of(notification));
+		when(repo.compensate(NotificationId.of(id), SagaOutcome.COMPENSATE)).thenReturn(true);
+
+		ResponseCompensated result = directory.compensate(id, getClass(), SagaOutcome.COMPENSATE);
+
+		assertEquals(SagaOutcome.COMPENSATE, result.sagaState());
+		assertTrue(result.success());
+		verify(repo).findById(id);
+		verify(repo).compensate(NotificationId.of(id), SagaOutcome.COMPENSATE);
+	}
+
+	@Test
+	void compensate_whenNotificationExistsButCompensateReturnsFalse_shouldReturnIdempodentFalse() {
+		UUID id = UUID.randomUUID();
+		UUID messageRef = UUID.randomUUID();
+
+		Notification notification = Notification.builder()
+			.id(NotificationId.of(id))
+    		.messageRef(new MessageRef(messageRef))
+    		.seen(false)
+    		.createdAt(new CreatedAtTimestamp(LocalDateTime.now()))
+    		.build();
+
+		when(repo.findById(id)).thenReturn(Optional.of(notification));
+		when(repo.compensate(NotificationId.of(id), SagaOutcome.COMPENSATE)).thenReturn(false);
+
+		ResponseCompensated result = directory.compensate(id, getClass(), SagaOutcome.COMPENSATE);
+
+		assertEquals(SagaOutcome.IDEMPOTENT, result.sagaState());
+		assertFalse(result.success());
+		verify(repo).findById(id);
+		verify(repo).compensate(NotificationId.of(id), SagaOutcome.COMPENSATE);
 	}
 }

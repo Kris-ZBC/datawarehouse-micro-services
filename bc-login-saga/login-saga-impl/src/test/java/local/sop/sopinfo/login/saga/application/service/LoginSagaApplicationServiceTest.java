@@ -13,26 +13,34 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 
+import local.sop.sopinfo.login.saga.application.api.dto.CreateAuditlogCmd;
 import local.sop.sopinfo.login.saga.application.api.dto.LoginCmd;
 import local.sop.sopinfo.login.saga.application.api.dto.LoginResult;
 import local.sop.sopinfo.login.saga.application.infrastructure.response.ResponseCompensated;
 import local.sop.sopinfo.login.saga.application.ports.out.auditlog.AuditlogPort;
 import local.sop.sopinfo.login.saga.application.ports.out.consent.ConsentPort;
 import local.sop.sopinfo.login.saga.application.ports.out.login.LoginPort;
-import local.sop.sopinfo.sharedkernel.enums.ActorType;
-import local.sop.sopinfo.sharedkernel.enums.Severity;
-import local.sop.sopinfo.sharedkernel.exceptions.ConflictException;
-import local.sop.sopinfo.sharedkernel.exceptions.DomainException;
-import local.sop.sopinfo.sharedkernel.exceptions.ErrorCode;
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.enums.ActorType;
+import local.sop.common.libs.sharedkernel.enums.Severity;
+import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
+import local.sop.common.libs.sharedkernel.exceptions.DomainException;
+import local.sop.common.libs.sharedkernel.exceptions.ErrorCode;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
+
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+
+
 
 @ExtendWith(MockitoExtension.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
@@ -61,6 +69,8 @@ class LoginSagaApplicationServiceTest {
 
     private LoginCmd validLoginCmd;
 
+    private Validator validator;
+
     @BeforeEach
     void setUp() {
         validLoginCmd = new LoginCmd(
@@ -74,6 +84,8 @@ class LoginSagaApplicationServiceTest {
             "test-component",
             "test-data",
             "test-description");
+
+            validator = Validation.buildDefaultValidatorFactory().getValidator();
     }
 
     private LoginResult loginResult(UUID loginId, UUID personRef) {
@@ -224,4 +236,24 @@ class LoginSagaApplicationServiceTest {
         verify(auditlogPort, never()).create(any(UUID.class), any(ActorType.class), any(Severity.class),
                 anyString(), anyString(), anyString(), anyString(), anyString());
     }
+
+
+    @Test
+    void shouldPassValidation_whenCreateAuditlogCmdIsValid() {
+            CreateAuditlogCmd cmd = new CreateAuditlogCmd(
+                            UUID.randomUUID(),
+                            ActorType.USER,
+                            Severity.INFO,
+                            "system",
+                            "service",
+                            "component",
+                            "data",
+                            "description");
+
+            var violations = validator.validate(cmd);
+
+            assertTrue(violations.isEmpty());
+    }
+
+    
 }

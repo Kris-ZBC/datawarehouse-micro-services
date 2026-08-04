@@ -30,9 +30,9 @@ import local.sop.sopinfo.person.application.api.dto.PersonResponse;
 import local.sop.sopinfo.person.application.api.dto.PhoneNumberResponse;
 import local.sop.sopinfo.person.application.api.dto.RemovePhoneNumberCmd;
 import local.sop.sopinfo.person.application.api.dto.UpdatePersonCmd;
-import local.sop.sopinfo.sharedkernel.enums.PhoneUserType;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.response.ResponseCompensated;
+import local.sop.common.libs.sharedkernel.enums.PhoneUserType;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 
 class InternalPersonControllerTest {
 

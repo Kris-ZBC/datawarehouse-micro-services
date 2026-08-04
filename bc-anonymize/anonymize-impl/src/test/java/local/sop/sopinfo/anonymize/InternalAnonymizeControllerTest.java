@@ -37,9 +37,9 @@ import local.sop.sopinfo.anonymize.application.api.dto.CreateAnonymizeCmd;
 import local.sop.sopinfo.anonymize.application.api.dto.FetchByIdQuery;
 import local.sop.sopinfo.anonymize.application.api.dto.FetchByParamsQuery;
 import local.sop.sopinfo.anonymize.interfaceweb.InternalAnonymizeController;
-import local.sop.sopinfo.infrastructure.web.exception.EndpointExceptionHandler;
-import local.sop.sopinfo.sharedkernel.exceptions.NotFoundException;
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.infrastructure.web.exception.EndpointExceptionHandler;
+import local.sop.common.libs.sharedkernel.exceptions.NotFoundException;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 
 
 @TestPropertySource(properties = {

@@ -9,9 +9,9 @@ import org.springframework.web.client.RestClient;
 import local.sop.sopinfo.message.saga.application.api.dto.NotificationResponse;
 import local.sop.sopinfo.message.saga.application.infrastructure.request.PayloadNotificationCreate;
 import local.sop.sopinfo.message.saga.application.ports.out.notification.NotificationPort;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.request.PayloadCompensateCreate;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.response.ResponseCompensated;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.request.PayloadCompensateCreate;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 
 @Component
 public class NotificationHttpAdapter implements NotificationPort {

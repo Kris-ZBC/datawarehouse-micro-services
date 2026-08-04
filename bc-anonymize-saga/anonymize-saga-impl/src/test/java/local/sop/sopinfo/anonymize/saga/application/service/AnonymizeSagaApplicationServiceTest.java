@@ -4,12 +4,12 @@ import local.sop.sopinfo.anonymize.saga.application.ports.out.auditlog.AuditlogP
 import local.sop.sopinfo.anonymize.saga.application.ports.out.anonymize.AnonymizePort;
 import local.sop.sopinfo.anonymize.saga.application.ports.out.person.PersonPort;
 import local.sop.sopinfo.anonymize.saga.application.api.dto.CreateAnonymizeCmd;
-import local.sop.sopinfo.sharedkernel.enums.ActorType;
-import local.sop.sopinfo.sharedkernel.enums.Severity;
+import local.sop.common.libs.sharedkernel.enums.ActorType;
+import local.sop.common.libs.sharedkernel.enums.Severity;
 
-import local.sop.sopinfo.sharedkernel.exceptions.ConflictException;
-import local.sop.sopinfo.sharedkernel.exceptions.DomainException;
-import local.sop.sopinfo.sharedkernel.exceptions.ErrorCode;
+import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
+import local.sop.common.libs.sharedkernel.exceptions.DomainException;
+import local.sop.common.libs.sharedkernel.exceptions.ErrorCode;
 import local.sop.sopinfo.person.application.api.dto.PersonResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -19,8 +19,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import static org.mockito.Mockito.*;
 
-import local.sop.sopinfo.sharedkernel.sagas.compensate.response.ResponseCompensated;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
 
 
 import java.util.List;

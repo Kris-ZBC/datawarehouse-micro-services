@@ -12,7 +12,7 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
-import local.sop.sopinfo.sharedkernel.compositekey.dtos.CompositeKey;
+import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
 import local.sop.sopinfo.sopeducation.domain.model.SopEducation;
 import local.sop.sopinfo.sopeducation.domain.model.valueobjects.CreatedAtTimestamp;
 

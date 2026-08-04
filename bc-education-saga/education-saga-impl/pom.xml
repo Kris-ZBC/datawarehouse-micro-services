@@ -21,23 +21,21 @@
 
     <!-- shared-kernel inherited-->
 
-    <dependency>
-      <groupId>local.sop.sopinfo</groupId>
-      <artifactId>common-security</artifactId>
-      <version>${revision}</version>
-    </dependency>
+  <dependency>
+    <groupId>local.sop.common.libs</groupId>
+    <artifactId>common-security</artifactId>
+  </dependency>
 
-    <dependency>
-      <groupId>local.sop.sopinfo</groupId>
-      <artifactId>common-core</artifactId>
-      <version>${revision}</version>
-    </dependency>
 
-    <dependency>
-      <groupId>local.sop.sopinfo</groupId>
-      <artifactId>common-web</artifactId>
-      <version>${revision}</version>
-    </dependency>
+  <dependency>
+    <groupId>local.sop.common.libs</groupId>
+    <artifactId>common-core</artifactId>
+  </dependency>
+
+  <dependency>
+    <groupId>local.sop.common.libs</groupId>
+    <artifactId>common-web</artifactId>
+  </dependency>
 
     <!-- Spring Boot starters -->
     <dependency>

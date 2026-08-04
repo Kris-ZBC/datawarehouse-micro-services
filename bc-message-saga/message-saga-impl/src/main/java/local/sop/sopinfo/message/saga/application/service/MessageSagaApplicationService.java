@@ -32,11 +32,11 @@ import local.sop.sopinfo.message.saga.application.ports.out.notification.Notific
 import local.sop.sopinfo.message.saga.application.ports.out.person.PersonPort;
 import local.sop.sopinfo.message.saga.application.ports.out.personnotification.PersonNotificationPort;
 import local.sop.sopinfo.message.saga.application.ports.out.saga.MessageSagaStatePort;
-import local.sop.sopinfo.sharedkernel.exceptions.ConflictException;
-import local.sop.sopinfo.sharedkernel.exceptions.DomainException;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
-import local.sop.sopinfo.sharedkernel.sagas.concurrency.locks.SagaConcurrencyLock;
-import local.sop.sopinfo.sharedkernel.sagas.concurrency.locks.SagaStatus;
+import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
+import local.sop.common.libs.sharedkernel.exceptions.DomainException;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.concurrency.locks.SagaConcurrencyLock;
+import local.sop.common.libs.sharedkernel.sagas.concurrency.locks.SagaStatus;
 
 @Service
 public class MessageSagaApplicationService implements MessageSagaDirectory {

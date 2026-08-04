@@ -18,9 +18,9 @@ import local.sop.sopinfo.message.domain.model.Message;
 import local.sop.sopinfo.message.domain.model.valueobjects.MessageId;
 import local.sop.sopinfo.message.domain.ports.out.MessageRepositoryPort;
 import local.sop.sopinfo.message.domain.service.MessageDomain;
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.response.ResponseCompensated;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 
 class MessageApplicationServiceTest {
 

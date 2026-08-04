@@ -12,9 +12,9 @@ import local.sop.sopinfo.login.saga.application.infrastructure.response.Response
 import local.sop.sopinfo.login.saga.application.ports.out.auditlog.AuditlogPort;
 import local.sop.sopinfo.login.saga.application.ports.out.consent.ConsentPort;
 import local.sop.sopinfo.login.saga.application.ports.out.login.LoginPort;
-import local.sop.sopinfo.sharedkernel.enums.ActorType;
-import local.sop.sopinfo.sharedkernel.enums.Severity;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.enums.ActorType;
+import local.sop.common.libs.sharedkernel.enums.Severity;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
 
 class PortsOutContractTest {
 

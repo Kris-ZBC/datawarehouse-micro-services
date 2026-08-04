@@ -18,14 +18,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
 import local.sop.sopinfo.educationline.domain.model.EducationLine;
 import local.sop.sopinfo.educationline.domain.model.valueobjects.EducationLineDuration;
 import local.sop.sopinfo.educationline.domain.model.valueobjects.EducationLineId;
 import local.sop.sopinfo.educationline.domain.model.valueobjects.EducationLineName;
 import local.sop.sopinfo.educationline.domain.model.valueobjects.EducationRef;
 
-import local.sop.sopinfo.sharedkernel.exceptions.ConflictException;
+import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
 
 class EducationLineRepositoryAdapterTest {
 

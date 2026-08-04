@@ -25,8 +25,8 @@ import local.sop.sopinfo.personnotification.interfaceadapters.persistence.jpa.Pe
 import local.sop.sopinfo.personnotification.interfaceadapters.persistence.jpa.PersonNotificationEntity;
 import local.sop.sopinfo.personnotification.interfaceadapters.persistence.jpa.PersonNotificationId;
 import local.sop.sopinfo.personnotification.interfaceadapters.persistence.jpa.PersonNotificationRepositoryAdapter;
-import local.sop.sopinfo.sharedkernel.compositekey.dtos.CompositeKey;
-import local.sop.sopinfo.sharedkernel.exceptions.NotFoundException;
+import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
+import local.sop.common.libs.sharedkernel.exceptions.NotFoundException;
 
 @DataJpaTest
 @TestPropertySource(properties = {

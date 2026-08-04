@@ -13,7 +13,7 @@ import local.sop.sopinfo.educationline.domain.model.valueobjects.EducationLineDu
 import local.sop.sopinfo.educationline.domain.model.valueobjects.EducationLineId;
 import local.sop.sopinfo.educationline.domain.model.valueobjects.EducationLineName;
 import local.sop.sopinfo.educationline.domain.model.valueobjects.EducationRef;
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 
 public class EducationLineTest {
 

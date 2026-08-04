@@ -7,7 +7,7 @@ import local.sop.sopinfo.login.application.api.dto.LoginResult;
 import local.sop.sopinfo.login.application.api.dto.LogoutCmd;
 import local.sop.sopinfo.login.application.api.dto.SessionValidationResult;
 import local.sop.sopinfo.login.application.api.dto.ValidateSessionCmd;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.Compensatable;
+import local.sop.common.libs.sharedkernel.sagas.compensate.Compensatable;
 
 public interface LoginDirectory extends Compensatable{
 	CreatedLoginResult createLogin(CreateLoginCmd cmd);

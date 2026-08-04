@@ -1,6 +1,8 @@
 package local.sop.sopinfo.anonymize.application.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -24,6 +26,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import local.sop.sopinfo.anonymize.application.api.dto.AnonymizeResponse;
+import local.sop.sopinfo.anonymize.application.api.dto.CompensateAnonymizeStatementCmd;
 import local.sop.sopinfo.anonymize.application.api.dto.CreateAnonymizeCmd;
 import local.sop.sopinfo.anonymize.application.api.dto.FetchByIdQuery;
 import local.sop.sopinfo.anonymize.application.api.dto.FetchByParamsQuery;
@@ -32,7 +35,9 @@ import local.sop.sopinfo.anonymize.domain.model.valueobjects.AnonymizeId;
 import local.sop.sopinfo.anonymize.domain.model.valueobjects.PersonRef;
 import local.sop.sopinfo.anonymize.domain.ports.out.AnonymizeRepositoryPort;
 import local.sop.sopinfo.anonymize.domain.service.AnonymizeDomain;
-import local.sop.sopinfo.sharedkernel.exceptions.NotFoundException;
+import local.sop.common.libs.sharedkernel.exceptions.NotFoundException;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -359,5 +364,99 @@ public class AnonymizeApplicationServiceTest {
         assertNotNull(result);
         assertTrue(result.isEmpty());
     }
+
+    @Test
+    void compensate_WhenRepositoryReturnsTrue_ShouldReturnCompensated() {
+        // Given
+        when(port.compensate(
+                AnonymizeId.of(testId),
+                SagaOutcome.COMPENSATE))
+                .thenReturn(true);
+
+        // When
+        ResponseCompensated result = service.compensate(
+                testId,
+                String.class,
+                SagaOutcome.COMPENSATE);
+
+        // Then
+        assertEquals(SagaOutcome.COMPENSATED, result.sagaState());
+        assertTrue(result.success());
+
+        verify(port).compensate(
+                AnonymizeId.of(testId),
+                SagaOutcome.COMPENSATE);
+    }
+
+    @Test
+    void compensate_WhenRepositoryReturnsFalse_ShouldReturnIdempotent() {
+        // Given
+        when(port.compensate(
+                AnonymizeId.of(testId),
+                SagaOutcome.COMPENSATE))
+                .thenReturn(false);
+
+        // When
+        ResponseCompensated result = service.compensate(
+                testId,
+                String.class,
+                SagaOutcome.COMPENSATE);
+
+        // Then
+        assertEquals(SagaOutcome.IDEMPOTENT, result.sagaState());
+        assertFalse(result.success());
+
+        verify(port).compensate(
+                AnonymizeId.of(testId),
+                SagaOutcome.COMPENSATE);
+    }
+
+    @Test
+    void should_store_and_return_values() {
+        // given
+        Class<?> clazz = String.class;
+        SagaOutcome sagaState = SagaOutcome.SUCCEEDED; // adjust if enum differs
+
+        // when
+        CompensateAnonymizeStatementCmd cmd =
+                new CompensateAnonymizeStatementCmd(clazz, sagaState);
+
+        // then
+        assertEquals(clazz, cmd.clazz());
+        assertEquals(sagaState, cmd.sagaState());
+    }
+
+    @Test
+    void records_should_be_equal_when_values_are_same() {
+        // given
+        Class<?> clazz = String.class;
+        SagaOutcome sagaState = SagaOutcome.SUCCEEDED;
+
+        // when
+        CompensateAnonymizeStatementCmd cmd1 =
+                new CompensateAnonymizeStatementCmd(clazz, sagaState);
+
+        CompensateAnonymizeStatementCmd cmd2 =
+                new CompensateAnonymizeStatementCmd(clazz, sagaState);
+
+        // then
+        assertEquals(cmd1, cmd2);
+        assertEquals(cmd1.hashCode(), cmd2.hashCode());
+    }
+
+    @Test
+    void should_not_be_equal_when_values_differ() {
+        // given
+        CompensateAnonymizeStatementCmd cmd1 =
+                new CompensateAnonymizeStatementCmd(String.class, SagaOutcome.SUCCEEDED);
+
+        CompensateAnonymizeStatementCmd cmd2 =
+                new CompensateAnonymizeStatementCmd(Integer.class, SagaOutcome.SUCCEEDED);
+
+        // then
+        assertNotEquals(cmd1, cmd2);
+    }
+
+    
 
 }

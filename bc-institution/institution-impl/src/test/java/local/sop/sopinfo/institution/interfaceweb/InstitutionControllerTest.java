@@ -21,11 +21,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import local.sop.sopinfo.infrastructure.web.exception.EndpointExceptionHandler;
+import local.sop.common.libs.infrastructure.web.exception.EndpointExceptionHandler;
 import local.sop.sopinfo.institution.application.api.InstitutionDirectory;
 import local.sop.sopinfo.institution.application.api.dto.InstitutionQuery;
 import local.sop.sopinfo.institution.application.api.dto.InstitutionResponse;
-import local.sop.sopinfo.sharedkernel.exceptions.NotFoundException;
+import local.sop.common.libs.sharedkernel.exceptions.NotFoundException;
 
 @WebMvcTest(controllers = InternalInstitutionController.class)
 @AutoConfigureMockMvc(addFilters = false)

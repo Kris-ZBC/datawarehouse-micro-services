@@ -24,7 +24,7 @@ import org.springframework.test.context.TestPropertySource;
 import local.sop.sopinfo.consent.domain.model.valueobject.ConsentStatementRef;
 
 import local.sop.sopinfo.consent.interfaceadapters.persistence.jpa.consentstatement.factory.ProdStatementEntityFactory;
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 
 @ActiveProfiles({"prod", "h2"})
 @TestPropertySource(properties = {

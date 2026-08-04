@@ -3,7 +3,7 @@ package local.sop.sopinfo.login.domain.model.valueobjects;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 
 /**
  * Represents a bcrypt-hashed password as stored in the database.

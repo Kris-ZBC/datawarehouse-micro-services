@@ -1,7 +1,7 @@
 package local.sop.sopinfo.apprentice.domain.model;
 
 import local.sop.sopinfo.apprentice.domain.model.valueobjects.*;
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

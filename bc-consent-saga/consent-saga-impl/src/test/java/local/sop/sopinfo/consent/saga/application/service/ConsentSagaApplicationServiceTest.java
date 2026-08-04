@@ -22,17 +22,17 @@ import local.sop.sopinfo.consent.saga.application.api.dto.RevokeConsentCmd;
 import local.sop.sopinfo.consent.saga.application.ports.out.auditlog.AuditlogPort;
 import local.sop.sopinfo.consent.saga.application.ports.out.consent.ConsentPort;
 import local.sop.sopinfo.consent.saga.application.ports.out.saga.ConsentSagaStatePort;
-import local.sop.sopinfo.sharedkernel.enums.ActorType;
-import local.sop.sopinfo.sharedkernel.enums.ConsentPurpose;
-import local.sop.sopinfo.sharedkernel.enums.ConsentStatus;
-import local.sop.sopinfo.sharedkernel.enums.ConsentType;
-import local.sop.sopinfo.sharedkernel.enums.Severity;
-import local.sop.sopinfo.sharedkernel.exceptions.ConflictException;
-import local.sop.sopinfo.sharedkernel.exceptions.DomainException;
-import local.sop.sopinfo.sharedkernel.exceptions.ErrorCode;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.enums.SagaOutcome;
-import local.sop.sopinfo.sharedkernel.sagas.compensate.response.ResponseCompensated;
-import local.sop.sopinfo.sharedkernel.sagas.concurrency.locks.SagaStatus;
+import local.sop.common.libs.sharedkernel.enums.ActorType;
+import local.sop.common.libs.sharedkernel.enums.ConsentPurpose;
+import local.sop.common.libs.sharedkernel.enums.ConsentStatus;
+import local.sop.common.libs.sharedkernel.enums.ConsentType;
+import local.sop.common.libs.sharedkernel.enums.Severity;
+import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
+import local.sop.common.libs.sharedkernel.exceptions.DomainException;
+import local.sop.common.libs.sharedkernel.exceptions.ErrorCode;
+import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
+import local.sop.common.libs.sharedkernel.sagas.concurrency.locks.SagaStatus;
 
 @ExtendWith(MockitoExtension.class)
 class ConsentSagaApplicationServiceTest {
@@ -551,12 +551,12 @@ class ConsentSagaApplicationServiceTest {
             when(consents.getStatement(consentStatementId)).thenReturn(statementResponse);
             when(consents.grant(any(), any(), any(), any(), any())).thenReturn(consentResponse);
             when(consents.getConsent(consentId)).thenReturn(null);
-            when(consents.compensateConsent(any(), any(), any())).thenReturn(compensatedOk);
+            when(consents.compensateConsentUpdate(any(), any(), any())).thenReturn(compensatedOk);
 
             assertThrows(ConflictException.class,
                 () -> service.grant(buildGrantCmd()));
 
-            verify(consents).compensateConsent(
+            verify(consents).compensateConsentUpdate(
                 eq(consentId),
                 eq(ConsentSagaApplicationService.class),
                 eq(SagaOutcome.COMPENSATED));
@@ -579,6 +579,204 @@ class ConsentSagaApplicationServiceTest {
                 eq(ConsentSagaApplicationService.class),
                 eq(SagaOutcome.COMPENSATED));
         }
+
+        @Test
+        void shouldThrowConflictException_whenGetConsentStatementThrowsRuntimeException() {
+            when(consents.getStatement(consentStatementId))
+                    .thenThrow(new RuntimeException("service unavailable"));
+
+            ConflictException ex = assertThrows(
+                    ConflictException.class,
+                    () -> service.grant(buildGrantCmd()));
+
+            assertEquals("consentstatement.read.failed", ex.getMessage());
+        }
+
+        @Test
+        void shouldReleaseLock_whenGetConsentStatementThrowsRuntimeException() {
+            when(consents.getStatement(consentStatementId))
+                    .thenThrow(new RuntimeException("service unavailable"));
+
+            assertThrows(
+                    ConflictException.class,
+                    () -> service.grant(buildGrantCmd()));
+
+            verify(sagaLock).release(sessionId);
+        }
+
+        @Test
+        void shouldRethrowDomainException_whenGetConsentStatementThrowsDomainException() {
+            DomainException domainEx = new DomainException(
+                    ErrorCode.CONFLICT,
+                    "consentstatement.read.failed",
+                    Map.of("id", consentStatementId.toString()));
+
+            when(consents.getStatement(consentStatementId))
+                    .thenThrow(domainEx);
+
+            DomainException thrown = assertThrows(
+                    DomainException.class,
+                    () -> service.grant(buildGrantCmd()));
+
+            assertSame(domainEx, thrown);
+        }
+
+        @Test
+        void shouldReleaseLock_whenGetConsentStatementThrowsDomainException() {
+            DomainException domainEx = new DomainException(
+                    ErrorCode.CONFLICT,
+                    "consentstatement.read.failed",
+                    Map.of("id", consentStatementId.toString()));
+
+            when(consents.getStatement(consentStatementId))
+                    .thenThrow(domainEx);
+
+            assertThrows(
+                    DomainException.class,
+                    () -> service.grant(buildGrantCmd()));
+
+            verify(sagaLock).release(sessionId);
+        }
+
+        @Test
+        void shouldSetSagaStatusToCompensating_whenConsentGetFailsAfterGrant() {
+            when(consents.getStatement(consentStatementId)).thenReturn(statementResponse);
+            when(consents.grant(any(), any(), any(), any(), any())).thenReturn(consentResponse);
+
+            when(consents.getConsent(consentId))
+                    .thenThrow(new RuntimeException("db down"));
+
+            assertThrows(
+                    ConflictException.class,
+                    () -> service.grant(buildGrantCmd()));
+
+            verify(sagaLock).updateStatus(sessionId, SagaStatus.COMPENSATING);
+        }
+
+        @Test
+        void shouldCallCompensateConsent_whenConsentGetFailsAfterGrant() {
+            when(consents.getStatement(consentStatementId)).thenReturn(statementResponse);
+            when(consents.grant(any(), any(), any(), any(), any())).thenReturn(consentResponse);
+            when(consents.compensateConsentUpdate(any(), any(), any())).thenReturn(compensatedOk);
+
+            when(consents.getConsent(consentId))
+                    .thenThrow(new RuntimeException("db down"));
+
+            assertThrows(
+                    ConflictException.class,
+                    () -> service.grant(buildGrantCmd()));
+
+            verify(consents).compensateConsentUpdate(
+                    eq(consentId),
+                    eq(ConsentSagaApplicationService.class),
+                    eq(SagaOutcome.COMPENSATED));
+        }
+
+
+        @Test
+        void shouldRethrowDomainException_whenConsentGetFailsAfterGrant() {
+            when(consents.getStatement(consentStatementId)).thenReturn(statementResponse);
+            when(consents.grant(any(), any(), any(), any(), any())).thenReturn(consentResponse);
+            when(consents.compensateConsentUpdate(any(), any(), any())).thenReturn(compensatedOk);
+            DomainException ex = new DomainException(
+                    ErrorCode.CONFLICT,
+                    "consent.read.failed",
+                    Map.of("id", consentId.toString()));
+
+            when(consents.getConsent(consentId)).thenThrow(ex);
+
+            DomainException thrown = assertThrows(
+                    DomainException.class,
+                    () -> service.grant(buildGrantCmd()));
+
+            assertSame(ex, thrown);
+
+            verify(consents).compensateConsentUpdate(
+                    eq(consentId),
+                    eq(ConsentSagaApplicationService.class),
+                    eq(SagaOutcome.COMPENSATED));
+
+            verify(sagaLock).release(sessionId);
+        }
+
+        @Test
+        void shouldReleaseLockAndThrowConflictException_whenConsentGetThrowsRuntimeException() {
+            // given
+            when(consents.getStatement(consentStatementId)).thenReturn(statementResponse);
+            when(consents.grant(any(), any(), any(), any(), any())).thenReturn(consentResponse);
+
+            when(consents.getConsent(consentId))
+                    .thenThrow(new RuntimeException("db down"));
+
+            // when
+            ConflictException ex = assertThrows(
+                    ConflictException.class,
+                    () -> service.grant(buildGrantCmd()));
+
+            // then
+            assertEquals("consent.read.failed", ex.getMessage());
+
+            verify(sagaLock).release(sessionId);
+
+            verify(consents).getConsent(consentId);
+        }
+       
+        @Test
+        void shouldUpdateStatusAndCompensateUpdate_whenConsentGetThrowsRuntimeException() {
+            // given
+            when(consents.getStatement(consentStatementId)).thenReturn(statementResponse);
+            when(consents.grant(any(), any(), any(), any(), any())).thenReturn(consentResponse);
+            when(consents.compensateConsentUpdate(any(), any(), any())).thenReturn(compensatedOk);
+
+            when(consents.getConsent(consentId))
+                    .thenThrow(new RuntimeException("db down"));
+
+            // when
+            ConflictException ex = assertThrows(
+                    ConflictException.class,
+                    () -> service.grant(buildGrantCmd()));
+
+            // then
+            assertEquals("consent.read.failed", ex.getMessage());
+
+            verify(sagaLock).updateStatus(sessionId, SagaStatus.COMPENSATING);
+
+            verify(consents).compensateConsentUpdate(
+                    eq(consentId),
+                    eq(ConsentSagaApplicationService.class),
+                    eq(SagaOutcome.COMPENSATED));
+        }
+
+
+        @Test
+        void shouldUpdateStatusAndCompensateUpdate_whenConsentGetThrowsDomainException() {
+            // given
+            when(consents.getStatement(consentStatementId)).thenReturn(statementResponse);
+            when(consents.grant(any(), any(), any(), any(), any())).thenReturn(consentResponse);
+            when(consents.compensateConsentUpdate(any(), any(), any())).thenReturn(compensatedOk);
+            DomainException ex = new DomainException(
+                    ErrorCode.CONFLICT,
+                    "consent.read.failed",
+                    Map.of("id", consentId.toString()));
+
+            when(consents.getConsent(consentId)).thenThrow(ex);
+
+            // when
+            DomainException thrown = assertThrows(
+                    DomainException.class,
+                    () -> service.grant(buildGrantCmd()));
+
+            // then
+            assertSame(ex, thrown);
+
+            verify(sagaLock).updateStatus(sessionId, SagaStatus.COMPENSATING);
+
+            verify(consents).compensateConsentUpdate(
+                    eq(consentId),
+                    eq(ConsentSagaApplicationService.class),
+                    eq(SagaOutcome.COMPENSATED));
+        }
+        
     }
 
     // ── withdraw — failures ────────────────────────────────────────────────────
@@ -737,6 +935,10 @@ class ConsentSagaApplicationServiceTest {
                 eq(SagaOutcome.COMPENSATED));
         }
     }
+
+    
+
+
 
     // ── Builder helpers ────────────────────────────────────────────────────────
 

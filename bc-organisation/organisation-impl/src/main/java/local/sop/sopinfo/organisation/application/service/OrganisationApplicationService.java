@@ -10,8 +10,8 @@ import local.sop.sopinfo.organisation.application.api.dto.OrganisationResponse;
 import local.sop.sopinfo.organisation.interfaceadapters.persistence.jpa.OrganisationSpringDataRepository;
 
 // Exception
-import local.sop.sopinfo.sharedkernel.exceptions.NotFoundException;
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.exceptions.NotFoundException;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 
 // Logging
 import org.slf4j.Logger;
