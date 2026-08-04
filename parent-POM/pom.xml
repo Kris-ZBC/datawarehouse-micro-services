@@ -78,28 +78,10 @@ Parent pom for multi-module project aggregator and BOM (dependency management)
         <module>../bc-sop-instructor/sop-instructor-api</module>
         <module>../bc-sop-instructor/sop-instructor-impl</module>
 
-        <!-- SAGA -->
-        <module>../bc-auth_handler/auth_handler-api</module>
-        <module>../bc-auth_handler/auth_handler-impl</module>
-        
-        <module>../bc-check_in_handler/check_in_handler-api</module>
-        <module>../bc-check_in_handler/check_in_handler-impl</module>
-
-        <module>../bc-communication_handler/communication_handler-api</module>
-        <module>../bc-communication_handler/communication_handler-impl</module>
-        
-        <module>../bc-organisation_handler/organisation_handler-api</module>
-        <module>../bc-organisation_handler/organisation_handler-impl</module>
-        
-        <module>../bc-user_handler/user_handler-api</module>
-        <module>../bc-user_handler/user_handler-impl</module>
-       
         <module>../bc-organisation/organisation-api</module>
         <module>../bc-organisation/organisation-impl</module>
 
-        <module>../bc-sop_handler/sop_handler-api</module>
-        <module>../bc-sop_handler/sop_handler-impl</module>
-
+        <!-- SAGA -->
         <module>../bc-consent-saga/consent-saga-api</module>
         <module>../bc-consent-saga/consent-saga-impl</module>
 

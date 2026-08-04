@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import local.sop.sopinfo.sharedkernel.enums.WeekDay;
+import local.sop.common.libs.sharedkernel.enums.WeekDay;
 
 import java.util.List;
 import java.util.Optional;

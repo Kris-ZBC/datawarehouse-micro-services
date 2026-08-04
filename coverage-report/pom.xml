@@ -47,36 +47,6 @@
         </dependency>
          <dependency>
             <groupId>local.sop.sopinfo</groupId>
-            <artifactId>auth_handler-api</artifactId>
-            <version>${revision}</version>
-        </dependency>
-         <dependency>
-            <groupId>local.sop.sopinfo</groupId>
-            <artifactId>auth_handler-impl</artifactId>
-            <version>${revision}</version>
-        </dependency>
-         <dependency>
-            <groupId>local.sop.sopinfo</groupId>
-            <artifactId>check_in_handler-api</artifactId>
-            <version>${revision}</version>
-        </dependency>
-         <dependency>
-            <groupId>local.sop.sopinfo</groupId>
-            <artifactId>check_in_handler-impl</artifactId>
-            <version>${revision}</version>
-        </dependency>
-         <dependency>
-            <groupId>local.sop.sopinfo</groupId>
-            <artifactId>communication_handler-api</artifactId>
-            <version>${revision}</version>
-        </dependency>
-         <dependency>
-            <groupId>local.sop.sopinfo</groupId>
-            <artifactId>communication_handler-impl</artifactId>
-            <version>${revision}</version>
-        </dependency>
-         <dependency>
-            <groupId>local.sop.sopinfo</groupId>
             <artifactId>consent-api</artifactId>
             <version>${revision}</version>
         </dependency>
@@ -187,16 +157,6 @@
         </dependency>
          <dependency>
             <groupId>local.sop.sopinfo</groupId>
-            <artifactId>organisation_handler-api</artifactId>
-            <version>${revision}</version>
-        </dependency>
-         <dependency>
-            <groupId>local.sop.sopinfo</groupId>
-            <artifactId>organisation_handler-impl</artifactId>
-            <version>${revision}</version>
-        </dependency>
-         <dependency>
-            <groupId>local.sop.sopinfo</groupId>
             <artifactId>person-api</artifactId>
             <version>${revision}</version>
         </dependency>
@@ -223,26 +183,6 @@
         <dependency>
             <groupId>local.sop.sopinfo</groupId>
             <artifactId>consent-saga-impl</artifactId>
-            <version>${revision}</version>
-        </dependency>
-        <dependency>
-            <groupId>local.sop.sopinfo</groupId>
-            <artifactId>sop_handler-api</artifactId>
-            <version>${revision}</version>
-        </dependency>
-        <dependency>
-            <groupId>local.sop.sopinfo</groupId>
-            <artifactId>sop_handler-impl</artifactId>
-            <version>${revision}</version>
-        </dependency>
-        <dependency>
-            <groupId>local.sop.sopinfo</groupId>
-            <artifactId>user_handler-api</artifactId>
-            <version>${revision}</version>
-        </dependency>
-         <dependency>
-            <groupId>local.sop.sopinfo</groupId>
-            <artifactId>user_handler-impl</artifactId>
             <version>${revision}</version>
         </dependency>
          <dependency>

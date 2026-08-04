@@ -7,8 +7,8 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
-import local.sop.sopinfo.sharedkernel.enums.WeekDay;
-import local.sop.sopinfo.sharedkernel.valueobjects.utils.UUIDUtil;
+import local.sop.common.libs.sharedkernel.enums.WeekDay;
+import local.sop.common.libs.sharedkernel.valueobjects.utils.UUIDUtil;
 
 class WorkHourScheduleEntityTest {
 

@@ -9,8 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
-import local.sop.sopinfo.sharedkernel.enums.WeekDay;
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.enums.WeekDay;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 import local.sop.sopinfo.workhour.domain.model.WorkHourSchedule;
 import local.sop.sopinfo.workhour.domain.ports.out.WorkHourScheduleRepositoryPort;
 

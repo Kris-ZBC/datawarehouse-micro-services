@@ -4,7 +4,7 @@ import java.util.regex.Pattern;
 import java.util.Map;
 import java.util.StringJoiner;
 
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 
 public record WorkScheduleTime(String time) {
     private static final Pattern TIME_PATTERN = Pattern.compile("^([01]?[0-9]|2[0-3]):[0-5][0-9]$");

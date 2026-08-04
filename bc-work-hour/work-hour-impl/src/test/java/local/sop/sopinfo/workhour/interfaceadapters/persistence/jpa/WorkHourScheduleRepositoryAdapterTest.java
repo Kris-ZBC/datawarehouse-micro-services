@@ -17,9 +17,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import local.sop.sopinfo.sharedkernel.enums.WeekDay;
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
-import local.sop.sopinfo.sharedkernel.valueobjects.utils.UUIDUtil;
+import local.sop.common.libs.sharedkernel.enums.WeekDay;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.valueobjects.utils.UUIDUtil;
 import local.sop.sopinfo.workhour.domain.model.WorkHourSchedule;
 import local.sop.sopinfo.workhour.domain.model.valueobjects.SopRef;
 import local.sop.sopinfo.workhour.domain.model.valueobjects.WorkScheduleId;

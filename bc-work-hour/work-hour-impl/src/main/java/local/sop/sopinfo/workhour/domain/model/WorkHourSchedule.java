@@ -3,8 +3,8 @@ package local.sop.sopinfo.workhour.domain.model;
 import java.util.Map;
 import java.util.StringJoiner;
 
-import local.sop.sopinfo.sharedkernel.enums.WeekDay;
-import local.sop.sopinfo.sharedkernel.exceptions.ValidationException;
+import local.sop.common.libs.sharedkernel.enums.WeekDay;
+import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 import local.sop.sopinfo.workhour.domain.model.valueobjects.*;
 
 /**

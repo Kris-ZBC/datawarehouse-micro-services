@@ -6,7 +6,7 @@ package local.sop.sopinfo.workhour.domain.service;
 
 import java.util.UUID;
 
-import local.sop.sopinfo.sharedkernel.enums.WeekDay;
+import local.sop.common.libs.sharedkernel.enums.WeekDay;
 import local.sop.sopinfo.workhour.domain.model.WorkHourSchedule;
 
 public interface WorkHourScheduleDomain {
