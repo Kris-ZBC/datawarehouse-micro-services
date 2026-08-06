@@ -11,7 +11,7 @@ import com.tngtech.archunit.lang.ArchRule;
 import com.tngtech.archunit.lang.ConditionEvents;
 import com.tngtech.archunit.lang.SimpleConditionEvent;
 
-@AnalyzeClasses(packages = "local.sop.sopinfo.sopinstructor")
+@AnalyzeClasses(packages = "local.sop.datawarehouse.sopinstructor")
 public class CompositeKeyValidationArchitectureTest {
 
     // ── Rule 1: Any class annotated with @ValidateCompositeKey must have its

@@ -10,7 +10,7 @@ skinparam ComponentStyle uml2
 
 folder "BC - Education - Implementation (education-impl)" #LightGrey {
   package "Education - api" #LightBlue{
-    package "local.sop.sopinfo.education" {
+    package "local.sop.datawarehouse.education" {
       package "application" {
         package "api" {
           package "dto" {
@@ -76,7 +76,7 @@ folder "BC - Education - Implementation (education-impl)" #LightGrey {
   }
 
   package "Education - impl" #LightSteelBlue{
-    package "local.sop.sopinfo.education" {
+    package "local.sop.datawarehouse.education" {
       package "domain" #LightCoral {
         package "model" {
           package "valueobjects" {

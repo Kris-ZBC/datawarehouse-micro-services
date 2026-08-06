@@ -13,7 +13,7 @@ class OnionArchitectureTest {
     @DisplayName("message module should follow onion architecture")
     void messageModuleShouldFollowOnionArchitecture() {
         var importedClasses = new ClassFileImporter()
-            .importPackages("local.sop.sopinfo.message");
+            .importPackages("local.sop.datawarehouse.message");
 
         onionArchitecture()
             .domainModels("..domain.model..")

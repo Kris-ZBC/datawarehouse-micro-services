@@ -9,7 +9,7 @@ package local.sop.datawarehouse.notification.architecture;
 
 // public class ApiArchitectureTest {
 
-// 	private static final JavaClasses imported = new ClassFileImporter().importPackages("local.sop.sopinfo.notification");
+// 	private static final JavaClasses imported = new ClassFileImporter().importPackages("local.sop.datawarehouse.notification");
 
 // 	@Test
 // 	void api_contract_should_be_framework_free() {

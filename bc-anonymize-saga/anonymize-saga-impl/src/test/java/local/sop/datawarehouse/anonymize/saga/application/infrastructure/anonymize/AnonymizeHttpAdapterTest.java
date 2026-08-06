@@ -6,7 +6,6 @@ import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
 import local.sop.common.libs.sharedkernel.sagas.compensate.request.PayloadCompensateCreate;
 import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 import local.sop.datawarehouse.anonymize.saga.application.api.dto.AnonymizeResponse;
-import local.sop.datawarehouse.anonymize.saga.application.infrastructure.anonymize.AnonymizeHttpAdapter;
 import local.sop.datawarehouse.anonymize.saga.application.infrastructure.request.PayloadAnonymizeCreate;
 
 import org.junit.jupiter.api.BeforeEach;

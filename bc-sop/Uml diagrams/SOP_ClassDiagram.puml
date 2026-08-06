@@ -33,7 +33,7 @@ folder "BC - SOP - Implementation" #Salmon {
     endlegend
 
     folder "SOP-api" #Red {
-        package "local.sop.sopinfo.sop.application.api" {
+        package "local.sop.datawarehouse.sop.application.api" {
             interface SOPDirectory <<API>> {
                 + findById(query: SOPQuery) : SOPResponse
             }
@@ -59,7 +59,7 @@ folder "BC - SOP - Implementation" #Salmon {
     }
 
     folder "SOP-impl" #LightGreen {
-        package "local.sop.sopinfo.sop" {
+        package "local.sop.datawarehouse.sop" {
             
             package "interfaceweb" #Yellow {
                 class InternalSOPController <<Controller>> {

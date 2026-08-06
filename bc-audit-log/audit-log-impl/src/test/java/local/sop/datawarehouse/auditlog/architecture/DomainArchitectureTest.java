@@ -9,7 +9,7 @@ public class DomainArchitectureTest {
 
   @Test
   void domain_must_be_framework_free() {
-    var classes = new ClassFileImporter().importPackages("local.sop.sopinfo.auditlog");
+    var classes = new ClassFileImporter().importPackages("local.sop.datawarehouse.auditlog");
 
     ArchRuleDefinition.noClasses().that()
       .resideInAnyPackage("..domain..") 

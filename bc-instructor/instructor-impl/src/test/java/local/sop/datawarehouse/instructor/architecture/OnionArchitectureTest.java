@@ -11,18 +11,18 @@ class OnionArchitectureTest {
     @Test
     void should_follow_onion_architecture() {
         var classes = new ClassFileImporter()
-                .importPackages("local.sop.sopinfo.instructor");
+                .importPackages("local.sop.datawarehouse.instructor");
 
         onionArchitecture()
                 .withOptionalLayers(true)
-                .domainModels("local.sop.sopinfo.instructor.domain.model..")
+                .domainModels("local.sop.datawarehouse.instructor.domain.model..")
                 .domainServices(
-                        "local.sop.sopinfo.instructor.domain.service..",
-                        "local.sop.sopinfo.instructor.domain.ports.."
+                        "local.sop.datawarehouse.instructor.domain.service..",
+                        "local.sop.datawarehouse.instructor.domain.ports.."
                 )
-                .applicationServices("local.sop.sopinfo.instructor.application.service..")
-                .adapter("persistence", "local.sop.sopinfo.instructor.interfaceadapters.persistence..")
-                .adapter("web", "local.sop.sopinfo.instructor.interfaceweb..")
+                .applicationServices("local.sop.datawarehouse.instructor.application.service..")
+                .adapter("persistence", "local.sop.datawarehouse.instructor.interfaceadapters.persistence..")
+                .adapter("web", "local.sop.datawarehouse.instructor.interfaceweb..")
                 .check(classes);
     }
 }

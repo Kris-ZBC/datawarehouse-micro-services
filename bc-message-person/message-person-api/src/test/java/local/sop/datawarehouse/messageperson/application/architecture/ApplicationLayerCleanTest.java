@@ -18,7 +18,7 @@ import com.tngtech.archunit.core.domain.JavaField;
 import com.tngtech.archunit.core.domain.JavaModifier;
 import com.tngtech.archunit.core.importer.ImportOption;
 
-@AnalyzeClasses(packages = {"local.sop.sopinfo.messageperson", "local.sop.common.libs.sharedkernel" },
+@AnalyzeClasses(packages = {"local.sop.datawarehouse.messageperson", "local.sop.common.libs.sharedkernel" },
     importOptions = {
         ImportOption.DoNotIncludeTests.class
     }

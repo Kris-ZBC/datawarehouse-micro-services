@@ -16,7 +16,7 @@ package local.sop.datawarehouse.notification.architecture;
 // import com.tngtech.archunit.lang.ConditionEvents;
 // import com.tngtech.archunit.lang.SimpleConditionEvent;
 
-// @AnalyzeClasses(packages = "local.sop.sopinfo.notification",
+// @AnalyzeClasses(packages = "local.sop.datawarehouse.notification",
 // 	importOptions = {
 // 		ImportOption.DoNotIncludeTests.class,
 // 	})

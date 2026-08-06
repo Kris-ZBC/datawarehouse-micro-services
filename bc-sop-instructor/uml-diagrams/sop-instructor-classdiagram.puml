@@ -10,7 +10,7 @@ skinparam WrapWidth 260
 folder "Sop Instructor BC" #LightGrey {
 
 	package "sop-instructor-api" #LightBlue {
-		package "local.sop.sopinfo.sopInstructor" as ApiRoot {
+		package "local.sop.datawarehouse.sopInstructor" as ApiRoot {
 			package "application.api" {
 
 				interface SopInstructorDirectory {
@@ -51,7 +51,7 @@ folder "Sop Instructor BC" #LightGrey {
 	}
 
 	package "sop-instructor-impl" #LightSteelBlue {
-		package "local.sop.sopinfo.sopInstructor" as ImplRoot {
+		package "local.sop.datawarehouse.sopInstructor" as ImplRoot {
 
 			class SopInstructorStartApplication {
 				+ {static} main(args: String[]): void

@@ -10,7 +10,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.client.RestClient;
 
-import local.sop.datawarehouse.anonymize.saga.application.infrastructure.person.PersonHttpAdapter;
 import local.sop.datawarehouse.person.application.api.dto.PersonResponse;
 
 import static org.junit.jupiter.api.Assertions.assertSame;

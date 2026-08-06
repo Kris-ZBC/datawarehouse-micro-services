@@ -30,7 +30,6 @@ import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
 import local.sop.datawarehouse.anonymize.saga.application.api.AnonymizeSagaDirectory;
 import local.sop.datawarehouse.anonymize.saga.application.api.dto.AnonymizeResponse;
 import local.sop.datawarehouse.anonymize.saga.application.api.dto.CreateAnonymizeCmd;
-import local.sop.datawarehouse.anonymize.saga.application.interfaceweb.AnonymizeSagaController;
 
 @WebMvcTest(AnonymizeSagaController.class)
 @Import(EndpointExceptionHandler.class)

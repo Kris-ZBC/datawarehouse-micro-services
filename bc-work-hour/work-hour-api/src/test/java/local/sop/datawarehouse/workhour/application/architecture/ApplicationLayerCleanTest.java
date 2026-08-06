@@ -19,7 +19,7 @@ import com.tngtech.archunit.core.domain.JavaModifier;
 import com.tngtech.archunit.core.importer.ImportOption;
 
 
-@AnalyzeClasses(packages = "local.sop.sopinfo.workhour",
+@AnalyzeClasses(packages = "local.sop.datawarehouse.workhour",
     importOptions = {
         ImportOption.DoNotIncludeTests.class,   // <-- udelukker target/test-classes
     })

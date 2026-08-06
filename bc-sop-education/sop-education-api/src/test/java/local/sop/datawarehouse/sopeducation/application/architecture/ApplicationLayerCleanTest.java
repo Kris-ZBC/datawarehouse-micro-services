@@ -17,7 +17,7 @@ import com.tngtech.archunit.lang.ArchRule;
 import com.tngtech.archunit.lang.ConditionEvents;
 import com.tngtech.archunit.lang.SimpleConditionEvent;
 
-@AnalyzeClasses(packages = { "local.sop.sopinfo.sopeducation",
+@AnalyzeClasses(packages = { "local.sop.datawarehouse.sopeducation",
                              "local.sop.common.libs.sharedkernel" }, 
     importOptions = {
         ImportOption.DoNotIncludeTests.class,   // <-- excludes target/test-classes

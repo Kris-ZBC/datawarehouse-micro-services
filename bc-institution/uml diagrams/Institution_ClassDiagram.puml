@@ -33,7 +33,7 @@ folder "BC - Institution - Implementation" #Salmon {
     endlegend
 
     folder "Institution-api" #Red {
-        package "local.sop.sopinfo.institution.application.api" {
+        package "local.sop.datawarehouse.institution.application.api" {
             interface InstitutionDirectory <<API>> {
                 + findById(query: InstitutionQuery) : InstitutionResponse
             }
@@ -57,7 +57,7 @@ folder "BC - Institution - Implementation" #Salmon {
     }
 
     folder "Institution-impl" #LightGreen {
-        package "local.sop.sopinfo.institution" {
+        package "local.sop.datawarehouse.institution" {
             
             package "interfaceweb" #Yellow {
                 class InternalInstitutionController <<Controller>> {

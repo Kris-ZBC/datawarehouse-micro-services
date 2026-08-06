@@ -9,7 +9,7 @@ public class ApplicationArchitectureTest {
 
   @Test
   void application_must_not_depend_on_adapters() {
-    var classes = new ClassFileImporter().importPackages("local.sop.sopinfo.sopeducation");
+    var classes = new ClassFileImporter().importPackages("local.sop.datawarehouse.sopeducation");
     ArchRuleDefinition.noClasses().that()
       .resideInAnyPackage("..application..")
       .should().dependOnClassesThat()

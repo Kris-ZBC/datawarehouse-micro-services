@@ -10,7 +10,7 @@ skinparam WrapWidth 260
 folder "Message Person BC" #LightGrey {
 
 	package "message-person-api" #LightBlue {
-		package "local.sop.sopinfo.messagePerson" as ApiRoot {
+		package "local.sop.datawarehouse.messagePerson" as ApiRoot {
 			package "application.api" {
 
 				interface MessagePersonDirectory {
@@ -51,7 +51,7 @@ folder "Message Person BC" #LightGrey {
 	}
 
 	package "message-person-impl" #LightSteelBlue {
-		package "local.sop.sopinfo.messagePerson" as ImplRoot {
+		package "local.sop.datawarehouse.messagePerson" as ImplRoot {
 
 			class MessagePersonStartApplication {
 				+ {static} main(args: String[]): void

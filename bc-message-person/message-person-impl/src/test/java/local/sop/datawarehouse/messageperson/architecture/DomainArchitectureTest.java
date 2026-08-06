@@ -8,7 +8,7 @@ import com.tngtech.archunit.lang.syntax.ArchRuleDefinition;
 public class DomainArchitectureTest {
  @Test
   void domain_must_be_framework_free() {
-    var classes = new ClassFileImporter().importPackages("local.sop.sopinfo.messageperson");
+    var classes = new ClassFileImporter().importPackages("local.sop.datawarehouse.messageperson");
     ArchRuleDefinition.noClasses().that()
       .resideInAnyPackage("..domain.model", "..domain.ports.out")
       .should().dependOnClassesThat()
@@ -27,7 +27,7 @@ public class DomainArchitectureTest {
 
     @Test
   void domain_must_be_framework_free_except_config() {
-    var classes = new ClassFileImporter().importPackages("local.sop.sopinfo.messageperson");
+    var classes = new ClassFileImporter().importPackages("local.sop.datawarehouse.messageperson");
     ArchRuleDefinition.noClasses().that()
       .resideInAnyPackage("..domain.service")
         .and().areNotAnnotatedWith("org.springframework.stereotype.Component")

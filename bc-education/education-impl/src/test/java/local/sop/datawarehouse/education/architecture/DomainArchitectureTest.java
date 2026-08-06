@@ -8,7 +8,7 @@ public class DomainArchitectureTest {
 
     @Test
     public void domain_should_not_depend_on_other_packages() {
-        var importedClasses = new ClassFileImporter().importPackages("local.sop.sopinfo.education");
+        var importedClasses = new ClassFileImporter().importPackages("local.sop.datawarehouse.education");
 
         ArchRuleDefinition.noClasses()
                 .that()

@@ -8,7 +8,7 @@ import static com.tngtech.archunit.library.Architectures.onionArchitecture;
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ImportOption;
 
-@AnalyzeClasses(packages = "local.sop.sopinfo.person", importOptions = {
+@AnalyzeClasses(packages = "local.sop.datawarehouse.person", importOptions = {
         ImportOption.DoNotIncludeTests.class, // <-- udelukker target/test-classes
 })
 

@@ -9,7 +9,7 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
 public class ApiArchitectureTest {
 
-    private static final JavaClasses imported = new ClassFileImporter().importPackages("local.sop.sopinfo.auditlog");
+    private static final JavaClasses imported = new ClassFileImporter().importPackages("local.sop.datawarehouse.auditlog");
     @Test
     void api_contract_should_be_framework_free() {
 

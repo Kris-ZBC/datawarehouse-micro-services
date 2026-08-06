@@ -9,7 +9,7 @@ import com.tngtech.archunit.core.importer.ImportOption;
 import static com.tngtech.archunit.library.Architectures.onionArchitecture;
 
 @AnalyzeClasses(
-  packages = {"local.sop.sopinfo.consent", "local.sop.common.libs.sharedkernel", "local.sop.common.libs.infrastructure"},
+  packages = {"local.sop.datawarehouse.consent", "local.sop.common.libs.sharedkernel", "local.sop.common.libs.infrastructure"},
   importOptions = { ImportOption.DoNotIncludeTests.class }
 )
 public class OnionArchitectureTest {

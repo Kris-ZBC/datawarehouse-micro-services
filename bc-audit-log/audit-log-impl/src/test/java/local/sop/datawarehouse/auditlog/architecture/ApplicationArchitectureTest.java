@@ -12,7 +12,7 @@ public class ApplicationArchitectureTest {
   void application_must_not_depend_on_adapters() {
   var classes = new ClassFileImporter()
     .withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
-    .importPackages("local.sop.sopinfo.auditlog");
+    .importPackages("local.sop.datawarehouse.auditlog");
 
     ArchRuleDefinition.noClasses().that()
       .resideInAnyPackage("..application..")

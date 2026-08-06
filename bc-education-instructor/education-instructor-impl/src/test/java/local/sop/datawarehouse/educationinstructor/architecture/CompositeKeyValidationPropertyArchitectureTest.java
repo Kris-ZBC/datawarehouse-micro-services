@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 import com.tngtech.archunit.junit.AnalyzeClasses;
 
-@AnalyzeClasses(packages = "local.sop.sopinfo.educationinstructor")
+@AnalyzeClasses(packages = "local.sop.datawarehouse.educationinstructor")
 class CompositeKeyValidationPropertyArchitectureTest {
 
     @Test

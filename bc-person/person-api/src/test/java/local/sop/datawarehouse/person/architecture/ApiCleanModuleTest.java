@@ -7,7 +7,7 @@ import com.tngtech.archunit.lang.ArchRule;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 
-@AnalyzeClasses(packages = "local.sop.sopinfo.person",
+@AnalyzeClasses(packages = "local.sop.datawarehouse.person",
     importOptions = {
         ImportOption.DoNotIncludeTests.class,
         ImportOption.DoNotIncludeJars.class

@@ -8,7 +8,7 @@ import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
 
 @AnalyzeClasses(
-  packages = "local.sop.sopinfo.login",
+  packages = "local.sop.datawarehouse.login",
   importOptions = { ImportOption.DoNotIncludeTests.class}
 )
 public class OnionArchitectureTest {

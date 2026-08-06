@@ -9,7 +9,7 @@ import com.tngtech.archunit.core.importer.ClassFileImporter;
 
 public class ApiArchitectureTest {
 
-	private static final JavaClasses imported = new ClassFileImporter().importPackages("local.sop.sopinfo.login");
+	private static final JavaClasses imported = new ClassFileImporter().importPackages("local.sop.datawarehouse.login");
 
 	@Test
 	void api_contract_should_be_framework_free() {

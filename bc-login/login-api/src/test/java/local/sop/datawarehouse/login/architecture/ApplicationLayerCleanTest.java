@@ -16,7 +16,7 @@ import com.tngtech.archunit.lang.ArchRule;
 import com.tngtech.archunit.lang.ConditionEvents;
 import com.tngtech.archunit.lang.SimpleConditionEvent;
 
-@AnalyzeClasses(packages = "local.sop.sopinfo.login",
+@AnalyzeClasses(packages = "local.sop.datawarehouse.login",
 	importOptions = {
 		ImportOption.DoNotIncludeTests.class,
 	})

@@ -12,7 +12,7 @@ public class ApplicationArchitectureTest {
     public void application_should_not_depend_on_adapters_or_infrastructure() {
         var importedClasses = new ClassFileImporter()
                 .withImportOption(new ImportOption.DoNotIncludeTests())
-                .importPackages("local.sop.sopinfo.education");
+                .importPackages("local.sop.datawarehouse.education");
 
         ArchRuleDefinition.noClasses()
                 .that()

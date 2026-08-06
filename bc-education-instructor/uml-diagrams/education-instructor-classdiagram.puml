@@ -10,7 +10,7 @@ skinparam WrapWidth 260
 folder "Education Instructor BC" #LightGrey {
 
 	package "education-instructor-api" #LightBlue {
-		package "local.sop.sopinfo.educationInstructor" as ApiRoot {
+		package "local.sop.datawarehouse.educationInstructor" as ApiRoot {
 			package "application.api" {
 				interface EducationInstructorDirectory {
 					+ createEducationInstructor(cmd: CreateEducationInstructorCmd): EducationInstructorResponse
@@ -41,7 +41,7 @@ folder "Education Instructor BC" #LightGrey {
 	}
 
 	package "education-instructor-impl" #LightSteelBlue {
-		package "local.sop.sopinfo.educationInstructor" as ImplRoot {
+		package "local.sop.datawarehouse.educationInstructor" as ImplRoot {
 
 			class EducationInstructorStartApplication {
 				+ {static} main(args: String[]): void

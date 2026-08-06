@@ -13,7 +13,7 @@ class ArchPropsSanityTest {
     @Test
     @DisplayName("should use expected base package")
     void shouldUseExpectedBasePackage() {
-        assertEquals("local.sop.sopinfo.message", MessageStartApplication.class.getPackageName());
+        assertEquals("local.sop.datawarehouse.message", MessageStartApplication.class.getPackageName());
     }
 
     @Test

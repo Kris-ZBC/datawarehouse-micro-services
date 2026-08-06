@@ -10,7 +10,7 @@ public class DomainArchitectureTest {
 	
 	@Test
 	void domain_must_be_framework_free() {
-		JavaClasses classes = new ClassFileImporter().importPackages("local.sop.sopinfo.login");
+		JavaClasses classes = new ClassFileImporter().importPackages("local.sop.datawarehouse.login");
 
 		ArchRuleDefinition.noClasses().that()
 			.resideInAnyPackage("..domain.model", "..domain.ports.out")
@@ -30,7 +30,7 @@ public class DomainArchitectureTest {
 
 	@Test
 	void domain_must_be_framework_free_except_config() {
-		JavaClasses classes = new ClassFileImporter().importPackages("local.sop.sopinfo.login");
+		JavaClasses classes = new ClassFileImporter().importPackages("local.sop.datawarehouse.login");
 
 		ArchRuleDefinition.noClasses().that()
 			.resideInAnyPackage("..domain.service")

@@ -8,7 +8,7 @@ import com.tngtech.archunit.core.importer.ImportOption;
 import static com.tngtech.archunit.library.Architectures.onionArchitecture;
 
 @AnalyzeClasses(
-packages = "local.sop.sopinfo.education",
+packages = "local.sop.datawarehouse.education",
 importOptions = ImportOption.DoNotIncludeTests.class)
 
 public class OnionArchitectureTest {

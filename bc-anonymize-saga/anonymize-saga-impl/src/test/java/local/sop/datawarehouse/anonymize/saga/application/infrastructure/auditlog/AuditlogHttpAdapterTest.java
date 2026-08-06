@@ -8,7 +8,6 @@ import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
 import local.sop.common.libs.sharedkernel.sagas.compensate.request.PayloadCompensateCreate;
 import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 import local.sop.datawarehouse.anonymize.saga.application.api.dto.ResponseAuditlog;
-import local.sop.datawarehouse.anonymize.saga.application.infrastructure.auditlog.AuditlogHttpAdapter;
 import local.sop.datawarehouse.anonymize.saga.application.infrastructure.request.PayloadAuditlogCreate;
 
 import org.junit.jupiter.api.BeforeEach;

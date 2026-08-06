@@ -10,7 +10,7 @@ import com.tngtech.archunit.core.importer.ClassFileImporter;
 class DomainArchitectureTest {
 
     private final JavaClasses classes = new ClassFileImporter()
-            .importPackages("local.sop.sopinfo.instructor");
+            .importPackages("local.sop.datawarehouse.instructor");
 
     @Test
     void domain_should_not_depend_on_application() {

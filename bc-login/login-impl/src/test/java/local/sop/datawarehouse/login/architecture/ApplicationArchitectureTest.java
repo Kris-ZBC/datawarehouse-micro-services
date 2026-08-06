@@ -9,7 +9,7 @@ import com.tngtech.archunit.lang.syntax.ArchRuleDefinition;
 public class ApplicationArchitectureTest {
 	@Test
 	void application_must_not_depend_on_adapters() {
-		JavaClasses classes = new ClassFileImporter().importPackages("local.sop.sopinfo.login");
+		JavaClasses classes = new ClassFileImporter().importPackages("local.sop.datawarehouse.login");
 		ArchRuleDefinition.noClasses().that()
 			.resideInAnyPackage("..application..")
 			.should().dependOnClassesThat()
