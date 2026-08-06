@@ -4,7 +4,7 @@
    <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>local.sop.sopinfo</groupId>
+        <groupId>local.sop.datawarehouse</groupId>
         <artifactId>parent</artifactId>
         <version>${revision}</version>
         <relativePath>../parent-POM/pom.xml</relativePath>
@@ -16,263 +16,258 @@
      <!-- This module exists ONLY to aggregate coverage across bounded contexts -->
      <dependencies>
         <dependency>
-            <groupId>local.sop.sopinfo</groupId>
+            <groupId>local.sop.datawarehouse</groupId>
             <artifactId>person-notification-api</artifactId>
             <version>${revision}</version>
         </dependency>
          <dependency>
-            <groupId>local.sop.sopinfo</groupId>
+            <groupId>local.sop.datawarehouse</groupId>
             <artifactId>person-notification-impl</artifactId>
             <version>${revision}</version>
         </dependency>
         <dependency>
-            <groupId>local.sop.sopinfo</groupId>
+            <groupId>local.sop.datawarehouse</groupId>
             <artifactId>apprentice-api</artifactId>
             <version>${revision}</version>
         </dependency>
          <dependency>
-            <groupId>local.sop.sopinfo</groupId>
+            <groupId>local.sop.datawarehouse</groupId>
             <artifactId>apprentice-impl</artifactId>
             <version>${revision}</version>
         </dependency>
          <dependency>
-            <groupId>local.sop.sopinfo</groupId>
+            <groupId>local.sop.datawarehouse</groupId>
             <artifactId>audit-log-api</artifactId>
             <version>${revision}</version>
         </dependency>
          <dependency>
-            <groupId>local.sop.sopinfo</groupId>
+            <groupId>local.sop.datawarehouse</groupId>
             <artifactId>audit-log-impl</artifactId>
             <version>${revision}</version>
         </dependency>
          <dependency>
-            <groupId>local.sop.sopinfo</groupId>
-            <artifactId>consent-api</artifactId>
-            <version>${revision}</version>
-        </dependency>
-         <dependency>
-            <groupId>local.sop.sopinfo</groupId>
+            <groupId>local.sop.datawarehouse</groupId>
             <artifactId>consent-impl</artifactId>
             <version>${revision}</version>
         </dependency>
 		<dependency>
-            <groupId>local.sop.sopinfo</groupId>
+            <groupId>local.sop.datawarehouse</groupId>
             <artifactId>education-instructor-api</artifactId>
             <version>${revision}</version>
         </dependency>
         <dependency>
-            <groupId>local.sop.sopinfo</groupId>
+            <groupId>local.sop.datawarehouse</groupId>
             <artifactId>education-instructor-impl</artifactId>
             <version>${revision}</version>
         </dependency>
         <dependency>
-            <groupId>local.sop.sopinfo</groupId>
+            <groupId>local.sop.datawarehouse</groupId>
             <artifactId>education-api</artifactId>
             <version>${revision}</version>
         </dependency>
         <dependency>
-            <groupId>local.sop.sopinfo</groupId>
+            <groupId>local.sop.datawarehouse</groupId>
             <artifactId>education-impl</artifactId>
             <version>${revision}</version>
         </dependency>
          <dependency>
-            <groupId>local.sop.sopinfo</groupId>
+            <groupId>local.sop.datawarehouse</groupId>
             <artifactId>education-line-api</artifactId>
             <version>${revision}</version>
         </dependency>
          <dependency>
-            <groupId>local.sop.sopinfo</groupId>
+            <groupId>local.sop.datawarehouse</groupId>
             <artifactId>education-line-impl</artifactId>
             <version>${revision}</version>
         </dependency>
 		<dependency>
-            <groupId>local.sop.sopinfo</groupId>
+            <groupId>local.sop.datawarehouse</groupId>
             <artifactId>education-line-saga-api</artifactId>
             <version>${revision}</version>
         </dependency>
          <dependency>
-            <groupId>local.sop.sopinfo</groupId>
+            <groupId>local.sop.datawarehouse</groupId>
             <artifactId>education-line-saga-impl</artifactId>
             <version>${revision}</version>
         </dependency>
         <dependency>
-            <groupId>local.sop.sopinfo</groupId>
+            <groupId>local.sop.datawarehouse</groupId>
             <artifactId>education-saga-api</artifactId>
             <version>${revision}</version>
         </dependency>
          <dependency>
-            <groupId>local.sop.sopinfo</groupId>
+            <groupId>local.sop.datawarehouse</groupId>
             <artifactId>education-saga-impl</artifactId>
             <version>${revision}</version>
         </dependency>
          <dependency>
-            <groupId>local.sop.sopinfo</groupId>
+            <groupId>local.sop.datawarehouse</groupId>
             <artifactId>institution-api</artifactId>
             <version>${revision}</version>
         </dependency>
          <dependency>
-            <groupId>local.sop.sopinfo</groupId>
+            <groupId>local.sop.datawarehouse</groupId>
             <artifactId>institution-impl</artifactId>
             <version>${revision}</version>
         </dependency>
          <dependency>
-            <groupId>local.sop.sopinfo</groupId>
+            <groupId>local.sop.datawarehouse</groupId>
             <artifactId>instructor-api</artifactId>
             <version>${revision}</version>
         </dependency>
          <dependency>
-            <groupId>local.sop.sopinfo</groupId>
+            <groupId>local.sop.datawarehouse</groupId>
             <artifactId>instructor-impl</artifactId>
             <version>${revision}</version>
         </dependency>
          <dependency>
-            <groupId>local.sop.sopinfo</groupId>
+            <groupId>local.sop.datawarehouse</groupId>
             <artifactId>message-api</artifactId>
             <version>${revision}</version>
         </dependency>
          <dependency>
-            <groupId>local.sop.sopinfo</groupId>
+            <groupId>local.sop.datawarehouse</groupId>
             <artifactId>message-impl</artifactId>
             <version>${revision}</version>
         </dependency>
          <dependency>
-            <groupId>local.sop.sopinfo</groupId>
+            <groupId>local.sop.datawarehouse</groupId>
             <artifactId>notification-api</artifactId>
             <version>${revision}</version>
         </dependency>
          <dependency>
-            <groupId>local.sop.sopinfo</groupId>
+            <groupId>local.sop.datawarehouse</groupId>
             <artifactId>notification-impl</artifactId>
             <version>${revision}</version>
         </dependency>
         <dependency>
-            <groupId>local.sop.sopinfo</groupId>
+            <groupId>local.sop.datawarehouse</groupId>
             <artifactId>organisation-api</artifactId>
             <version>${revision}</version>
         </dependency>
         <dependency>
-            <groupId>local.sop.sopinfo</groupId>
+            <groupId>local.sop.datawarehouse</groupId>
             <artifactId>organisation-impl</artifactId>
             <version>${revision}</version>
         </dependency>
          <dependency>
-            <groupId>local.sop.sopinfo</groupId>
+            <groupId>local.sop.datawarehouse</groupId>
             <artifactId>person-api</artifactId>
             <version>${revision}</version>
         </dependency>
          <dependency>
-            <groupId>local.sop.sopinfo</groupId>
+            <groupId>local.sop.datawarehouse</groupId>
             <artifactId>person-impl</artifactId>
             <version>${revision}</version>
         </dependency>
          <dependency>
-            <groupId>local.sop.sopinfo</groupId>
+            <groupId>local.sop.datawarehouse</groupId>
             <artifactId>sop-api</artifactId>
             <version>${revision}</version>
         </dependency>
          <dependency>
-            <groupId>local.sop.sopinfo</groupId>
+            <groupId>local.sop.datawarehouse</groupId>
             <artifactId>sop-impl</artifactId>
             <version>${revision}</version>
         </dependency>
         <dependency>
-            <groupId>local.sop.sopinfo</groupId>
+            <groupId>local.sop.datawarehouse</groupId>
             <artifactId>consent-saga-api</artifactId>
             <version>${revision}</version>
         </dependency>
         <dependency>
-            <groupId>local.sop.sopinfo</groupId>
+            <groupId>local.sop.datawarehouse</groupId>
             <artifactId>consent-saga-impl</artifactId>
             <version>${revision}</version>
         </dependency>
          <dependency>
-            <groupId>local.sop.sopinfo</groupId>
+            <groupId>local.sop.datawarehouse</groupId>
             <artifactId>work-hour-api</artifactId>
             <version>${revision}</version>
         </dependency>
          <dependency>
-            <groupId>local.sop.sopinfo</groupId>
+            <groupId>local.sop.datawarehouse</groupId>
             <artifactId>work-hour-impl</artifactId>
             <version>${revision}</version>
         </dependency>
         <dependency>
-            <groupId>local.sop.sopinfo</groupId>
+            <groupId>local.sop.datawarehouse</groupId>
             <artifactId>login-api</artifactId>
             <version>${revision}</version>
         </dependency>
         <dependency>
-            <groupId>local.sop.sopinfo</groupId>
+            <groupId>local.sop.datawarehouse</groupId>
             <artifactId>login-impl</artifactId>
             <version>${revision}</version>
         </dependency>
 		<dependency>
-			<groupId>local.sop.sopinfo</groupId>
+			<groupId>local.sop.datawarehouse</groupId>
 			<artifactId>login-saga-api</artifactId>
 			<version>${revision}</version>
 		</dependency>
 		<dependency>
-			<groupId>local.sop.sopinfo</groupId>
+			<groupId>local.sop.datawarehouse</groupId>
 			<artifactId>login-saga-impl</artifactId>
 			<version>${revision}</version>
 		</dependency>
 		<dependency>
-			<groupId>local.sop.sopinfo</groupId>
+			<groupId>local.sop.datawarehouse</groupId>
 			<artifactId>registration-saga-api</artifactId>
 			<version>${revision}</version>
 		</dependency>
 		<dependency>
-			<groupId>local.sop.sopinfo</groupId>
+			<groupId>local.sop.datawarehouse</groupId>
 			<artifactId>registration-saga-impl</artifactId>
 			<version>${revision}</version>
 		</dependency>
 
          <dependency>
-             <groupId>local.sop.sopinfo</groupId>
+             <groupId>local.sop.datawarehouse</groupId>
              <artifactId>anonymize-api</artifactId>
              <version>${revision}</version>
          </dependency>
          <dependency>
-             <groupId>local.sop.sopinfo</groupId>
+             <groupId>local.sop.datawarehouse</groupId>
              <artifactId>anonymize-impl</artifactId>
              <version>${revision}</version>
          </dependency>
          <dependency>
-             <groupId>local.sop.sopinfo</groupId>
+             <groupId>local.sop.datawarehouse</groupId>
              <artifactId>anonymize-saga-api</artifactId>
              <version>${revision}</version>
          </dependency>
          <dependency>
-             <groupId>local.sop.sopinfo</groupId>
+             <groupId>local.sop.datawarehouse</groupId>
              <artifactId>anonymize-saga-impl</artifactId>
              <version>${revision}</version>
          </dependency>
          <dependency>
-                <groupId>local.sop.sopinfo</groupId>
+                <groupId>local.sop.datawarehouse</groupId>
                 <artifactId>sop-education-api</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>
-                <groupId>local.sop.sopinfo</groupId>
+                <groupId>local.sop.datawarehouse</groupId>
                 <artifactId>sop-education-impl</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>
-                <groupId>local.sop.sopinfo</groupId>
+                <groupId>local.sop.datawarehouse</groupId>
                 <artifactId>message-person-api</artifactId>
                 <version>${revision}</version>
             </dependency>  
             <dependency>
-                <groupId>local.sop.sopinfo</groupId>
+                <groupId>local.sop.datawarehouse</groupId>
                 <artifactId>message-person-impl</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>
-                <groupId>local.sop.sopinfo</groupId>
+                <groupId>local.sop.datawarehouse</groupId>
                 <artifactId>message-saga-api</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>
-                <groupId>local.sop.sopinfo</groupId>
+                <groupId>local.sop.datawarehouse</groupId>
                 <artifactId>message-saga-impl</artifactId>
                 <version>${revision}</version>
             </dependency>

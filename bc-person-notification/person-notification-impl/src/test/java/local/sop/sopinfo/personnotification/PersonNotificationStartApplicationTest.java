@@ -5,6 +5,8 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.springframework.boot.SpringApplication;
 
+import local.sop.datawarehouse.personnotification.PersonNotificationStartApplication;
+
 public class PersonNotificationStartApplicationTest {
 
     @Test

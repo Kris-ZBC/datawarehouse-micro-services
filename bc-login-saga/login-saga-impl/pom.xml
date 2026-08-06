@@ -3,7 +3,7 @@
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>local.sop.sopinfo</groupId>
+		<groupId>local.sop.datawarehouse</groupId>
 		<artifactId>parent</artifactId>
 		<version>${revision}</version>
 		<relativePath>../../parent-POM/pom.xml</relativePath>
@@ -14,7 +14,7 @@
 	<!-- API module dependencies -->
 	<dependencies>
 		<dependency>
-			<groupId>local.sop.sopinfo</groupId>
+			<groupId>local.sop.datawarehouse</groupId>
 			<artifactId>login-saga-api</artifactId>
 			<version>${revision}</version>
 		</dependency>
@@ -73,7 +73,7 @@
 
 		<!-- Optional: pin the main class for the Boot plugin -->
 	<properties>
-		<start-class>local.sop.sopinfo.login.saga.LoginSagaStartApplication</start-class>
+		<start-class>local.sop.datawarehouse.login.saga.LoginSagaStartApplication</start-class>
 		<spring-boot.run.skip>false</spring-boot.run.skip>
 	</properties>
 

@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-			<groupId>local.sop.sopinfo</groupId>
+			<groupId>local.sop.datawarehouse</groupId>
 		  <artifactId>parent</artifactId>
 		  <version>${revision}</version>
 		  <relativePath>../../parent-POM/pom.xml</relativePath>
@@ -19,7 +19,7 @@
   <!-- shared-kernel inherited-->
 
 	<dependency>
-		<groupId>local.sop.sopinfo</groupId>
+		<groupId>local.sop.datawarehouse</groupId>
 		<artifactId>education-line-api</artifactId>
 		<version>${revision}</version>
 	</dependency>
@@ -94,7 +94,7 @@
 
 <!-- Optional: pin the main class for the Boot plugin -->
 <properties>
-  <start-class>local.sop.sopinfo.educationline.EducationLineStartApplication</start-class>
+  <start-class>local.sop.datawarehouse.educationline.EducationLineStartApplication</start-class>
   <spring-boot.run.skip>false</spring-boot.run.skip>
 </properties>
 

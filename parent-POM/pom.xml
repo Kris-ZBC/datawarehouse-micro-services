@@ -8,14 +8,15 @@ Parent pom for multi-module project aggregator and BOM (dependency management)
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>local.sop.sopinfo</groupId>
-        <artifactId>bom</artifactId>
+        <groupId>local.sop.datawarehouse</groupId>
+        <artifactId>datawarehouse-bom</artifactId>
         <version>${revision}</version>
         <relativePath>../master-BOM/pom.xml</relativePath>
     </parent>
 
     <artifactId>parent</artifactId>
     <packaging>pom</packaging>
+    <name>Datawarehouse - Parent POM</name>
     
     <modules>       
         <module>../coverage-report</module>

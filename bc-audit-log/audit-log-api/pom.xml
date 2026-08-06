@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-      <groupId>local.sop.sopinfo</groupId>
+      <groupId>local.sop.datawarehouse</groupId>
       <artifactId>parent</artifactId>
       <version>${revision}</version>
       <relativePath>../../parent-POM/pom.xml</relativePath>

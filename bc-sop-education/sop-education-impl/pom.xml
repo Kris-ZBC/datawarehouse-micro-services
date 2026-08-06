@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-      <groupId>local.sop.sopinfo</groupId>
+      <groupId>local.sop.datawarehouse</groupId>
       <artifactId>parent</artifactId>
       <version>${revision}</version>
       <relativePath>../../parent-POM/pom.xml</relativePath>
@@ -15,6 +15,12 @@
     <packaging>jar</packaging>
 
 <dependencies>
+  
+  <dependency>
+    <groupId>local.sop.datawarehouse</groupId>
+    <artifactId>sop-education-api</artifactId>
+    <version>${revision}</version>
+  </dependency>
 
   <!-- shared-kernel inherited-->
   
@@ -42,13 +48,6 @@
     <groupId>local.sop.common.libs</groupId>
     <artifactId>common-validation</artifactId>
   </dependency>
-  
-  <dependency>
-    <groupId>local.sop.sopinfo</groupId>
-    <artifactId>sop-education-api</artifactId>
-    <version>${revision}</version>
-  </dependency>
-
 
 <dependency>
     <groupId>org.flywaydb</groupId>
@@ -130,7 +129,7 @@
 </dependencies>
 
 <properties>
-    <start-class>local.sop.sopinfo.sopeducation.SopEducationStartApplication</start-class>
+    <start-class>local.sop.datawarehouse.sopeducation.SopEducationStartApplication</start-class>
     <spring-boot.run.skip>false</spring-boot.run.skip>
 </properties>
 

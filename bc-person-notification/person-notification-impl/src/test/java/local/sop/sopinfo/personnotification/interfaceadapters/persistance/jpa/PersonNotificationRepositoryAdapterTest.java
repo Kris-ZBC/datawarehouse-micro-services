@@ -20,13 +20,13 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
-import local.sop.sopinfo.personnotification.domain.model.PersonNotification;
-import local.sop.sopinfo.personnotification.interfaceadapters.persistence.jpa.PersonNotificationJpaMapper;
-import local.sop.sopinfo.personnotification.interfaceadapters.persistence.jpa.PersonNotificationEntity;
-import local.sop.sopinfo.personnotification.interfaceadapters.persistence.jpa.PersonNotificationId;
-import local.sop.sopinfo.personnotification.interfaceadapters.persistence.jpa.PersonNotificationRepositoryAdapter;
 import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
 import local.sop.common.libs.sharedkernel.exceptions.NotFoundException;
+import local.sop.datawarehouse.personnotification.domain.model.PersonNotification;
+import local.sop.datawarehouse.personnotification.interfaceadapters.persistence.jpa.PersonNotificationEntity;
+import local.sop.datawarehouse.personnotification.interfaceadapters.persistence.jpa.PersonNotificationId;
+import local.sop.datawarehouse.personnotification.interfaceadapters.persistence.jpa.PersonNotificationJpaMapper;
+import local.sop.datawarehouse.personnotification.interfaceadapters.persistence.jpa.PersonNotificationRepositoryAdapter;
 
 @DataJpaTest
 @TestPropertySource(properties = {

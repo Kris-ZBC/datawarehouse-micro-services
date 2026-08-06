@@ -7,12 +7,12 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
-import local.sop.sopinfo.personnotification.domain.model.PersonNotification;
-import local.sop.sopinfo.personnotification.domain.model.valueobjects.CreatedAtTimestamp;
-import local.sop.sopinfo.personnotification.interfaceadapters.persistence.jpa.PersonNotificationJpaMapper;
-import local.sop.sopinfo.personnotification.interfaceadapters.persistence.jpa.PersonNotificationEntity;
-import local.sop.sopinfo.personnotification.interfaceadapters.persistence.jpa.PersonNotificationId;
 import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
+import local.sop.datawarehouse.personnotification.domain.model.PersonNotification;
+import local.sop.datawarehouse.personnotification.domain.model.valueobjects.CreatedAtTimestamp;
+import local.sop.datawarehouse.personnotification.interfaceadapters.persistence.jpa.PersonNotificationEntity;
+import local.sop.datawarehouse.personnotification.interfaceadapters.persistence.jpa.PersonNotificationId;
+import local.sop.datawarehouse.personnotification.interfaceadapters.persistence.jpa.PersonNotificationJpaMapper;
 
 class PersonNotificationJpaMapperTest {
 

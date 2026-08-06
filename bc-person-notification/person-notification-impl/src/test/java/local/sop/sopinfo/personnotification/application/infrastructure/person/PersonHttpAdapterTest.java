@@ -18,9 +18,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
 
-import local.sop.sopinfo.personnotification.application.infrastructure.response.PersonResponse;
-import local.sop.sopinfo.personnotification.application.infrastructure.response.PhoneNumberResponse;
 import local.sop.common.libs.sharedkernel.enums.PhoneUserType;
+import local.sop.datawarehouse.personnotification.application.infrastructure.person.PersonHttpAdapter;
+import local.sop.datawarehouse.personnotification.application.infrastructure.response.PersonResponse;
+import local.sop.datawarehouse.personnotification.application.infrastructure.response.PhoneNumberResponse;
 
 @ExtendWith(MockitoExtension.class)
 public class PersonHttpAdapterTest {

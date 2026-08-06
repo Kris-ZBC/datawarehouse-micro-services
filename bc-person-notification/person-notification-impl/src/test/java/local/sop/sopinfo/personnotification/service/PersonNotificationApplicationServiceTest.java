@@ -15,17 +15,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import local.sop.sopinfo.personnotification.application.api.dto.CreatePersonNotificationCmd;
-import local.sop.sopinfo.personnotification.application.api.dto.CreatedPersonNotificationResult;
-import local.sop.sopinfo.personnotification.application.api.dto.PersonNotificationResponse;
-import local.sop.sopinfo.personnotification.application.api.dto.ToggleActivatePersonNotificationCmd;
-import local.sop.sopinfo.personnotification.application.service.PersonNotificationApplicationService;
-import local.sop.sopinfo.personnotification.domain.model.PersonNotification;
-import local.sop.sopinfo.personnotification.domain.model.valueobjects.CreatedAtTimestamp;
-import local.sop.sopinfo.personnotification.domain.ports.out.PersonNotificationPort;
-import local.sop.sopinfo.personnotification.domain.service.PersonNotificationDomain;
 import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
 import local.sop.common.libs.sharedkernel.exceptions.NotFoundException;
+import local.sop.datawarehouse.personnotification.application.api.dto.CreatePersonNotificationCmd;
+import local.sop.datawarehouse.personnotification.application.api.dto.CreatedPersonNotificationResult;
+import local.sop.datawarehouse.personnotification.application.api.dto.PersonNotificationResponse;
+import local.sop.datawarehouse.personnotification.application.api.dto.ToggleActivatePersonNotificationCmd;
+import local.sop.datawarehouse.personnotification.application.service.PersonNotificationApplicationService;
+import local.sop.datawarehouse.personnotification.domain.model.PersonNotification;
+import local.sop.datawarehouse.personnotification.domain.model.valueobjects.CreatedAtTimestamp;
+import local.sop.datawarehouse.personnotification.domain.ports.out.PersonNotificationPort;
+import local.sop.datawarehouse.personnotification.domain.service.PersonNotificationDomain;
 
 import java.util.Optional;
 

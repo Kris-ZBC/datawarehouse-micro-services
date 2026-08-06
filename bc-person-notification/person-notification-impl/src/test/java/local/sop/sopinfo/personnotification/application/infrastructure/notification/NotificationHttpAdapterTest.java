@@ -18,7 +18,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestClient;
-import local.sop.sopinfo.personnotification.application.infrastructure.response.NotificationResponse;
+
+import local.sop.datawarehouse.personnotification.application.infrastructure.notification.NotificationHttpAdapter;
+import local.sop.datawarehouse.personnotification.application.infrastructure.response.NotificationResponse;
 
 @ExtendWith(MockitoExtension.class)
 public class NotificationHttpAdapterTest {

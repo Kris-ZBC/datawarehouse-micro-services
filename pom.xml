@@ -9,7 +9,7 @@
          
   <parent>
                 
-    <groupId>local.sop.sopinfo</groupId>
+    <groupId>local.sop.datawarehouse</groupId>
                 
     <artifactId>parent</artifactId>
                 

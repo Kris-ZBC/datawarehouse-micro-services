@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
    <parent>
-        <groupId>local.sop.sopinfo</groupId>
+        <groupId>local.sop.datawarehouse</groupId>
         <artifactId>parent</artifactId>
         <version>${revision}</version>
         <relativePath>../../parent-POM/pom.xml</relativePath>
@@ -16,6 +16,18 @@
 
 
 <dependencies>
+
+	<dependency>
+		<groupId>local.sop.datawarehouse</groupId>
+		<artifactId>message-api</artifactId>
+		<version>${revision}</version>
+	</dependency>
+  
+  <dependency>
+    <groupId>local.sop.datawarehouse</groupId>
+    <artifactId>person-notification-api</artifactId>
+    <version>${revision}</version>
+  </dependency>
 
   <!-- shared-kernel inherited-->
   
@@ -38,13 +50,6 @@
     <groupId>local.sop.common.libs</groupId>
     <artifactId>common-security</artifactId>
   </dependency>
-  
-  <dependency>
-    <groupId>local.sop.sopinfo</groupId>
-    <artifactId>person-notification-api</artifactId>
-    <version>${revision}</version>
-  </dependency>
-
 
   <dependency>
     <groupId>org.flywaydb</groupId>
@@ -55,11 +60,6 @@
     <groupId>org.flywaydb</groupId>
     <artifactId>flyway-mysql</artifactId>
   </dependency>
-	<dependency>
-		<groupId>local.sop.sopinfo</groupId>
-		<artifactId>message-api</artifactId>
-		<version>${revision}</version>
-	</dependency>
 
       <!-- mariadb driver -->
   <dependency>
@@ -108,7 +108,7 @@
 </dependencies>
 
 <properties>
-    <start-class>local.sop.sopinfo.message.MessageStartApplication</start-class>
+    <start-class>local.sop.datawarehouse.message.MessageStartApplication</start-class>
     <spring-boot.run.skip>false</spring-boot.run.skip>
 </properties>
 

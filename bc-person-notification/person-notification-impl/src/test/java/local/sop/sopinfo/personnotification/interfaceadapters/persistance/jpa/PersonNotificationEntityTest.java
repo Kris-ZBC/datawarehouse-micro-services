@@ -10,9 +10,9 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
-import local.sop.sopinfo.personnotification.interfaceadapters.persistence.jpa.PersonNotificationEntity;
-import local.sop.sopinfo.personnotification.interfaceadapters.persistence.jpa.PersonNotificationId;
 import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
+import local.sop.datawarehouse.personnotification.interfaceadapters.persistence.jpa.PersonNotificationEntity;
+import local.sop.datawarehouse.personnotification.interfaceadapters.persistence.jpa.PersonNotificationId;
 
 class PersonNotificationEntityTest {
 

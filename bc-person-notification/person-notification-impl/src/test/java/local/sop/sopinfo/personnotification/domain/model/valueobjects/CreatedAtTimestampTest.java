@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 
 import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
+import local.sop.datawarehouse.personnotification.domain.model.valueobjects.CreatedAtTimestamp;
 
 public class CreatedAtTimestampTest {
 

@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-      <groupId>local.sop.sopinfo</groupId>
+      <groupId>local.sop.datawarehouse</groupId>
       <artifactId>parent</artifactId>
       <version>${revision}</version>
       <relativePath>../../parent-POM/pom.xml</relativePath>
@@ -18,7 +18,7 @@
 
   <!-- shared-kernel inherited-->
 	<dependency>
-	<groupId>local.sop.sopinfo</groupId>
+	<groupId>local.sop.datawarehouse</groupId>
 	<artifactId>audit-log-api</artifactId>
 	<version>${revision}</version>
 	</dependency>
@@ -115,7 +115,7 @@
 
 <!-- Optional: pin the main class for the Boot plugin -->
   <properties>
-    <start-class>local.sop.sopinfo.auditlog.AuditlogStartApplicaton</start-class>
+    <start-class>local.sop.datawarehouse.auditlog.AuditlogStartApplicaton</start-class>
     <spring-boot.run.skip>false</spring-boot.run.skip>
   </properties>
 

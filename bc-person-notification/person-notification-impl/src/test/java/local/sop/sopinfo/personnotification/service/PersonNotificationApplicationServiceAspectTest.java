@@ -28,18 +28,17 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import local.sop.common.libs.infrastructure.validation.compositekeys.CompositeKeyValidationAspect;
-
-import local.sop.sopinfo.personnotification.application.api.PersonNotificationDirectory;
-import local.sop.sopinfo.personnotification.application.api.dto.CreatePersonNotificationCmd;
-import local.sop.sopinfo.personnotification.application.api.dto.ToggleActivatePersonNotificationCmd;
-import local.sop.sopinfo.personnotification.application.service.PersonNotificationApplicationService;
-import local.sop.sopinfo.personnotification.domain.model.PersonNotification;
-import local.sop.sopinfo.personnotification.domain.model.valueobjects.CreatedAtTimestamp;
-import local.sop.sopinfo.personnotification.domain.ports.out.PersonNotificationPort;
-import local.sop.sopinfo.personnotification.domain.service.PersonNotificationDomain;
 import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
 import local.sop.common.libs.sharedkernel.compositekey.validate.CompositeKeyValidator;
 import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
+import local.sop.datawarehouse.personnotification.application.api.PersonNotificationDirectory;
+import local.sop.datawarehouse.personnotification.application.api.dto.CreatePersonNotificationCmd;
+import local.sop.datawarehouse.personnotification.application.api.dto.ToggleActivatePersonNotificationCmd;
+import local.sop.datawarehouse.personnotification.application.service.PersonNotificationApplicationService;
+import local.sop.datawarehouse.personnotification.domain.model.PersonNotification;
+import local.sop.datawarehouse.personnotification.domain.model.valueobjects.CreatedAtTimestamp;
+import local.sop.datawarehouse.personnotification.domain.ports.out.PersonNotificationPort;
+import local.sop.datawarehouse.personnotification.domain.service.PersonNotificationDomain;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {PersonNotificationApplicationServiceAspectTest.TestConfig.class})

@@ -9,11 +9,11 @@
         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>local.sop.sopinfo</groupId>
-    <artifactId>bom</artifactId>
+    <groupId>local.sop.datawarehouse</groupId>
+    <artifactId>datawarehouse-bom</artifactId>
     <version>${revision}</version>
     <packaging>pom</packaging>
-    <name>Master BOM</name>
+    <name>Datawarehouse - Master BOM</name>
 
     <properties>
         <mockito.version>5.20.0</mockito.version>

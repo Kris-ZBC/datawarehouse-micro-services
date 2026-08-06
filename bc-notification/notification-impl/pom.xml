@@ -5,7 +5,7 @@
 		<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-			<groupId>local.sop.sopinfo</groupId>
+			<groupId>local.sop.datawarehouse</groupId>
 			<artifactId>parent</artifactId>
 			<version>${revision}</version>
 			<relativePath>../../parent-POM/pom.xml</relativePath>
@@ -17,7 +17,7 @@
 	<dependencies>
 
 		<dependency>
-			<groupId>local.sop.sopinfo</groupId>
+			<groupId>local.sop.datawarehouse</groupId>
 			<artifactId>notification-api</artifactId>
 			<version>${revision}</version>
 		</dependency>
@@ -104,7 +104,7 @@
 	</dependencies>
 
 	<properties>
-		<start-class>local.sop.sopinfo.notification.NotificationStartApplication</start-class>
+		<start-class>local.sop.datawarehouse.notification.NotificationStartApplication</start-class>
 		<spring-boot.run.skip>false</spring-boot.run.skip>
 	</properties>
 	

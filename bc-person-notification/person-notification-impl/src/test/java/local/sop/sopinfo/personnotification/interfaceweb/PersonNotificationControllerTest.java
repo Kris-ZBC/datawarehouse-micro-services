@@ -30,11 +30,12 @@ import local.sop.common.libs.infrastructure.security.DisableSecurity;
 import local.sop.common.libs.infrastructure.web.exception.EndpointExceptionHandler;
 import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
 import local.sop.common.libs.sharedkernel.exceptions.NotFoundException;
-import local.sop.sopinfo.personnotification.application.api.PersonNotificationDirectory;
-import local.sop.sopinfo.personnotification.application.api.dto.CreatePersonNotificationCmd;
-import local.sop.sopinfo.personnotification.application.api.dto.CreatedPersonNotificationResult;
-import local.sop.sopinfo.personnotification.application.api.dto.PersonNotificationResponse;
-import local.sop.sopinfo.personnotification.application.api.dto.ToggleActivatePersonNotificationCmd;
+import local.sop.datawarehouse.personnotification.application.api.PersonNotificationDirectory;
+import local.sop.datawarehouse.personnotification.application.api.dto.CreatePersonNotificationCmd;
+import local.sop.datawarehouse.personnotification.application.api.dto.CreatedPersonNotificationResult;
+import local.sop.datawarehouse.personnotification.application.api.dto.PersonNotificationResponse;
+import local.sop.datawarehouse.personnotification.application.api.dto.ToggleActivatePersonNotificationCmd;
+import local.sop.datawarehouse.personnotification.interfaceweb.PersonNotificationController;
 
 @WebMvcTest(PersonNotificationController.class)
 @Import(EndpointExceptionHandler.class)
