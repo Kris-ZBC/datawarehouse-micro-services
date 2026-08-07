@@ -45,12 +45,6 @@ Parent pom for multi-module project aggregator and BOM (dependency management)
 
         <module>../bc-instructor/instructor-api</module>
         <module>../bc-instructor/instructor-impl</module>
-
-        <module>../bc-message/message-api</module>
-        <module>../bc-message/message-impl</module>
-        
-        <module>../bc-notification/notification-api</module>
-        <module>../bc-notification/notification-impl</module>
         
         <module>../bc-person/person-api</module>
         <module>../bc-person/person-impl</module>
@@ -58,23 +52,11 @@ Parent pom for multi-module project aggregator and BOM (dependency management)
         <module>../bc-sop/sop-api</module>
         <module>../bc-sop/sop-impl</module>
 
-        <module>../bc-work-hour/work-hour-api</module>
-        <module>../bc-work-hour/work-hour-impl</module>
-
         <module>../bc-anonymize/anonymize-api</module>
         <module>../bc-anonymize/anonymize-impl</module>
 
-        <module>../bc-login/login-api</module>
-        <module>../bc-login/login-impl</module>
-
-        <module>../bc-person-notification/person-notification-api</module>
-        <module>../bc-person-notification/person-notification-impl</module>
-
         <module>../bc-sop-education/sop-education-api</module>
         <module>../bc-sop-education/sop-education-impl</module>
-
-        <module>../bc-message-person/message-person-api</module>
-        <module>../bc-message-person/message-person-impl</module>
 
         <module>../bc-sop-instructor/sop-instructor-api</module>
         <module>../bc-sop-instructor/sop-instructor-impl</module>
@@ -92,18 +74,11 @@ Parent pom for multi-module project aggregator and BOM (dependency management)
         <module>../bc-education-saga/education-saga-api</module>
         <module>../bc-education-saga/education-saga-impl</module>
 
-        <module>../bc-login-saga/login-saga-api</module>
-        <module>../bc-login-saga/login-saga-impl</module>
-
         <module>../bc-anonymize-saga/anonymize-saga-api</module>
         <module>../bc-anonymize-saga/anonymize-saga-impl</module>
 
         <module>../bc-registration-saga/registration-saga-api</module>
         <module>../bc-registration-saga/registration-saga-impl</module>
-
-		<module>../bc-message-saga/message-saga-api</module>
-        <module>../bc-message-saga/message-saga-impl</module>
-
         
     </modules>
 

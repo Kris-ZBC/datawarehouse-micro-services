@@ -17,16 +17,6 @@
      <dependencies>
         <dependency>
             <groupId>local.sop.datawarehouse</groupId>
-            <artifactId>person-notification-api</artifactId>
-            <version>${revision}</version>
-        </dependency>
-         <dependency>
-            <groupId>local.sop.datawarehouse</groupId>
-            <artifactId>person-notification-impl</artifactId>
-            <version>${revision}</version>
-        </dependency>
-        <dependency>
-            <groupId>local.sop.datawarehouse</groupId>
             <artifactId>apprentice-api</artifactId>
             <version>${revision}</version>
         </dependency>
@@ -120,26 +110,6 @@
             <artifactId>instructor-impl</artifactId>
             <version>${revision}</version>
         </dependency>
-         <dependency>
-            <groupId>local.sop.datawarehouse</groupId>
-            <artifactId>message-api</artifactId>
-            <version>${revision}</version>
-        </dependency>
-         <dependency>
-            <groupId>local.sop.datawarehouse</groupId>
-            <artifactId>message-impl</artifactId>
-            <version>${revision}</version>
-        </dependency>
-         <dependency>
-            <groupId>local.sop.datawarehouse</groupId>
-            <artifactId>notification-api</artifactId>
-            <version>${revision}</version>
-        </dependency>
-         <dependency>
-            <groupId>local.sop.datawarehouse</groupId>
-            <artifactId>notification-impl</artifactId>
-            <version>${revision}</version>
-        </dependency>
         <dependency>
             <groupId>local.sop.datawarehouse</groupId>
             <artifactId>organisation-api</artifactId>
@@ -180,36 +150,6 @@
             <artifactId>consent-saga-impl</artifactId>
             <version>${revision}</version>
         </dependency>
-         <dependency>
-            <groupId>local.sop.datawarehouse</groupId>
-            <artifactId>work-hour-api</artifactId>
-            <version>${revision}</version>
-        </dependency>
-         <dependency>
-            <groupId>local.sop.datawarehouse</groupId>
-            <artifactId>work-hour-impl</artifactId>
-            <version>${revision}</version>
-        </dependency>
-        <dependency>
-            <groupId>local.sop.datawarehouse</groupId>
-            <artifactId>login-api</artifactId>
-            <version>${revision}</version>
-        </dependency>
-        <dependency>
-            <groupId>local.sop.datawarehouse</groupId>
-            <artifactId>login-impl</artifactId>
-            <version>${revision}</version>
-        </dependency>
-		<dependency>
-			<groupId>local.sop.datawarehouse</groupId>
-			<artifactId>login-saga-api</artifactId>
-			<version>${revision}</version>
-		</dependency>
-		<dependency>
-			<groupId>local.sop.datawarehouse</groupId>
-			<artifactId>login-saga-impl</artifactId>
-			<version>${revision}</version>
-		</dependency>
 		<dependency>
 			<groupId>local.sop.datawarehouse</groupId>
 			<artifactId>registration-saga-api</artifactId>
@@ -249,26 +189,6 @@
             <dependency>
                 <groupId>local.sop.datawarehouse</groupId>
                 <artifactId>sop-education-impl</artifactId>
-                <version>${revision}</version>
-            </dependency>
-            <dependency>
-                <groupId>local.sop.datawarehouse</groupId>
-                <artifactId>message-person-api</artifactId>
-                <version>${revision}</version>
-            </dependency>  
-            <dependency>
-                <groupId>local.sop.datawarehouse</groupId>
-                <artifactId>message-person-impl</artifactId>
-                <version>${revision}</version>
-            </dependency>
-            <dependency>
-                <groupId>local.sop.datawarehouse</groupId>
-                <artifactId>message-saga-api</artifactId>
-                <version>${revision}</version>
-            </dependency>
-            <dependency>
-                <groupId>local.sop.datawarehouse</groupId>
-                <artifactId>message-saga-impl</artifactId>
                 <version>${revision}</version>
             </dependency>
      </dependencies>
