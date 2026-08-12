@@ -78,6 +78,7 @@ class EducationApplicationServiceTest {
         void shouldUpdateEducationName() {
             UUID id = UUID.randomUUID();
             String newName = "Updated Name";
+            UpdateEducationNameCmd cmd = new UpdateEducationNameCmd(newName);
             Education existing = createValidEducation(id, "Old Name");
 
             when(repository.findById(any(EducationId.class))).thenReturn(Optional.of(existing));
@@ -85,7 +86,7 @@ class EducationApplicationServiceTest {
             when(repository.updateName(any(Education.class)))
                     .thenAnswer(invocation -> invocation.getArgument(0));
 
-            EducationResponse response = applicationService.updateEducationName(id, newName);
+            EducationResponse response = applicationService.updateEducationName(id, cmd);
 
             assertThat(response.name()).isEqualTo("Updated Name");
             verify(repository).updateName(any(Education.class));
@@ -95,13 +96,14 @@ class EducationApplicationServiceTest {
         void shouldUpdateEducationCategory() {
             UUID id = UUID.randomUUID();
             String newCategory = "Updated Category";
+            UpdateEducationCategoryCmd cmd = new UpdateEducationCategoryCmd(newCategory);
             Education existing = createValidEducation(id, "Name");
 
             when(repository.findById(any(EducationId.class))).thenReturn(Optional.of(existing));
             when(repository.updateCategory(any(Education.class)))
                     .thenAnswer(invocation -> invocation.getArgument(0));
 
-            EducationResponse response = applicationService.updateEducationCategory(id, newCategory);
+            EducationResponse response = applicationService.updateEducationCategory(id, cmd);
 
             assertThat(response.category()).isEqualTo("Updated Category");
             verify(repository).updateCategory(any(Education.class));
@@ -111,12 +113,15 @@ class EducationApplicationServiceTest {
         void shouldThrowExceptionWhenUpdatingNameToExistingName() {
             UUID id = UUID.randomUUID();
             String takenName = "Taken Name";
+
             Education existing = createValidEducation(id, "Original Name");
 
             when(repository.findById(any(EducationId.class))).thenReturn(Optional.of(existing));
             when(repository.existsByName(any(EducationName.class))).thenReturn(true);
 
-            assertThatThrownBy(() -> applicationService.updateEducationName(id, takenName))
+            UpdateEducationNameCmd cmd = new UpdateEducationNameCmd(takenName);
+
+            assertThatThrownBy(() -> applicationService.updateEducationName(id, cmd))
                     .isInstanceOf(ValidationException.class)
                     .hasMessageContaining("education.name.exists");
         }
@@ -128,7 +133,9 @@ class EducationApplicationServiceTest {
 
             when(repository.findById(any(EducationId.class))).thenReturn(Optional.empty());
 
-            assertThatThrownBy(() -> applicationService.updateEducationName(id, newName))
+            UpdateEducationNameCmd cmd = new UpdateEducationNameCmd(newName);
+
+            assertThatThrownBy(() -> applicationService.updateEducationName(id, cmd))
                     .isInstanceOf(NotFoundException.class)
                     .hasMessageContaining("education.not.found");
         }
@@ -140,7 +147,9 @@ class EducationApplicationServiceTest {
             when(repository.findById(any(EducationId.class)))
                     .thenReturn(Optional.empty());
 
-            assertThatThrownBy(() -> applicationService.updateEducationCategory(id, "New Category"))
+            UpdateEducationCategoryCmd cmd = new UpdateEducationCategoryCmd("New Category");
+
+            assertThatThrownBy(() -> applicationService.updateEducationCategory(id, cmd))
                     .isInstanceOf(NotFoundException.class)
                     .hasMessageContaining("education.not.found");
 
@@ -165,7 +174,9 @@ class EducationApplicationServiceTest {
             when(repository.existsByCategory(any(EducationCategory.class)))
                     .thenReturn(true);
 
-            assertThatThrownBy(() -> applicationService.updateEducationCategory(id, "Taken Category"))
+            UpdateEducationCategoryCmd cmd = new UpdateEducationCategoryCmd("Taken Category");
+
+            assertThatThrownBy(() -> applicationService.updateEducationCategory(id, cmd))
                     .isInstanceOf(ValidationException.class)
                     .hasMessageContaining("education.category.exists");
 

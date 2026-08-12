@@ -35,18 +35,13 @@ class PersonApiDtoTest {
 
     @Test
     void shouldExposePhoneNumberCommandsAndResponses() {
-        UUID personId = UUID.randomUUID();
         UUID phoneNumberId = UUID.randomUUID();
 
-        AddPhoneNumberCmd addCmd = new AddPhoneNumberCmd(personId, PhoneUserType.PARENT, "87654321");
-        RemovePhoneNumberCmd removeCmd = new RemovePhoneNumberCmd(personId, phoneNumberId);
+        AddPhoneNumberCmd addCmd = new AddPhoneNumberCmd(PhoneUserType.PARENT, "87654321");
         PhoneNumberResponse response = new PhoneNumberResponse(phoneNumberId, PhoneUserType.PARENT, "87654321");
 
-        assertEquals(personId, addCmd.personId());
         assertEquals(PhoneUserType.PARENT, addCmd.type());
         assertEquals("87654321", addCmd.value());
-        assertEquals(personId, removeCmd.personId());
-        assertEquals(phoneNumberId, removeCmd.phoneNumberId());
         assertEquals(phoneNumberId, response.id());
         assertEquals(PhoneUserType.PARENT, response.type());
         assertEquals("87654321", response.value());

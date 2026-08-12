@@ -24,7 +24,6 @@ import local.sop.datawarehouse.person.application.api.dto.AddPhoneNumberCmd;
 import local.sop.datawarehouse.person.application.api.dto.CreatePersonCmd;
 import local.sop.datawarehouse.person.application.api.dto.PersonResponse;
 import local.sop.datawarehouse.person.application.api.dto.PhoneNumberResponse;
-import local.sop.datawarehouse.person.application.api.dto.RemovePhoneNumberCmd;
 import local.sop.datawarehouse.person.application.api.dto.UpdatePersonCmd;
 
 import org.slf4j.Logger;
@@ -81,25 +80,25 @@ public class InternalPersonController {
 		return response;
 	}
 
-	@PostMapping("/phone-number")
+	@PostMapping("/{id}/phone-number")
 	@ResponseStatus(HttpStatus.CREATED)
-	public PhoneNumberResponse addPhoneNumber(@Valid @RequestBody AddPhoneNumberCmd cmd) {
-		log.info("Add phone number request received for personId={}", cmd.personId());
+	public PhoneNumberResponse addPhoneNumber(@PathVariable UUID id, @Valid @RequestBody AddPhoneNumberCmd cmd) {
+		log.info("Add phone number request received for personId={}", id);
 
-		PhoneNumberResponse response = personDirectory.addPhoneNumber(cmd);
+		PhoneNumberResponse response = personDirectory.addPhoneNumber(id, cmd);
 
-		log.info("Phone number added successfully for personId={}", cmd.personId());
+		log.info("Phone number added successfully for personId={}", id);
 		return response;
 	}
 
-	@DeleteMapping("/phone-number")
+	@DeleteMapping("/{id}/phone-number/{phoneId}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
-	public void removePhoneNumber(@Valid @RequestBody RemovePhoneNumberCmd cmd) {
-		log.info("Remove phone number request received for personId={}, phoneNumberId={}", cmd.personId(), cmd.phoneNumberId());
+	public void removePhoneNumber(@PathVariable UUID id, @PathVariable UUID phoneId) {
+		log.info("Remove phone number request received for personId={}, phoneNumberId={}", id, phoneId);
 
-		personDirectory.removePhoneNumber(cmd);
+		personDirectory.removePhoneNumber(id, phoneId);
 
-		log.info("Phone number removed successfully for personId={}, phoneNumberId={}", cmd.personId(), cmd.phoneNumberId());
+		log.info("Phone number removed successfully for personId={}, phoneNumberId={}", id, phoneId);
 	}
     // Ping endpoint
     @GetMapping("/ping")

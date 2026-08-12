@@ -15,7 +15,6 @@ import local.sop.datawarehouse.person.application.api.dto.AddPhoneNumberCmd;
 import local.sop.datawarehouse.person.application.api.dto.CreatePersonCmd;
 import local.sop.datawarehouse.person.application.api.dto.PersonResponse;
 import local.sop.datawarehouse.person.application.api.dto.PhoneNumberResponse;
-import local.sop.datawarehouse.person.application.api.dto.RemovePhoneNumberCmd;
 import local.sop.datawarehouse.person.application.api.dto.UpdatePersonCmd;
 import local.sop.datawarehouse.person.application.mapper.PersonResponseMapper;
 import local.sop.datawarehouse.person.domain.model.Person;
@@ -131,10 +130,10 @@ public class PersonApplicationService implements PersonDirectory {
 
 	@Override
 	@Transactional
-	public PhoneNumberResponse addPhoneNumber(AddPhoneNumberCmd cmd) {
-		log.info("Adding phone number for personId={}", cmd.personId());
+	public PhoneNumberResponse addPhoneNumber(UUID id, AddPhoneNumberCmd cmd) {
+		log.info("Adding phone number for personId={}", id);
 
-		Person existingPerson = getRequiredPerson(new PersonId(cmd.personId()));
+		Person existingPerson = getRequiredPerson(new PersonId(id));
 
 		PhoneNumber phoneNumber = PhoneNumber.builder()
 				.type(cmd.type())
@@ -144,32 +143,32 @@ public class PersonApplicationService implements PersonDirectory {
 		Person updatedPerson = existingPerson.withAddedPhoneNumber(phoneNumber);
 		personRepositoryPort.save(updatedPerson);
 
-		log.info("Phone number added for personId={}", cmd.personId());
+		log.info("Phone number added for personId={}", id);
 		return PersonResponseMapper.toResponse(phoneNumber);
 	}
 
 	@Override
 	@Transactional
-	public void removePhoneNumber(RemovePhoneNumberCmd cmd) {
-		log.info("Removing phone number for personId={}, phoneNumberId={}", cmd.personId(), cmd.phoneNumberId());
+	public void removePhoneNumber(UUID personId, UUID phoneId) {
+		log.info("Removing phone number for personId={}, phoneNumberId={}", personId, phoneId);
 
-		Person existingPerson = getRequiredPerson(new PersonId(cmd.personId()));
-		PhoneNumberId parsedPhoneNumberId = new PhoneNumberId(cmd.phoneNumberId());
+		Person existingPerson = getRequiredPerson(new PersonId(personId));
+		PhoneNumberId parsedPhoneNumberId = new PhoneNumberId(phoneId);
 
 		if (!existingPerson.hasPhoneNumber(parsedPhoneNumberId)) {
-			log.warn("Remove phone number rejected because phone number was not found for personId={}, phoneNumberId={}", cmd.personId(), cmd.phoneNumberId());
+			log.warn("Remove phone number rejected because phone number was not found for personId={}, phoneNumberId={}", personId, phoneId);
 			throw new NotFoundException(
 					"person.phonenumber.not.found",
 					Map.of(
 							"field", "phoneNumberId",
-							"id", cmd.phoneNumberId(),
-							"personId", cmd.personId()));
+							"id", phoneId,
+							"personId", personId));
 		}
 
 		Person updatedPerson = existingPerson.withRemovedPhoneNumber(parsedPhoneNumberId);
 		personRepositoryPort.save(updatedPerson);
 
-		log.info("Phone number removed for personId={}, phoneNumberId={}", cmd.personId(), cmd.phoneNumberId());
+		log.info("Phone number removed for personId={}, phoneNumberId={}", personId, phoneId);
 	}
 
 	private Person getRequiredPerson(PersonId personId) {

@@ -31,7 +31,6 @@ import local.sop.datawarehouse.person.application.api.dto.CreatePersonCmd;
 import local.sop.datawarehouse.person.application.api.dto.CreatePhoneNumberCmd;
 import local.sop.datawarehouse.person.application.api.dto.PersonResponse;
 import local.sop.datawarehouse.person.application.api.dto.PhoneNumberResponse;
-import local.sop.datawarehouse.person.application.api.dto.RemovePhoneNumberCmd;
 import local.sop.datawarehouse.person.application.api.dto.UpdatePersonCmd;
 
 class InternalPersonControllerTest {
@@ -223,9 +222,9 @@ class InternalPersonControllerTest {
                 "12345678"
         );
 
-        AddPhoneNumberCmd cmd = new AddPhoneNumberCmd(personId, PhoneUserType.SELF, "12345678");
+        AddPhoneNumberCmd cmd = new AddPhoneNumberCmd(PhoneUserType.SELF, "12345678");
 
-        mockMvc.perform(post("/internal/persons/phone-number")
+        mockMvc.perform(post("/internal/persons/{id}/phone-number", personId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(cmd)))
                 .andExpect(status().isCreated())
@@ -233,7 +232,7 @@ class InternalPersonControllerTest {
                 .andExpect(jsonPath("$.type").value("SELF"))
                 .andExpect(jsonPath("$.value").value("12345678"));
 
-        assertEquals(personId, personDirectory.receivedAddPhoneNumberCmd.personId());
+        assertEquals(personId, personDirectory.receivedAddPhoneNumberPersonId);
         assertEquals(PhoneUserType.SELF, personDirectory.receivedAddPhoneNumberCmd.type());
         assertEquals("12345678", personDirectory.receivedAddPhoneNumberCmd.value());
     }
@@ -243,16 +242,12 @@ class InternalPersonControllerTest {
         UUID personId = UUID.randomUUID();
         UUID phoneNumberId = UUID.randomUUID();
 
-        RemovePhoneNumberCmd cmd = new RemovePhoneNumberCmd(personId, phoneNumberId);
-
-        mockMvc.perform(delete("/internal/persons/phone-number")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(cmd)))
+        mockMvc.perform(delete("/internal/persons/{id}/phone-number/{phoneId}", personId, phoneNumberId))
                 .andExpect(status().isNoContent());
 
-        assertNotNull(personDirectory.receivedRemovePhoneNumberCmd);
-        assertEquals(personId, personDirectory.receivedRemovePhoneNumberCmd.personId());
-        assertEquals(phoneNumberId, personDirectory.receivedRemovePhoneNumberCmd.phoneNumberId());
+        assertNotNull(personDirectory.receivedRemovePhoneNumberPersonId);
+        assertEquals(personId, personDirectory.receivedRemovePhoneNumberPersonId);
+        assertEquals(phoneNumberId, personDirectory.receivedRemovePhoneNumberPhoneId);
     }
 
     private static final class StubPersonDirectory implements PersonDirectory {
@@ -279,7 +274,9 @@ class InternalPersonControllerTest {
         private UUID receivedUpdatePersonId;
         private UpdatePersonCmd receivedUpdateCmd;
         private AddPhoneNumberCmd receivedAddPhoneNumberCmd;
-        private RemovePhoneNumberCmd receivedRemovePhoneNumberCmd;
+        private UUID receivedAddPhoneNumberPersonId;
+        private UUID receivedRemovePhoneNumberPersonId;
+        private UUID receivedRemovePhoneNumberPhoneId;
 
         @Override
         public UUID create(CreatePersonCmd cmd) {
@@ -310,16 +307,18 @@ class InternalPersonControllerTest {
             return updateResult;
         }
 
-        @Override
-        public PhoneNumberResponse addPhoneNumber(AddPhoneNumberCmd cmd) {
-            this.receivedAddPhoneNumberCmd = cmd;
-            return addPhoneNumberResult;
-        }
+                @Override
+                public PhoneNumberResponse addPhoneNumber(UUID id, AddPhoneNumberCmd cmd) {
+                        this.receivedAddPhoneNumberPersonId = id;
+                        this.receivedAddPhoneNumberCmd = cmd;
+                        return addPhoneNumberResult;
+                }
 
-        @Override
-        public void removePhoneNumber(RemovePhoneNumberCmd cmd) {
-            this.receivedRemovePhoneNumberCmd = cmd;
-        }
+                @Override
+                public void removePhoneNumber(UUID personId, UUID phoneId) {
+                        this.receivedRemovePhoneNumberPersonId = personId;
+                        this.receivedRemovePhoneNumberPhoneId = phoneId;
+                }
 
         @Override
         public ResponseCompensated compensate(UUID id, Class<?> clazz, SagaOutcome sagaState) {

@@ -18,6 +18,8 @@ import local.sop.common.libs.sharedkernel.sagas.compensate.request.PayloadCompen
 import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 import local.sop.datawarehouse.education.application.api.EducationDirectory;
 import local.sop.datawarehouse.education.application.api.dto.CreateEducationCmd;
+import local.sop.datawarehouse.education.application.api.dto.UpdateEducationNameCmd;
+import local.sop.datawarehouse.education.application.api.dto.UpdateEducationCategoryCmd;
 import local.sop.datawarehouse.education.application.api.dto.EducationResponse;
 
 @RestController
@@ -37,13 +39,13 @@ public class EducationController {
     }
 
     @PutMapping("/{id}/name")
-    public ResponseEntity<EducationResponse> updateEducationName(@PathVariable UUID id, @RequestBody String name) {
-        return ResponseEntity.ok(directory.updateEducationName(id, name));
+    public ResponseEntity<EducationResponse> updateEducationName(@PathVariable UUID id, @Valid @RequestBody UpdateEducationNameCmd cmd) {
+        return ResponseEntity.ok(directory.updateEducationName(id, cmd));
     }
 
     @PutMapping("/{id}/category")
-    public ResponseEntity<EducationResponse> updateEducationCategory(@PathVariable UUID id, @RequestBody String category) {
-        return ResponseEntity.ok(directory.updateEducationCategory(id, category));
+    public ResponseEntity<EducationResponse> updateEducationCategory(@PathVariable UUID id, @Valid @RequestBody UpdateEducationCategoryCmd cmd) {
+        return ResponseEntity.ok(directory.updateEducationCategory(id, cmd));
     }
 
     @GetMapping(path = "/{id}", produces = "application/json")

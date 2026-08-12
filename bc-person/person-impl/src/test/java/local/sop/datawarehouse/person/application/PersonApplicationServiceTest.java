@@ -23,7 +23,6 @@ import local.sop.datawarehouse.person.application.api.dto.CreatePersonCmd;
 import local.sop.datawarehouse.person.application.api.dto.CreatePhoneNumberCmd;
 import local.sop.datawarehouse.person.application.api.dto.PersonResponse;
 import local.sop.datawarehouse.person.application.api.dto.PhoneNumberResponse;
-import local.sop.datawarehouse.person.application.api.dto.RemovePhoneNumberCmd;
 import local.sop.datawarehouse.person.application.api.dto.UpdatePersonCmd;
 import local.sop.datawarehouse.person.domain.model.Person;
 import local.sop.datawarehouse.person.domain.model.PhoneNumber;
@@ -411,7 +410,8 @@ class PersonApplicationServiceTest {
         PersonApplicationService service = new PersonApplicationService(new CapturingPersonDomain(), repository);
 
         PhoneNumberResponse response = service.addPhoneNumber(
-                new AddPhoneNumberCmd(personId, PhoneUserType.SELF, "12345678")
+                personId,
+                new AddPhoneNumberCmd(PhoneUserType.SELF, "12345678")
         );
 
         assertEquals(PhoneUserType.SELF, response.type());
@@ -430,7 +430,8 @@ class PersonApplicationServiceTest {
         NotFoundException exception = assertThrows(
                 NotFoundException.class,
                 () -> service.addPhoneNumber(
-                        new AddPhoneNumberCmd(UUID.randomUUID(), PhoneUserType.SELF, "12345678"))
+                        UUID.randomUUID(),
+                        new AddPhoneNumberCmd(PhoneUserType.SELF, "12345678"))
         );
 
         assertEquals("person.not.found", exception.getMessage());
@@ -458,7 +459,7 @@ class PersonApplicationServiceTest {
 
         PersonApplicationService service = new PersonApplicationService(new CapturingPersonDomain(), repository);
 
-        service.removePhoneNumber(new RemovePhoneNumberCmd(personId, phoneNumberId.value()));
+        service.removePhoneNumber(personId, phoneNumberId.value());
 
         assertEquals(1, repository.savedPersons.size());
         assertEquals(0, repository.savedPersons.getFirst().getPhoneNumbers().size());
@@ -483,7 +484,7 @@ class PersonApplicationServiceTest {
 
         NotFoundException exception = assertThrows(
                 NotFoundException.class,
-                () -> service.removePhoneNumber(new RemovePhoneNumberCmd(personId, UUID.randomUUID()))
+                () -> service.removePhoneNumber(personId, UUID.randomUUID())
         );
 
         assertEquals("person.phonenumber.not.found", exception.getMessage());

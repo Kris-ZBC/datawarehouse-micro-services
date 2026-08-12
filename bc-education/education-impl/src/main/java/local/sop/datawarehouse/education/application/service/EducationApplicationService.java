@@ -15,6 +15,8 @@ import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
 import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 import local.sop.datawarehouse.education.application.api.EducationDirectory;
 import local.sop.datawarehouse.education.application.api.dto.CreateEducationCmd;
+import local.sop.datawarehouse.education.application.api.dto.UpdateEducationNameCmd;
+import local.sop.datawarehouse.education.application.api.dto.UpdateEducationCategoryCmd;
 import local.sop.datawarehouse.education.application.api.dto.EducationResponse;
 import local.sop.datawarehouse.education.domain.model.Education;
 import local.sop.datawarehouse.education.domain.model.valueobjects.EducationCategory;
@@ -60,23 +62,23 @@ public class EducationApplicationService implements EducationDirectory {
     }
 
     @Override
-    public EducationResponse updateEducationName(UUID id, String name) {
-        log.info("Updating name of education ID: {} to '{}'", id, name);
-    
+    public EducationResponse updateEducationName(UUID id, UpdateEducationNameCmd cmd) {
+        log.info("Updating name of education ID: {} to '{}'", id, cmd.name());
+
         Education existing = repository.findById(EducationId.parse(id.toString()))
             .orElseThrow(() -> {
                 log.warn("Education not found for name update: {}", id);
                 return new NotFoundException("education.not.found", Map.of("id", id));
             });
 
-        if (!existing.getName().value().equals(name) && repository.existsByName(new EducationName(name))) {
-            log.warn("Name update failed: New name '{}' is already taken", name);
-            throw new ValidationException("education.name.exists", Map.of("name", name));
+        if (!existing.getName().value().equals(cmd.name()) && repository.existsByName(new EducationName(cmd.name()))) {
+            log.warn("Name update failed: New name '{}' is already taken", cmd.name());
+            throw new ValidationException("education.name.exists", Map.of("name", cmd.name()));
         }
 
         Education updated = Education.builder()
             .id(existing.getId())
-            .name(new EducationName(name))
+            .name(new EducationName(cmd.name()))
             .category(existing.getCategory())
             .active(existing.isActive())
             .build();
@@ -87,24 +89,24 @@ public class EducationApplicationService implements EducationDirectory {
     }
 
     @Override
-    public EducationResponse updateEducationCategory(UUID id, String category) {
-        log.info("Updating category of education ID: {} to '{}'", id, category);
-    
+    public EducationResponse updateEducationCategory(UUID id, UpdateEducationCategoryCmd cmd) {
+        log.info("Updating category of education ID: {} to '{}'", id, cmd.category());
+
         Education existing = repository.findById(EducationId.parse(id.toString()))
             .orElseThrow(() -> {
                 log.warn("Education not found for category update: {}", id);
                 return new NotFoundException("education.not.found", Map.of("id", id));
             });
             
-        if (!existing.getCategory().value().equals(category) && repository.existsByCategory(new EducationCategory(category))) {
-            log.warn("Category update failed: New category '{}' is already taken", category);
-            throw new ValidationException("education.category.exists", Map.of("category", category));
+        if (!existing.getCategory().value().equals(cmd.category()) && repository.existsByCategory(new EducationCategory(cmd.category()))) {
+            log.warn("Category update failed: New category '{}' is already taken", cmd.category());
+            throw new ValidationException("education.category.exists", Map.of("category", cmd.category()));
         }
 
         Education updated = Education.builder()
             .id(existing.getId())
             .name(existing.getName())
-            .category(new EducationCategory(category))
+            .category(new EducationCategory(cmd.category()))
             .active(existing.isActive())
             .build();
 

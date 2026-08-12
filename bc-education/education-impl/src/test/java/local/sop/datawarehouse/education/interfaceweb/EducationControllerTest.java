@@ -8,6 +8,8 @@ import local.sop.common.libs.sharedkernel.sagas.compensate.request.PayloadCompen
 import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 import local.sop.datawarehouse.education.application.api.EducationDirectory;
 import local.sop.datawarehouse.education.application.api.dto.CreateEducationCmd;
+import local.sop.datawarehouse.education.application.api.dto.UpdateEducationNameCmd;
+import local.sop.datawarehouse.education.application.api.dto.UpdateEducationCategoryCmd;
 import local.sop.datawarehouse.education.application.api.dto.EducationResponse;
 import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
 import org.junit.jupiter.api.Test;
@@ -112,12 +114,12 @@ class EducationControllerTest {
         EducationResponse response = new EducationResponse(
                 id, "Updated Name", "Data and Communication", true);
 
-        when(directory.updateEducationName(any(UUID.class), any(String.class))).thenReturn(response);
+        when(directory.updateEducationName(any(UUID.class), any(UpdateEducationNameCmd.class))).thenReturn(response);
 
         mockMvc.perform(put(BASE_URL + "/{id}/name", id)
                 .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(newName)))
+                .content(objectMapper.writeValueAsString(new UpdateEducationNameCmd(newName))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Updated Name"));
     }
@@ -129,12 +131,12 @@ class EducationControllerTest {
         EducationResponse response = new EducationResponse(
                 id, "IT Support", "Updated IT", true);
 
-        when(directory.updateEducationCategory(any(UUID.class), any(String.class))).thenReturn(response);
+        when(directory.updateEducationCategory(any(UUID.class), any(UpdateEducationCategoryCmd.class))).thenReturn(response);
 
         mockMvc.perform(put(BASE_URL + "/{id}/category", id)
                 .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(newCategory)))
+                .content(objectMapper.writeValueAsString(new UpdateEducationCategoryCmd(newCategory))))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.category").value("Updated IT"));
     }
