@@ -113,6 +113,11 @@ Parent pom for multi-module project aggregator and BOM (dependency management)
           <scope>test</scope>
         </dependency>
 
+        <dependency>
+          <groupId>local.sop.common.libs</groupId>
+          <artifactId>shared-kernel</artifactId>
+        </dependency>
+
     </dependencies>
 
   <build>
@@ -148,6 +153,12 @@ Parent pom for multi-module project aggregator and BOM (dependency management)
             </configuration>
           </execution>
         </executions>
+      </plugin>
+
+      <!-- Flatten POMs before install/deploy so published artifacts resolve ${revision}. -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>flatten-maven-plugin</artifactId>
       </plugin>
 
       <!-- Root Surefire: pass ${argLine}; exclude E2E/IT by default -->

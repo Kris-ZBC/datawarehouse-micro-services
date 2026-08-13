@@ -14,7 +14,19 @@ variables:
 .maven-auth: &maven-auth
   before_script:
     - |
-      export MAVEN_SETTINGS_FILE="$(mktemp "${TMPDIR:-/tmp}/maven-settings-${CI_JOB_ID:-job}.XXXXXX.xml")"
+      export MAVEN_TMP_ROOT="${TMPDIR:-/tmp}"
+      export MAVEN_SETTINGS_FILE="$(mktemp "${MAVEN_TMP_ROOT}/maven-settings-${CI_JOB_ID:-job}.XXXXXX.xml")"
+      export MAVEN_REPO_DIR="$(mktemp -d "${MAVEN_TMP_ROOT}/maven-repo-${CI_JOB_ID:-job}.XXXXXX")"
+      cleanup_maven_tmp() {
+        [ -n "${MAVEN_SETTINGS_FILE:-}" ] && rm -f "${MAVEN_SETTINGS_FILE}"
+        if [ -n "${MAVEN_REPO_DIR:-}" ] && [ -d "${MAVEN_REPO_DIR}" ]; then
+          case "${MAVEN_REPO_DIR}" in
+            "${MAVEN_TMP_ROOT}"/maven-repo-*) rm -rf "${MAVEN_REPO_DIR}" ;;
+            *) echo "Refusing to remove unexpected Maven repo path: ${MAVEN_REPO_DIR}" ;;
+          esac
+        fi
+      }
+      trap cleanup_maven_tmp EXIT
       cat > "${MAVEN_SETTINGS_FILE}" <<EOF
       <settings>
         <servers>
@@ -26,7 +38,7 @@ variables:
         </servers>
       </settings>
       EOF
-      export MAVEN_CLI_OPTS="${MAVEN_CLI_OPTS} --settings ${MAVEN_SETTINGS_FILE}"
+      export MAVEN_CLI_OPTS="${MAVEN_CLI_OPTS} -Dmaven.repo.local=${MAVEN_REPO_DIR} --settings ${MAVEN_SETTINGS_FILE}"
     - |
       if [ -f .mvn/wrapper/maven-wrapper.properties ]; then
         chmod +x ./mvnw
@@ -211,7 +223,7 @@ test:
     - test -f "$TLS_DIR/SOP-Info/person.p12"
     - test -f "$TLS_DIR/SOP-Info/test/test.p12" || true
 
-    - $MAVEN_CMD $MAVEN_CLI_OPTS clean test -Dtls.dir="$TLS_DIR/SOP-Info"
+    - $MAVEN_CMD $MAVEN_CLI_OPTS clean install -Dtls.dir="$TLS_DIR/SOP-Info"
   rules:
     - if: '$SKIP_TEST == "true"'
       when: never 
@@ -228,7 +240,7 @@ build:
   script:
     - sed -i 's/\r//' ./infra/scripts/*.sh
     - chmod +x ./infra/scripts/*.sh
-    - $MAVEN_CMD $MAVEN_CLI_OPTS clean package -DskipTests
+    - $MAVEN_CMD $MAVEN_CLI_OPTS clean install -DskipTests
     - ./infra/scripts/gen-dockerfiles.sh
     - ./infra/scripts/gen-db-provision.sh > db-provision.sql
     - export REGISTRY_IMAGE="$CI_REGISTRY_IMAGE"
