@@ -17,7 +17,7 @@ variables:
       export MAVEN_TMP_ROOT="${TMPDIR:-/tmp}"
       export MAVEN_SETTINGS_FILE="$(mktemp "${MAVEN_TMP_ROOT}/maven-settings-${CI_JOB_ID:-job}.XXXXXX.xml")"
       export MAVEN_REPO_DIR="$(mktemp -d "${MAVEN_TMP_ROOT}/maven-repo-${CI_JOB_ID:-job}.XXXXXX")"
-      export COMMON_LIBS_PROJECT_ID="${COMMON_LIBS_PROJECT_ID:-86}"
+      export COMMON_LIBS_PROJECT_ID="${COMMON_LIBS_PROJECT_ID:-85}"
       export COMMON_LIBS_MAVEN_URL="${COMMON_LIBS_MAVEN_URL:-${CI_API_V4_URL}/projects/${COMMON_LIBS_PROJECT_ID}/packages/maven}"
       export MAVEN_REPO_USERNAME="${MAVEN_REPO_USERNAME:-gitlab-ci-token}"
       export MAVEN_REPO_PASSWORD="${MAVEN_REPO_PASSWORD:-${CI_JOB_TOKEN}}"
