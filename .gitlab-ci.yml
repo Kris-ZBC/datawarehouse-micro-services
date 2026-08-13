@@ -10,14 +10,12 @@ variables:
     --batch-mode
     --no-transfer-progress
     -U
-    -Dmaven.repo.local=${CI_PROJECT_DIR}/.m2/repository
-    --settings ${CI_PROJECT_DIR}/.m2/settings.xml
 
 .maven-auth: &maven-auth
   before_script:
-    - mkdir -p ${CI_PROJECT_DIR}/.m2
     - |
-      cat > ${CI_PROJECT_DIR}/.m2/settings.xml <<EOF
+      export MAVEN_SETTINGS_FILE="$(mktemp "${TMPDIR:-/tmp}/maven-settings-${CI_JOB_ID:-job}.XXXXXX.xml")"
+      cat > "${MAVEN_SETTINGS_FILE}" <<EOF
       <settings>
         <servers>
           <server>
@@ -28,6 +26,7 @@ variables:
         </servers>
       </settings>
       EOF
+      export MAVEN_CLI_OPTS="${MAVEN_CLI_OPTS} --settings ${MAVEN_SETTINGS_FILE}"
     - |
       if [ -f .mvn/wrapper/maven-wrapper.properties ]; then
         chmod +x ./mvnw

@@ -93,14 +93,6 @@
 
             <dependency>
                 <groupId>local.sop.common.libs</groupId>
-                <artifactId>common-libs-bom</artifactId>
-                <version>${sop.common.libs.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>local.sop.common.libs</groupId>
                 <artifactId>common-core</artifactId>
                 <version>${sop.common.libs.version}</version>
             </dependency>
