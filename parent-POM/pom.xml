@@ -113,11 +113,6 @@ Parent pom for multi-module project aggregator and BOM (dependency management)
           <scope>test</scope>
         </dependency>
 
-        <dependency>
-          <groupId>local.sop.common.libs</groupId>
-          <artifactId>shared-kernel</artifactId>
-        </dependency>
-
     </dependencies>
 
   <build>
