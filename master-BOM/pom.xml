@@ -101,6 +101,36 @@
 
             <dependency>
                 <groupId>local.sop.common.libs</groupId>
+                <artifactId>common-core</artifactId>
+                <version>${sop.common.libs.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>local.sop.common.libs</groupId>
+                <artifactId>common-data</artifactId>
+                <version>${sop.common.libs.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>local.sop.common.libs</groupId>
+                <artifactId>common-security</artifactId>
+                <version>${sop.common.libs.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>local.sop.common.libs</groupId>
+                <artifactId>common-validation</artifactId>
+                <version>${sop.common.libs.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>local.sop.common.libs</groupId>
+                <artifactId>common-web</artifactId>
+                <version>${sop.common.libs.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>local.sop.common.libs</groupId>
                 <artifactId>shared-kernel</artifactId>
                 <version>${sop.common.libs.version}</version>
             </dependency>
