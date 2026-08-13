@@ -1,217 +1,302 @@
-# stages:
-#   - validate
-#   - test
-#   - build
-# # - deply (Now handled by CD (infrastructure team))
+stages:
+  - validate
+  - test
+  - build
+  - publish
+# - deply (Now handled by CD (infrastructure team))
 
-# # Check for case conflicts in file names, which can cause issues on case-insensitive file systems (like Windows or macOS). This is especially important for Java projects where package naming conventions are crucial.
-# check-casing:
-#   stage: validate
-#   script:
-#     - git ls-files | sort | uniq -di | tee /tmp/duplicates
-#     - if [ -s /tmp/duplicates ]; then echo "Case conflicts detected:" && cat /tmp/duplicates && exit 1; fi
-#   rules:
-#     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-#       when: always
-#     - if: '$CI_COMMIT_BRANCH == "main"'
-#       when: always
-#     - when: never
+variables:
+  MAVEN_CLI_OPTS: >-
+    --batch-mode
+    --no-transfer-progress
+    --settings ${CI_PROJECT_DIR}/.m2/settings.xml
 
-# # Check for Java package naming conventions and REST endpoint naming conventions.
-# check-conventions:
-#   stage: validate
-#   needs:
-#     - check-casing
-#   script:
-#     - |
-#       set -e
-#       FAILED=0
+.maven-auth: &maven-auth
+  before_script:
+    - mkdir -p ${CI_PROJECT_DIR}/.m2
+    - |
+      cat > ${CI_PROJECT_DIR}/.m2/settings.xml <<EOF
+      <settings>
+        <servers>
+          <server>
+            <id>gitlab-maven</id>
+            <username>gitlab-ci-token</username>
+            <password>${CI_JOB_TOKEN}</password>
+          </server>
+        </servers>
+      </settings>
+      EOF
+    - |
+      if [ -f .mvn/wrapper/maven-wrapper.properties ]; then
+        chmod +x ./mvnw
+        export MAVEN_CMD="./mvnw"
+      elif command -v mvn >/dev/null 2>&1; then
+        export MAVEN_CMD="mvn"
+      else
+        echo "No usable Maven command found. Commit .mvn/wrapper/maven-wrapper.properties or install Maven on the runner."
+        exit 1
+      fi
+      echo "Using Maven command: ${MAVEN_CMD}"
 
-#       git ls-files '*.java' > /tmp/java_files.txt
-#       echo "Found $(wc -l < /tmp/java_files.txt) Java files"
+# Check for case conflicts in file names, which can cause issues on case-insensitive file systems (like Windows or macOS). This is especially important for Java projects where package naming conventions are crucial.
+check-casing:
+  stage: validate
+  script:
+    - git ls-files | sort | uniq -di | tee /tmp/duplicates
+    - if [ -s /tmp/duplicates ]; then echo "Case conflicts detected:" && cat /tmp/duplicates && exit 1; fi
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: always
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: always
+    - when: never
 
-#       # ── Package naming ─────────────────────────────────────────────────────
-#       echo "Checking package naming..."
-#       while IFS= read -r file; do
-#         dir=$(dirname "$file")
-#         if echo "$dir" | grep -qE 'src/(main|test)/java'; then
-#           pkg=$(echo "$dir" | grep -oE 'java/.*' | cut -c6-)
-#           if echo "$pkg" | grep -qE '[A-Z]'; then
-#             echo "FAIL - uppercase in package path: $file"
-#             FAILED=1
-#           fi
-#           if echo "$pkg" | grep -qE '[^a-z0-9/]'; then
-#             echo "FAIL - illegal characters in package path: $file"
-#             FAILED=1
-#           fi
-#           if echo "$pkg" | grep -qE '(^|/)[0-9]'; then
-#             echo "FAIL - segment starts with digit: $file"
-#             FAILED=1
-#           fi
-#         fi
-#       done < /tmp/java_files.txt
-#       echo "Package naming check done"
-#       rm -f /tmp/java_files.txt
-#       # ── Endpoint naming ────────────────────────────────────────────────────
-#       echo "Checking endpoint naming..."
-#       rm -f /tmp/endpoints.txt
-#       touch /tmp/endpoints.txt
+# Check for Java package naming conventions and REST endpoint naming conventions.
+check-conventions:
+  stage: validate
+  needs:
+    - check-casing
+  script:
+    - |
+      set -e
+      FAILED=0
 
-#       while IFS= read -r file; do
-#         echo "$file" | grep -qE 'src/main/java' || continue
+      git ls-files '*.java' > /tmp/java_files.txt
+      echo "Found $(wc -l < /tmp/java_files.txt) Java files"
 
-#         # Only process files that are actual REST controllers
-#         grep -q '@RestController' "$file" 2>/dev/null || continue
+      # ── Package naming ─────────────────────────────────────────────────────
+      echo "Checking package naming..."
+      while IFS= read -r file; do
+        dir=$(dirname "$file")
+        if echo "$dir" | grep -qE 'src/(main|test)/java'; then
+          pkg=$(echo "$dir" | grep -oE 'java/.*' | cut -c6-)
+          if echo "$pkg" | grep -qE '[A-Z]'; then
+            echo "FAIL - uppercase in package path: $file"
+            FAILED=1
+          fi
+          if echo "$pkg" | grep -qE '[^a-z0-9/]'; then
+            echo "FAIL - illegal characters in package path: $file"
+            FAILED=1
+          fi
+          if echo "$pkg" | grep -qE '(^|/)[0-9]'; then
+            echo "FAIL - segment starts with digit: $file"
+            FAILED=1
+          fi
+        fi
+      done < /tmp/java_files.txt
+      echo "Package naming check done"
+      # ── Endpoint naming ────────────────────────────────────────────────────
+      echo "Checking endpoint naming..."
+      rm -f /tmp/endpoints.txt
+      touch /tmp/endpoints.txt
 
-#         # Strip block and line comments before checking endpoints
-#         stripped=$(perl -0777 -pe 's|/\*.*?\*/||gs; s|//[^\n]*||g' "$file")
+      while IFS= read -r file; do
+        echo "$file" | grep -qE 'src/main/java' || continue
 
-#         # Match @XxxMapping("/path") — positional first string argument only
-#         echo "$stripped" | grep -oE '@(Get|Post|Put|Delete|Patch|Request)Mapping\s*\(\s*"[^"]*"\s*\)' 2>/dev/null \
-#           | grep -oE '"[^"]*"' \
-#           | tr -d '"' \
-#           | while IFS= read -r endpoint; do
-#               echo "$file|$endpoint"
-#             done || true
+        # Only process files that are actual REST controllers
+        grep -q '@RestController' "$file" 2>/dev/null || continue
 
-#         # Match @XxxMapping(value="/path") or @XxxMapping(path="/path") explicitly
-#         echo "$stripped" | grep -oE '@(Get|Post|Put|Delete|Patch|Request)Mapping\s*\([^)]*\b(value|path)\s*=\s*"[^"]*"' 2>/dev/null \
-#           | grep -oE '(value|path)\s*=\s*"[^"]*"' \
-#           | grep -oE '"[^"]*"' \
-#           | tr -d '"' \
-#           | while IFS= read -r endpoint; do
-#               echo "$file|$endpoint"
-#             done || true
+        # Strip block and line comments before checking endpoints
+        stripped=$(perl -0777 -pe 's|/\*.*?\*/||gs; s|//[^\n]*||g' "$file")
 
-#       done < /tmp/java_files.txt >> /tmp/endpoints.txt || true
+        # Match @XxxMapping("/path") — positional first string argument only
+        echo "$stripped" | grep -oE '@(Get|Post|Put|Delete|Patch|Request)Mapping\s*\(\s*"[^"]*"\s*\)' 2>/dev/null \
+          | grep -oE '"[^"]*"' \
+          | tr -d '"' \
+          | while IFS= read -r endpoint; do
+              echo "$file|$endpoint"
+            done || true
 
-#       # Deduplicate
-#       sort -u /tmp/endpoints.txt -o /tmp/endpoints.txt
+        # Match @XxxMapping(value="/path") or @XxxMapping(path="/path") explicitly
+        echo "$stripped" | grep -oE '@(Get|Post|Put|Delete|Patch|Request)Mapping\s*\([^)]*\b(value|path)\s*=\s*"[^"]*"' 2>/dev/null \
+          | grep -oE '(value|path)\s*=\s*"[^"]*"' \
+          | grep -oE '"[^"]*"' \
+          | tr -d '"' \
+          | while IFS= read -r endpoint; do
+              echo "$file|$endpoint"
+            done || true
 
-#       echo "Found $(wc -l < /tmp/endpoints.txt) endpoint(s) to check"
+      done < /tmp/java_files.txt >> /tmp/endpoints.txt || true
 
-#       while IFS='|' read -r file endpoint; do
-#         # Skip non-path values (request params, method names etc.)
-#         echo "$endpoint" | grep -qE '^/' || continue
+      # Deduplicate
+      sort -u /tmp/endpoints.txt -o /tmp/endpoints.txt
 
-#         clean=$(echo "$endpoint" | sed 's/{[^}]*}//g')
-#         if echo "$clean" | grep -qE '[A-Z]'; then
-#           echo "FAIL - uppercase in endpoint path '$endpoint': $file"
-#           FAILED=1
-#         fi
-#         if echo "$clean" | grep -qE '_'; then
-#           echo "FAIL - underscore in endpoint path '$endpoint': $file"
-#           FAILED=1
-#         fi
-#       done < /tmp/endpoints.txt
-#       rm -f /tmp/endpoints.txt
-#       echo "Endpoint naming check done"
+      echo "Found $(wc -l < /tmp/endpoints.txt) endpoint(s) to check"
 
-#       if [ "${FAILED}" = "1" ]; then
-#         echo ""
-#         echo "Convention violations found."
-#         echo "  - Package naming:  run fix-package-naming.sh to correct"
-#         echo "  - Endpoint naming: use lowercase and hyphens only e.g. /internal/consent-statements"
-#         exit 1
-#       fi
+      while IFS='|' read -r file endpoint; do
+        # Skip non-path values (request params, method names etc.)
+        echo "$endpoint" | grep -qE '^/' || continue
 
-#       echo "All convention checks passed"
-#   rules:
-#     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-#       when: on_success
-#     - if: '$CI_COMMIT_BRANCH == "main"'
-#       when: on_success
-#     - when: never
+        clean=$(echo "$endpoint" | sed 's/{[^}]*}//g')
+        if echo "$clean" | grep -qE '[A-Z]'; then
+          echo "FAIL - uppercase in endpoint path '$endpoint': $file"
+          FAILED=1
+        fi
+        if echo "$clean" | grep -qE '_'; then
+          echo "FAIL - underscore in endpoint path '$endpoint': $file"
+          FAILED=1
+        fi
+      done < /tmp/endpoints.txt
+      rm -f /tmp/endpoints.txt
+      rm -f /tmp/java_files.txt
+      echo "Endpoint naming check done"
 
-# # Run mvn tests, to make sure that everything is good enough. We aim for atleast 80% code coverage, but for now we just run this, and if there are errors, we stop.
-# test:
-#   needs: ["check-casing", "check-conventions"]
-#   script:
-#     - |
-#       if [ "$CI_PIPELINE_SOURCE" == "merge_request_event" ]; then
-#         if [[ "$CI_MERGE_REQUEST_TARGET_BRANCH_NAME" == "main" ]] || [[ "$CI_MERGE_REQUEST_TARGET_BRANCH_NAME" =~ ^team/ ]]; then
-#           echo "🚀 MR targeting '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME' detected. Running mandatory tests..."
-#         else
-#           echo "✅ Skipping tests: MR targeting '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME'. Tests ONLY run for MRs targeting 'main' or 'team/*' branches."
-#           exit 0
-#         fi
-#       elif [ "$CI_COMMIT_BRANCH" == "main" ]; then
-#         echo "🚀 Direct push to main detected. Running mandatory tests..."
-#       else
-#         echo "✅ Skipping tests: Direct push to '$CI_COMMIT_BRANCH'. Tests ONLY run on direct pushes to 'main' or MRs targeting 'main'/'team/*' branches."
-#         exit 0
-#       fi
-#     # stop early if any used var is missing.  
-#     # stop early if any used var is missing.  
-#     - test -n "$SAMBA_SERVER"
-#     - test -n "$SHARE_NAME"
-#     - test -n "$SAMBA_USER"
-#     - test -n "$SAMBA_PASS"
+      if [ "${FAILED}" = "1" ]; then
+        echo ""
+        echo "Convention violations found."
+        echo "  - Package naming:  run fix-package-naming.sh to correct"
+        echo "  - Endpoint naming: use lowercase and hyphens only e.g. /internal/consent-statements"
+        exit 1
+      fi
+
+      echo "All convention checks passed"
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: on_success
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: on_success
+    - when: never
+
+# Run mvn tests, to make sure that everything is good enough. We aim for atleast 80% code coverage, but for now we just run this, and if there are errors, we stop.
+test:
+  needs: ["check-casing", "check-conventions"]
+  <<: *maven-auth
+  script:
+    - |
+      if [ "$CI_PIPELINE_SOURCE" == "merge_request_event" ]; then
+        if [[ "$CI_MERGE_REQUEST_TARGET_BRANCH_NAME" == "main" ]] || [[ "$CI_MERGE_REQUEST_TARGET_BRANCH_NAME" =~ ^team/ ]]; then
+          echo "🚀 MR targeting '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME' detected. Running mandatory tests..."
+        else
+          echo "✅ Skipping tests: MR targeting '$CI_MERGE_REQUEST_TARGET_BRANCH_NAME'. Tests ONLY run for MRs targeting 'main' or 'team/*' branches."
+          exit 0
+        fi
+      elif [ "$CI_COMMIT_BRANCH" == "main" ]; then
+        echo "🚀 Direct push to main detected. Running mandatory tests..."
+      else
+        echo "✅ Skipping tests: Direct push to '$CI_COMMIT_BRANCH'. Tests ONLY run on direct pushes to 'main' or MRs targeting 'main'/'team/*' branches."
+        exit 0
+      fi
+    # stop early if any used var is missing.  
+    # stop early if any used var is missing.  
+    - test -n "$SAMBA_SERVER"
+    - test -n "$SHARE_NAME"
+    - test -n "$SAMBA_USER"
+    - test -n "$SAMBA_PASS"
 
 
-#     - nc -zv dwhpoc.sop.local 3306
+    - nc -zv dwhpoc.sop.local 3306
 
-#     - docker system prune -a --volumes -f || true
+    - docker system prune -a --volumes -f || true
 
-#     - export TLS_DIR="$CI_PROJECT_DIR/certs"
-#     - rm -rf "$TLS_DIR"
-#     - mkdir -p "$TLS_DIR/SOP-Info"
-#     - chmod +x ./mvnw
+    - export TLS_DIR="$CI_PROJECT_DIR/certs"
+    - rm -rf "$TLS_DIR"
+    - mkdir -p "$TLS_DIR/SOP-Info"
+    - test -n "$MAVEN_CMD"
 
-#     # top-level certs
-#     - smbclient "//$SAMBA_SERVER/$SHARE_NAME" -U "$SAMBA_USER%$SAMBA_PASS" -D "SOP-Info" -c "prompt OFF; recurse OFF; lcd $TLS_DIR/SOP-Info; mget *.p12"
+    # top-level certs
+    - smbclient "//$SAMBA_SERVER/$SHARE_NAME" -U "$SAMBA_USER%$SAMBA_PASS" -D "SOP-Info" -c "prompt OFF; recurse OFF; lcd $TLS_DIR/SOP-Info; mget *.p12"
 
-#     # fetch *.p12 from direct subfolders under SOP-Info
-#     - |
-#         smbclient "//$SAMBA_SERVER/$SHARE_NAME" -U "$SAMBA_USER%$SAMBA_PASS" -D "SOP-Info" -c "ls" \
-#           | awk '/ D / {print $1}' \
-#           | while read -r d; do
-#               [ "$d" = "." ] || [ "$d" = ".." ] && continue
-#               mkdir -p "$TLS_DIR/SOP-Info/$d"
-#               smbclient "//$SAMBA_SERVER/$SHARE_NAME" -U "$SAMBA_USER%$SAMBA_PASS" -D "SOP-Info/$d" -c "prompt OFF; recurse OFF; lcd $TLS_DIR/SOP-Info/$d; mget *.p12" || true
-#             done
+    # fetch *.p12 from direct subfolders under SOP-Info
+    - |
+        smbclient "//$SAMBA_SERVER/$SHARE_NAME" -U "$SAMBA_USER%$SAMBA_PASS" -D "SOP-Info" -c "ls" \
+          | awk '/ D / {print $1}' \
+          | while read -r d; do
+              [ "$d" = "." ] || [ "$d" = ".." ] && continue
+              mkdir -p "$TLS_DIR/SOP-Info/$d"
+              smbclient "//$SAMBA_SERVER/$SHARE_NAME" -U "$SAMBA_USER%$SAMBA_PASS" -D "SOP-Info/$d" -c "prompt OFF; recurse OFF; lcd $TLS_DIR/SOP-Info/$d; mget *.p12" || true
+            done
 
-#     - find "$TLS_DIR/SOP-Info" -type f -name '*.p12' | sort
-#     - test -f "$TLS_DIR/SOP-Info/person.p12"
-#     - test -f "$TLS_DIR/SOP-Info/test/test.p12" || true
+    - find "$TLS_DIR/SOP-Info" -type f -name '*.p12' | sort
+    - test -f "$TLS_DIR/SOP-Info/person.p12"
+    - test -f "$TLS_DIR/SOP-Info/test/test.p12" || true
 
-#     - ./mvnw $MAVEN_CLI_OPTS clean test -Dtls.dir="$TLS_DIR/SOP-Info"
-#   rules:
-#     - if: '$SKIP_TEST == "true"'
-#       when: never 
-#     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
-#       when: on_success
-#     - if: '$CI_COMMIT_BRANCH == "main"'
-#       when: on_success
-#     - when: never
-
+    - $MAVEN_CMD $MAVEN_CLI_OPTS clean test -Dtls.dir="$TLS_DIR/SOP-Info"
+  rules:
+    - if: '$SKIP_TEST == "true"'
+      when: never 
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      when: on_success
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: on_success
+    - when: never
     
-# # if there are no tests that failed, we can proceed to build the project, and cre# run mvn tests, to make sure that everything is good e# if there are no tests that failed, we can proceed to build the project, and create a jar file that we can use in the docker-compose file
-# build:
-#   stage: build
-#   script:
-#     - sed -i 's/\r//' ./infra/scripts/*.sh
-#     - chmod +x ./mvnw ./infra/scripts/*.sh
-#     - ./mvnw $MAVEN_CLI_OPTS clean package -DskipTests
-#     - ./infra/scripts/gen-dockerfiles.sh
-#     - ./infra/scripts/gen-db-provision.sh > db-provision.sql
-#     - export REGISTRY_IMAGE="$CI_REGISTRY_IMAGE"
-#     - export IMAGE_TAG="$CI_COMMIT_SHORT_SHA"
-#     - ./infra/scripts/gen-compose.sh > docker-compose.yaml
-#     - ./infra/scripts/gen-manifest.sh > manifest.yml
-#     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
-#     - export REGISTRY_IMAGE="$CI_REGISTRY_IMAGE"
-#     - export IMAGE_TAG="$CI_COMMIT_SHORT_SHA"
-#     - docker compose build
-#     - docker compose push
-#   artifacts:
-#     paths:
-#       - docker-compose.yaml
-#       - manifest.yml
-#       - db-provision.sql
-#     expire_in: 1 hour
-#   rules:
-#     - if: '$SKIP_BUILD == "true"'
-#       when: never
-#     - if: $CI_COMMIT_BRANCH == "main"
-#       when: on_success
+# if there are no tests that failed, we can proceed to build the project, and cre# run mvn tests, to make sure that everything is good e# if there are no tests that failed, we can proceed to build the project, and create a jar file that we can use in the docker-compose file
+build:
+  stage: build
+  <<: *maven-auth
+  script:
+    - sed -i 's/\r//' ./infra/scripts/*.sh
+    - chmod +x ./infra/scripts/*.sh
+    - $MAVEN_CMD $MAVEN_CLI_OPTS clean package -DskipTests
+    - ./infra/scripts/gen-dockerfiles.sh
+    - ./infra/scripts/gen-db-provision.sh > db-provision.sql
+    - export REGISTRY_IMAGE="$CI_REGISTRY_IMAGE"
+    - export IMAGE_TAG="$CI_COMMIT_SHORT_SHA"
+    - ./infra/scripts/gen-compose.sh > docker-compose.yaml
+    - ./infra/scripts/gen-manifest.sh > manifest.yml
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
+    - export REGISTRY_IMAGE="$CI_REGISTRY_IMAGE"
+    - export IMAGE_TAG="$CI_COMMIT_SHORT_SHA"
+    - docker compose build
+    - docker compose push
+  artifacts:
+    paths:
+      - docker-compose.yaml
+      - manifest.yml
+      - db-provision.sql
+      - bc-*/*-impl/Dockerfile
+      - bc-*/*-api/target/*.jar
+      - bc-*/*-api/.flattened-pom.xml
+    expire_in: 1 hour
+  rules:
+    - if: '$SKIP_BUILD == "true"'
+      when: never
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: on_success
+
+publish-api-contracts:
+  stage: publish
+  needs:
+    - job: build
+      artifacts: true
+  <<: *maven-auth
+  script:
+    - test -n "$MAVEN_CMD"
+    - |
+      set -euo pipefail
+
+      api_dirs="$(find bc-* -maxdepth 2 -type d -name '*-api' | sort)"
+      if [ -z "$api_dirs" ]; then
+        echo "No *-api modules found to publish."
+        exit 1
+      fi
+
+      for api_dir in $api_dirs; do
+        artifact_id="$(basename "$api_dir")"
+        jar_file="$(find "$api_dir/target" -maxdepth 1 -type f -name "${artifact_id}-*.jar" ! -name '*-sources.jar' ! -name '*-javadoc.jar' | sort | head -n 1 || true)"
+
+        if [ -z "$jar_file" ]; then
+          echo "Missing packaged API jar for ${api_dir}"
+          exit 1
+        fi
+
+        pom_file="${api_dir}/.flattened-pom.xml"
+        if [ ! -f "$pom_file" ]; then
+          pom_file="${api_dir}/pom.xml"
+        fi
+
+        echo "Publishing ${artifact_id} from ${jar_file} to GitLab Package Registry"
+        $MAVEN_CMD $MAVEN_CLI_OPTS org.apache.maven.plugins:maven-deploy-plugin:3.1.3:deploy-file \
+          -DrepositoryId=gitlab-maven \
+          -Durl="${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/maven" \
+          -Dfile="${jar_file}" \
+          -DpomFile="${pom_file}" \
+          -Dpackaging=jar
+      done
+  rules:
+    - if: '$SKIP_PACKAGE_PUBLISH == "true"'
+      when: never
+    - if: '$SKIP_BUILD == "true"'
+      when: never
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: on_success
