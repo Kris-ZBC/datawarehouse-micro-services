@@ -199,7 +199,7 @@ test:
     - test -n "$MAVEN_CMD"
     - |
       echo "Checking common-libs dependency access before the full build..."
-      if ! $MAVEN_CMD $MAVEN_CLI_OPTS org.apache.maven.plugins:maven-dependency-plugin:3.8.1:get \
+      if ! $MAVEN_CMD $MAVEN_CLI_OPTS -N org.apache.maven.plugins:maven-dependency-plugin:3.8.1:get \
         -Dartifact=local.sop.common.libs:shared-kernel:1.0.0-SNAPSHOT \
         -Dtransitive=false; then
         echo "Could not resolve local.sop.common.libs:shared-kernel:1.0.0-SNAPSHOT from ${COMMON_LIBS_MAVEN_URL}"
