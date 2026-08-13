@@ -25,7 +25,7 @@
 		<test.jvm.args.extra>-Xshare:off</test.jvm.args.extra>
         <revision>0.0.1-SNAPSHOT</revision>
         <sop.common.libs.version>1.0.0-SNAPSHOT</sop.common.libs.version>
-        <gitlab.maven.url>https://gitlab.sop.local/api/v4/projects/85/packages/maven</gitlab.maven.url>
+        <gitlab.maven.url>https://gitlab.sop.local/api/v4/projects/86/packages/maven</gitlab.maven.url>
         <maven.compiler.plugin.version>3.14.1</maven.compiler.plugin.version>
         <java.version>21</java.version>
         <spring.boot.version>3.5.16</spring.boot.version>

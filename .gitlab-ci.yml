@@ -17,7 +17,7 @@ variables:
       export MAVEN_TMP_ROOT="${TMPDIR:-/tmp}"
       export MAVEN_SETTINGS_FILE="$(mktemp "${MAVEN_TMP_ROOT}/maven-settings-${CI_JOB_ID:-job}.XXXXXX.xml")"
       export MAVEN_REPO_DIR="$(mktemp -d "${MAVEN_TMP_ROOT}/maven-repo-${CI_JOB_ID:-job}.XXXXXX")"
-      export COMMON_LIBS_PROJECT_ID="${COMMON_LIBS_PROJECT_ID:-85}"
+      export COMMON_LIBS_PROJECT_ID="${COMMON_LIBS_PROJECT_ID:-86}"
       export COMMON_LIBS_MAVEN_URL="${COMMON_LIBS_MAVEN_URL:-${CI_API_V4_URL}/projects/${COMMON_LIBS_PROJECT_ID}/packages/maven}"
       export MAVEN_REPO_USERNAME="${MAVEN_REPO_USERNAME:-gitlab-ci-token}"
       export MAVEN_REPO_PASSWORD="${MAVEN_REPO_PASSWORD:-${CI_JOB_TOKEN}}"
@@ -196,6 +196,17 @@ test:
       fi
     # stop early if any used var is missing.  
     # stop early if any used var is missing.  
+    - test -n "$MAVEN_CMD"
+    - |
+      echo "Checking common-libs dependency access before the full build..."
+      if ! $MAVEN_CMD $MAVEN_CLI_OPTS org.apache.maven.plugins:maven-dependency-plugin:3.8.1:get \
+        -Dartifact=local.sop.common.libs:shared-kernel:1.0.0-SNAPSHOT \
+        -Dtransitive=false; then
+        echo "Could not resolve local.sop.common.libs:shared-kernel:1.0.0-SNAPSHOT from ${COMMON_LIBS_MAVEN_URL}"
+        echo "If project 86 is the common-libs project, allow this project's CI_JOB_TOKEN to read its Package Registry,"
+        echo "or set MAVEN_REPO_USERNAME/MAVEN_REPO_PASSWORD to a deploy token with read_package_registry."
+        exit 1
+      fi
     - test -n "$SAMBA_SERVER"
     - test -n "$SHARE_NAME"
     - test -n "$SAMBA_USER"
@@ -209,7 +220,6 @@ test:
     - export TLS_DIR="$CI_PROJECT_DIR/certs"
     - rm -rf "$TLS_DIR"
     - mkdir -p "$TLS_DIR/SOP-Info"
-    - test -n "$MAVEN_CMD"
 
     # top-level certs
     - smbclient "//$SAMBA_SERVER/$SHARE_NAME" -U "$SAMBA_USER%$SAMBA_PASS" -D "SOP-Info" -c "prompt OFF; recurse OFF; lcd $TLS_DIR/SOP-Info; mget *.p12"
