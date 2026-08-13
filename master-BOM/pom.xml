@@ -99,6 +99,12 @@
                 <scope>import</scope>
             </dependency>
 
+            <dependency>
+                <groupId>local.sop.common.libs</groupId>
+                <artifactId>shared-kernel</artifactId>
+                <version>${sop.common.libs.version}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
