@@ -26,6 +26,17 @@ variables:
         </servers>
       </settings>
       EOF
+    - |
+      if [ -f .mvn/wrapper/maven-wrapper.properties ]; then
+        chmod +x ./mvnw
+        export MAVEN_CMD="./mvnw"
+      elif command -v mvn >/dev/null 2>&1; then
+        export MAVEN_CMD="mvn"
+      else
+        echo "No usable Maven command found. Commit .mvn/wrapper/maven-wrapper.properties or install Maven on the runner."
+        exit 1
+      fi
+      echo "Using Maven command: ${MAVEN_CMD}"
 
 # Check for case conflicts in file names, which can cause issues on case-insensitive file systems (like Windows or macOS). This is especially important for Java projects where package naming conventions are crucial.
 check-casing:
@@ -74,7 +85,6 @@ check-conventions:
         fi
       done < /tmp/java_files.txt
       echo "Package naming check done"
-      rm -f /tmp/java_files.txt
       # ── Endpoint naming ────────────────────────────────────────────────────
       echo "Checking endpoint naming..."
       rm -f /tmp/endpoints.txt
@@ -128,6 +138,7 @@ check-conventions:
         fi
       done < /tmp/endpoints.txt
       rm -f /tmp/endpoints.txt
+      rm -f /tmp/java_files.txt
       echo "Endpoint naming check done"
 
       if [ "${FAILED}" = "1" ]; then
@@ -180,7 +191,7 @@ test:
     - export TLS_DIR="$CI_PROJECT_DIR/certs"
     - rm -rf "$TLS_DIR"
     - mkdir -p "$TLS_DIR/SOP-Info"
-    - chmod +x ./mvnw
+    - test -n "$MAVEN_CMD"
 
     # top-level certs
     - smbclient "//$SAMBA_SERVER/$SHARE_NAME" -U "$SAMBA_USER%$SAMBA_PASS" -D "SOP-Info" -c "prompt OFF; recurse OFF; lcd $TLS_DIR/SOP-Info; mget *.p12"
@@ -199,7 +210,7 @@ test:
     - test -f "$TLS_DIR/SOP-Info/person.p12"
     - test -f "$TLS_DIR/SOP-Info/test/test.p12" || true
 
-    - ./mvnw $MAVEN_CLI_OPTS clean test -Dtls.dir="$TLS_DIR/SOP-Info"
+    - $MAVEN_CMD $MAVEN_CLI_OPTS clean test -Dtls.dir="$TLS_DIR/SOP-Info"
   rules:
     - if: '$SKIP_TEST == "true"'
       when: never 
@@ -215,8 +226,8 @@ build:
   <<: *maven-auth
   script:
     - sed -i 's/\r//' ./infra/scripts/*.sh
-    - chmod +x ./mvnw ./infra/scripts/*.sh
-    - ./mvnw $MAVEN_CLI_OPTS clean package -DskipTests
+    - chmod +x ./infra/scripts/*.sh
+    - $MAVEN_CMD $MAVEN_CLI_OPTS clean package -DskipTests
     - ./infra/scripts/gen-dockerfiles.sh
     - ./infra/scripts/gen-db-provision.sh > db-provision.sql
     - export REGISTRY_IMAGE="$CI_REGISTRY_IMAGE"
@@ -233,13 +244,14 @@ build:
       - docker-compose.yaml
       - manifest.yml
       - db-provision.sql
+      - bc-*/*-impl/Dockerfile
       - bc-*/*-api/target/*.jar
       - bc-*/*-api/.flattened-pom.xml
     expire_in: 1 hour
   rules:
     - if: '$SKIP_BUILD == "true"'
       when: never
-    - if: $CI_COMMIT_BRANCH == "main"
+    - if: '$CI_COMMIT_BRANCH == "main"'
       when: on_success
 
 publish-api-contracts:
@@ -249,7 +261,7 @@ publish-api-contracts:
       artifacts: true
   <<: *maven-auth
   script:
-    - chmod +x ./mvnw
+    - test -n "$MAVEN_CMD"
     - |
       set -euo pipefail
 
@@ -274,7 +286,7 @@ publish-api-contracts:
         fi
 
         echo "Publishing ${artifact_id} from ${jar_file} to GitLab Package Registry"
-        ./mvnw $MAVEN_CLI_OPTS org.apache.maven.plugins:maven-deploy-plugin:3.1.3:deploy-file \
+        $MAVEN_CMD $MAVEN_CLI_OPTS org.apache.maven.plugins:maven-deploy-plugin:3.1.3:deploy-file \
           -DrepositoryId=gitlab-maven \
           -Durl="${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/maven" \
           -Dfile="${jar_file}" \
@@ -284,5 +296,7 @@ publish-api-contracts:
   rules:
     - if: '$SKIP_PACKAGE_PUBLISH == "true"'
       when: never
-    - if: $CI_COMMIT_BRANCH == "main"
+    - if: '$SKIP_BUILD == "true"'
+      when: never
+    - if: '$CI_COMMIT_BRANCH == "main"'
       when: on_success
