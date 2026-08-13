@@ -9,6 +9,8 @@ variables:
   MAVEN_CLI_OPTS: >-
     --batch-mode
     --no-transfer-progress
+    -U
+    -Dmaven.repo.local=${CI_PROJECT_DIR}/.m2/repository
     --settings ${CI_PROJECT_DIR}/.m2/settings.xml
 
 .maven-auth: &maven-auth
