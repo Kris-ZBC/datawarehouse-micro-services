@@ -155,6 +155,12 @@ Parent pom for multi-module project aggregator and BOM (dependency management)
         </executions>
       </plugin>
 
+      <!-- Flatten POMs before install/deploy so published artifacts resolve ${revision}. -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>flatten-maven-plugin</artifactId>
+      </plugin>
+
       <!-- Root Surefire: pass ${argLine}; exclude E2E/IT by default -->
       <plugin>
       <groupId>org.apache.maven.plugins</groupId>
