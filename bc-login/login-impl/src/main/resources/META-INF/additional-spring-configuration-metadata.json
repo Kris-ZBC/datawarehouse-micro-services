@@ -1,0 +1,47 @@
+{"properties": [
+  {
+    "name": "tls.dir",
+    "type": "java.lang.String",
+    "description": "A description for 'tls.dir'"
+  },
+  {
+    "name": "keystore.password",
+    "type": "java.lang.String",
+    "description": "A description for 'keystore.password'"
+  },
+  {
+    "name": "truststore.password",
+    "type": "java.lang.String",
+    "description": "A description for 'truststore.password'"
+  },
+  {
+    "name": "fqdn.package",
+    "type": "java.lang.String",
+    "description": "A description for 'fqdn.package'"
+  },
+  {
+    "name": "bc.qualifier",
+    "type": "java.lang.String",
+    "description": "A description for 'bc.qualifier'"
+  },
+  {
+    "name": "db.port",
+    "type": "java.lang.String",
+    "description": "A description for 'db.port'"
+  },
+  {
+    "name": "internal.mtls.allowed-callers",
+    "type": "java.lang.String",
+    "description": "A description for 'internal.mtls.allowed-callers'"
+  },
+  {
+    "name": "db.name",
+    "type": "java.lang.String",
+    "description": "A description for 'db.name'"
+  },
+  {
+    "name": "db.base-url",
+    "type": "java.lang.String",
+    "description": "A description for 'db.base-url'"
+  }
+]}
