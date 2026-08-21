@@ -45,6 +45,19 @@ public class PropsTest {
     }
 
     @Nested
+    class ConsentSagaPropsTest {
+
+        @Test
+        void recordStoresBaseUrl() {
+            ConsentSagaProps props = new ConsentSagaProps("CS");
+            assertEquals("CS", props.baseUrl());
+            assertEquals("ConsentSagaProps[baseUrl=CS]", props.toString());
+        }
+    }
+
+
+
+    @Nested
     class EducationLinePropsTest {
 
         @Test

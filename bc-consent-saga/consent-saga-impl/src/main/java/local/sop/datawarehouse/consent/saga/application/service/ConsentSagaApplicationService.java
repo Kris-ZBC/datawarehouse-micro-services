@@ -11,6 +11,7 @@ import jakarta.transaction.Transactional;
 import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
 import local.sop.common.libs.sharedkernel.exceptions.DomainException;
 import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 import local.sop.common.libs.sharedkernel.sagas.concurrency.locks.SagaStatus;
 import local.sop.datawarehouse.consent.saga.application.api.ConsentSagaDirectory;
 import local.sop.datawarehouse.consent.saga.application.api.dto.ConsentResponse;
@@ -84,7 +85,7 @@ public class ConsentSagaApplicationService implements ConsentSagaDirectory {
         /* ── Step 1: Create consent statement ──────────────────────────────── */
         UUID consentStatementId;
         try {
-            consentStatementId = consents.create(cmd.active(), cmd.statementText());
+            consentStatementId = consents.create(cmd.active(), cmd.statementText(), cmd.purpose(), cmd.type());
             log.info("SAGA [{}]: consent statement created {}",
                 sessionId, consentStatementId);
         } catch (DomainException ex) {
@@ -193,8 +194,7 @@ public class ConsentSagaApplicationService implements ConsentSagaDirectory {
         /* ── Step 2: Grant consent ─────────────────────────────────────────── */
         ConsentResponse response;
         try {
-            response = consents.grant(cmd.personRef(), cmd.consentStatementRef(),
-                cmd.purpose(), cmd.type(), cmd.status());
+            response = consents.grant(cmd.personRef(), cmd.consentStatementRef(), cmd.status());
             log.info("SAGA [{}]: consent granted {}", sessionId, response.consentId());
         } catch (DomainException ex) {
             sagaLock.release(sessionId);
@@ -236,13 +236,13 @@ public class ConsentSagaApplicationService implements ConsentSagaDirectory {
             log.info("SAGA [{}]: auditlog created {}", sessionId, auditlogId);
         } catch (DomainException ex) {
             sagaLock.updateStatus(sessionId, SagaStatus.COMPENSATING);
-            compensateConsent(sessionId, response.consentId());
+            compensateConsent(sessionId, response.consentId(), this.getClass(), SagaOutcome.COMPENSATED);
             throw ex;
         } catch (RuntimeException ex) {
             sagaLock.updateStatus(sessionId, SagaStatus.COMPENSATING);
             log.warn("SAGA [{}]: auditlog create failed, compensating consent {}",
                 sessionId, response.consentId());
-            compensateConsent(sessionId, response.consentId());
+            compensateConsent(sessionId, response.consentId(), this.getClass(), SagaOutcome.COMPENSATED);
             throw new ConflictException("auditlog.not.created",
                 Map.of("object", "auditlog"));
         }
@@ -383,10 +383,12 @@ public class ConsentSagaApplicationService implements ConsentSagaDirectory {
         }
     }
 
-    private void compensateConsent(UUID sessionId, UUID consentId) {
+
+
+    private void compensateConsent(UUID sessionId, UUID consentId, Class<?> clazz, SagaOutcome sagaState) {
         try {
             var result = consents.compensateConsent(consentId,
-                this.getClass(), SagaOutcome.COMPENSATED);
+                clazz, sagaState);
             if (result.success()) {
                 log.info("SAGA [{}]: consent {} compensated successfully",
                     sessionId, consentId);
@@ -421,6 +423,16 @@ public class ConsentSagaApplicationService implements ConsentSagaDirectory {
         } finally {
             sagaLock.release(sessionId);
         }
+    }
+
+
+
+    @Override
+    public ResponseCompensated compensateConsent(UUID id, Class<?> clazz, SagaOutcome sagaState) {
+        /* lock this saga */
+        sagaLock.tryLock(SagaConcurrencyLock.start(id));
+        this.compensateConsent(id, id, clazz, sagaState);
+        return new ResponseCompensated(sagaState, true);
     }
 
 }

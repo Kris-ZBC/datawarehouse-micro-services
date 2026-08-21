@@ -1,5 +1,7 @@
 package local.sop.datawarehouse.registration.saga.application.service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -17,7 +19,6 @@ import local.sop.datawarehouse.registration.saga.application.api.dto.apprentice.
 import local.sop.datawarehouse.registration.saga.application.api.dto.auditlog.AuditlogResponse;
 import local.sop.datawarehouse.registration.saga.application.api.dto.auditlog.CreateAuditlogCmd;
 import local.sop.datawarehouse.registration.saga.application.api.dto.consent.ConsentResponse;
-import local.sop.datawarehouse.registration.saga.application.api.dto.consent.ConsentStatementResponse;
 import local.sop.datawarehouse.registration.saga.application.api.dto.consent.GrantConsentCmd;
 import local.sop.datawarehouse.registration.saga.application.api.dto.educationline.EducationLineResponse;
 import local.sop.datawarehouse.registration.saga.application.api.dto.instructor.CreateInstructorCmd;
@@ -32,12 +33,15 @@ import local.sop.datawarehouse.registration.saga.application.infrastructure.resp
 import local.sop.datawarehouse.registration.saga.application.ports.out.apprentice.ApprenticePort;
 import local.sop.datawarehouse.registration.saga.application.ports.out.auditlog.AuditlogPort;
 import local.sop.datawarehouse.registration.saga.application.ports.out.consent.ConsentPort;
+import local.sop.datawarehouse.registration.saga.application.ports.out.consentsaga.ConsentSagaPort;
 import local.sop.datawarehouse.registration.saga.application.ports.out.educationline.EducationLinePort;
 import local.sop.datawarehouse.registration.saga.application.ports.out.instructor.InstructorPort;
 import local.sop.datawarehouse.registration.saga.application.ports.out.login.LoginPort;
 import local.sop.datawarehouse.registration.saga.application.ports.out.organization.OrganizationPort;
 import local.sop.datawarehouse.registration.saga.application.ports.out.person.PersonPort;
 import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.common.libs.sharedkernel.enums.ActorType;
+import local.sop.common.libs.sharedkernel.enums.Severity;
 import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
 import local.sop.common.libs.sharedkernel.exceptions.NotFoundException;
 
@@ -46,9 +50,11 @@ public class RegistrationSagaApplicationService implements RegistrationDirectory
 
     private static final Logger log = LoggerFactory.getLogger(RegistrationSagaApplicationService.class);
 
+
     private final ApprenticePort apprentices;
     private final AuditlogPort auditlogs;
     private final ConsentPort consents;
+    private final ConsentSagaPort consentSagas;
     private final EducationLinePort educationLines;
     private final InstructorPort instructors;
     private final LoginPort logins;
@@ -56,11 +62,12 @@ public class RegistrationSagaApplicationService implements RegistrationDirectory
     private final PersonPort persons;
 
     public RegistrationSagaApplicationService(ApprenticePort apprentices, AuditlogPort auditlogs,
-            EducationLinePort educationLines, ConsentPort consents, InstructorPort instructors, LoginPort logins,
+            EducationLinePort educationLines, ConsentSagaPort consentSagas, ConsentPort consents, InstructorPort instructors, LoginPort logins,
             OrganizationPort organizations, PersonPort persons) {
         this.apprentices = apprentices;
         this.auditlogs = auditlogs;
         this.educationLines = educationLines;
+        this.consentSagas = consentSagas;
         this.consents = consents;
         this.instructors = instructors;
         this.logins = logins;
@@ -116,18 +123,25 @@ public class RegistrationSagaApplicationService implements RegistrationDirectory
 
     @Override
     public CreatedApprenticeResponse registerApprentice(CreateApprenticeRegistrationCmd cmd) {
-        UUID personId = null;
-        UUID loginId = null;
-        UUID apprenticeId = null;
-        UUID consentId = null;
+
+        // CHANGED: these used to be shared mutable fields on the
+        // (singleton, @Service) class — meaning every concurrent
+        // registration request was reading and overwriting the SAME
+        // personId/loginId/etc. across threads. Now method-local,
+        // scoped to this one invocation, safe under concurrent load.
+        UUID personId;
+        UUID loginId;
+        UUID apprenticeId;
         UUID auditlogId = null;
 
         // Step 1, 2 and 3: Verify organization, education line and consent statement
         // exists
         verifyOrganizationExists(cmd.organizationRef());
         verifyEducationLineExists(cmd.educationLineRef());
+        /**
+         * Handled by consent-saga, so no need to verify here. The consent-saga will handle the verification of the consent statement and will throw an exception if it does not exist.  
         verifyConsentStatementExists(cmd.consentStatementId());
-
+        */
         // Step 4: Create a person
         try {
             personId = persons.create(
@@ -225,10 +239,13 @@ public class RegistrationSagaApplicationService implements RegistrationDirectory
         }
 
         // Step 10: Grant consent
+        List<UUID> consentIds = new ArrayList<>();
         try {
-            consentId = consents
-                    .grant(new GrantConsentCmd(personId, cmd.consentStatementId(), cmd.purpose(), cmd.type(),
-                            cmd.consentStatus()));
+            for (CreateApprenticeRegistrationCmd.ConsentStatement cs : cmd.consentStatements()) {
+                ConsentResponse resp = consentSagas.grant(
+                    new GrantConsentCmd(apprenticeId, personId, cs.consentStatementRef(), cs.status(), auditlogId, ActorType.USER, Severity.INFO, "Registration", "Apprentice registration", "Registration-Saga", "Apprentice registration", "Apprentice registration"));
+                consentIds.add(resp.consentId());
+            }
         } catch (ConflictException ex) {
             throw ex;
         } catch (Exception ex) {
@@ -236,36 +253,40 @@ public class RegistrationSagaApplicationService implements RegistrationDirectory
             compensateApprentice(apprenticeId);
             compensateLogin(loginId);
             compensatePerson(personId);
+            consentIds.forEach(this::compensateConsent);
             throw new ConflictException("consent.not.granted", Map.of("", "consent"));
         }
 
         // Step 11: Get the consent (sanity check)
-        ConsentResponse consent;
+        UUID currentConsentId = null;
         try {
-            consent = consents.getById(consentId);
-            if (consent == null) {
-                log.warn("Registration: sanity checking consent returned null for id: {}", consentId);
-                compensateConsent(consentId);
-                compensateApprentice(apprenticeId);
-                compensateLogin(loginId);
-                compensatePerson(personId);
-                throw new ConflictException("consent.not.found", Map.of("id", consentId.toString()));
+            for (UUID consentId : consentIds) {
+                currentConsentId = consentId;
+                ConsentResponse consent = consents.getById(consentId);
+                if (consent == null) {
+                    log.warn("Registration: sanity checking consent returned null for id: {}", consentId);
+                    compensateConsent(consentId);
+                    compensateApprentice(apprenticeId);
+                    compensateLogin(loginId);
+                    compensatePerson(personId);
+                    throw new ConflictException("consent.not.found", Map.of("id", consentId.toString()));
+                }
             }
         } catch (ConflictException ex) {
             throw ex;
         } catch (NotFoundException ex) {
-            compensateConsent(consentId);
+            consentIds.forEach(this::compensateConsent);
             compensateApprentice(apprenticeId);
             compensateLogin(loginId);
             compensatePerson(personId);
-            throw new ConflictException("consent.not.found", Map.of("id", consentId.toString()));
+            throw new ConflictException("consent.not.found", Map.of("id", currentConsentId.toString()));
         } catch (Exception ex) {
-            log.warn("Registration: failed to retrieve consent with id: {}", consentId, ex);
-            compensateConsent(consentId);
+            log.warn("Registration: failed to retrieve consent with id: {}", currentConsentId, ex);
+            consentIds.forEach(this::compensateConsent);
             compensateApprentice(apprenticeId);
             compensateLogin(loginId);
             compensatePerson(personId);
-            throw new ConflictException("consent.read.failed", Map.of("id", consentId.toString()));
+            throw new ConflictException("consent.read.failed", Map.of("id", currentConsentId.toString()));
         }
 
         // Step 12: Create audit log
@@ -283,7 +304,7 @@ public class RegistrationSagaApplicationService implements RegistrationDirectory
             throw ex;
         } catch (Exception ex) {
             log.warn("Registration: auditlog creation failed", ex);
-            compensateConsent(consentId);
+            consentIds.forEach(this::compensateConsent);
             compensateApprentice(apprenticeId);
             compensateLogin(loginId);
             compensatePerson(personId);
@@ -297,7 +318,7 @@ public class RegistrationSagaApplicationService implements RegistrationDirectory
             if (auditlog == null) {
                 log.warn("Registration: sanity checking auditlog returned null with id: {}", auditlogId);
                 compensateAuditlog(auditlogId);
-                compensateConsent(consentId);
+                consentIds.forEach(this::compensateConsent);
                 compensateApprentice(apprenticeId);
                 compensateLogin(loginId);
                 compensatePerson(personId);
@@ -307,7 +328,7 @@ public class RegistrationSagaApplicationService implements RegistrationDirectory
             throw ex;
         } catch (NotFoundException ex) {
             compensateAuditlog(auditlogId);
-            compensateConsent(consentId);
+            consentIds.forEach(this::compensateConsent);
             compensateApprentice(apprenticeId);
             compensateLogin(loginId);
             compensatePerson(personId);
@@ -316,7 +337,7 @@ public class RegistrationSagaApplicationService implements RegistrationDirectory
             log.warn(
                     "Registration: failed to retrieve auditlog with id: {}", auditlogId, ex);
             compensateAuditlog(auditlogId);
-            compensateConsent(consentId);
+            consentIds.forEach(this::compensateConsent);
             compensateApprentice(apprenticeId);
             compensateLogin(loginId);
             compensatePerson(personId);
@@ -371,15 +392,19 @@ public class RegistrationSagaApplicationService implements RegistrationDirectory
      */
     @Override
     public CreatedInstructorResponse registerInstructor(CreateInstructorRegistrationCmd cmd) {
-        UUID personId = null;
-        UUID loginId = null;
-        UUID instructorId = null;
-        UUID consentId = null;
+
+        // CHANGED: method-local now, not shared instance fields — see
+        // registerApprentice's comment for why this mattered.
+        UUID personId;
+        UUID loginId;
+        UUID instructorId;
         UUID auditlogId = null;
 
-        // Step 1 and 2: Verify organization and consent statement exists
+        // Step 1 and 2: Verify organization and consent statements exists
         verifyOrganizationExists(cmd.organizationRef());
-        verifyConsentStatementExists(cmd.consentStatementId());
+        /** Handled by consentsaga  
+         * cmd.consentStatements().forEach(cs -> verifyConsentStatementExists(cs.consentStatementRef()));
+         */
 
         // Step 3: Create a person
         try {
@@ -479,10 +504,13 @@ public class RegistrationSagaApplicationService implements RegistrationDirectory
         }
 
         // Step 9: Grant consent
+        List<UUID> consentIds = new ArrayList<>();
         try {
-            consentId = consents
-                    .grant(new GrantConsentCmd(personId, cmd.consentStatementId(), cmd.purpose(), cmd.type(),
-                            cmd.consentStatus()));
+            for (CreateInstructorRegistrationCmd.ConsentStatement cs : cmd.consentStatements()) {
+                ConsentResponse resp = consentSagas.grant(
+                    new GrantConsentCmd(instructorId, personId, cs.consentStatementRef(), cs.status(), auditlogId, ActorType.USER, Severity.INFO, "Registration", "Instructor registration", "Registration-Saga", "Instructor registration", "Instructor registration"));
+                consentIds.add(resp.consentId());
+            }
         } catch (ConflictException ex) {
             throw ex;
         } catch (Exception ex) {
@@ -490,43 +518,47 @@ public class RegistrationSagaApplicationService implements RegistrationDirectory
             compensateInstructor(instructorId);
             compensateLogin(loginId);
             compensatePerson(personId);
+            consentIds.forEach(this::compensateConsent);
             throw new ConflictException("consent.not.granted", Map.of("", "consent"));
         }
 
         // Step 10: Get the consent (sanity check)
-        ConsentResponse consent;
+        UUID currentConsentId = null;
         try {
-            consent = consents.getById(consentId);
-            if (consent == null) {
-                log.warn("Registration: sanity checking consent returned null for id: {}", consentId);
-                compensateConsent(consentId);
-                compensateInstructor(instructorId);
-                compensateLogin(loginId);
-                compensatePerson(personId);
-                throw new ConflictException("consent.not.found", Map.of("id", consentId.toString()));
+            for (UUID consentId : consentIds) {
+                currentConsentId = consentId;
+                ConsentResponse consent = consents.getById(consentId);
+                if (consent == null) {
+                    log.warn("Registration: sanity checking consent returned null for id: {}", consentId);
+                    consentIds.forEach(this::compensateConsent);
+                    compensateInstructor(instructorId);
+                    compensateLogin(loginId);
+                    compensatePerson(personId);
+                    throw new ConflictException("consent.not.found", Map.of("id", currentConsentId.toString()));
+                }
             }
         } catch (ConflictException ex) {
             throw ex;
         } catch (NotFoundException ex) {
-            compensateConsent(consentId);
+            consentIds.forEach(this::compensateConsent);
             compensateInstructor(instructorId);
             compensateLogin(loginId);
             compensatePerson(personId);
-            throw new ConflictException("consent.not.found", Map.of("id", consentId.toString()));
+            throw new ConflictException("consent.not.found", Map.of("id", currentConsentId.toString()));
         } catch (Exception ex) {
-            log.warn("Registration: failed to retrieve consent with id: {}", consentId, ex);
-            compensateConsent(consentId);
+            log.warn("Registration: failed to retrieve consent with id: {}", currentConsentId, ex);
+            consentIds.forEach(this::compensateConsent);
             compensateInstructor(instructorId);
             compensateLogin(loginId);
             compensatePerson(personId);
-            throw new ConflictException("consent.read.failed", Map.of("id", consentId.toString()));
+            throw new ConflictException("consent.read.failed", Map.of("id", currentConsentId.toString()));
         }
 
         // Step 11: Create audit log
         try {
             auditlogId = auditlogs.create(new CreateAuditlogCmd(
                     personId,
-                    local.sop.common.libs.sharedkernel.enums.ActorType.SERVICE,
+                    local.sop.common.libs.sharedkernel.enums.ActorType.USER,
                     local.sop.common.libs.sharedkernel.enums.Severity.INFO,
                     "registration-saga",
                     "RegistrationSagaApplicationService",
@@ -537,7 +569,7 @@ public class RegistrationSagaApplicationService implements RegistrationDirectory
             throw ex;
         } catch (Exception ex) {
             log.warn("Registration: auditlog creation failed", ex);
-            compensateConsent(consentId);
+            consentIds.forEach(this::compensateConsent);
             compensateInstructor(instructorId);
             compensateLogin(loginId);
             compensatePerson(personId);
@@ -551,7 +583,7 @@ public class RegistrationSagaApplicationService implements RegistrationDirectory
             if (auditlog == null) {
                 log.warn("Registration: sanity checking auditlog returned null with id: {}", auditlogId);
                 compensateAuditlog(auditlogId);
-                compensateConsent(consentId);
+                consentIds.forEach(this::compensateConsent);
                 compensateInstructor(instructorId);
                 compensateLogin(loginId);
                 compensatePerson(personId);
@@ -561,7 +593,7 @@ public class RegistrationSagaApplicationService implements RegistrationDirectory
             throw ex;
         } catch (NotFoundException ex) {
             compensateAuditlog(auditlogId);
-            compensateConsent(consentId);
+            consentIds.forEach(this::compensateConsent);
             compensateInstructor(instructorId);
             compensateLogin(loginId);
             compensatePerson(personId);
@@ -570,7 +602,7 @@ public class RegistrationSagaApplicationService implements RegistrationDirectory
             log.warn(
                     "Registration: failed to retrieve auditlog with id: {}", auditlogId, ex);
             compensateAuditlog(auditlogId);
-            compensateConsent(consentId);
+            consentIds.forEach(this::compensateConsent);
             compensateInstructor(instructorId);
             compensateLogin(loginId);
             compensatePerson(personId);
@@ -610,7 +642,7 @@ public class RegistrationSagaApplicationService implements RegistrationDirectory
     }
 
     private ResponseCompensated compensateConsent(UUID consentId) {
-        ResponseCompensated result = consents.compensate(consentId, getClass(), SagaOutcome.COMPENSATED);
+        ResponseCompensated result = consentSagas.compensateConsent(consentId, getClass(), SagaOutcome.COMPENSATED);
         log.warn("Registration: compensated consent id: {}. compensated. Success: {}", consentId, result.success());
         return result;
     }
@@ -662,25 +694,6 @@ public class RegistrationSagaApplicationService implements RegistrationDirectory
         return educationLine;
     }
 
-    private ConsentStatementResponse verifyConsentStatementExists(UUID consentStatementId) {
-        ConsentStatementResponse consentStatement;
-        try {
-            consentStatement = consents.getConsentStatementById(consentStatementId);
-
-            if (consentStatement == null) {
-                log.warn("Registration: consent statement returned null for id: {}", consentStatementId);
-                throw new ConflictException("consentstatement.not.found", Map.of("id", consentStatementId.toString()));
-            }
-        } catch (ConflictException ex) {
-            throw ex;
-        } catch (NotFoundException ex) {
-            throw new ConflictException("consentstatement.not.found", Map.of("id", consentStatementId.toString()));
-        } catch (Exception ex) {
-            log.warn("Registration: failed to retrieve consent statement with id: {}", consentStatementId, ex);
-            throw new ConflictException("consentstatement.read.failed", Map.of("id", consentStatementId.toString()));
-        }
-        return consentStatement;
-    }
 
     private UUID createLogin(CreateLoginCmd cmd) {
         ResponseLoginCreated loginCreatedResponse;

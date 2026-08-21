@@ -53,7 +53,7 @@ public class InternalSOPControllerTest {
 
         when(directory.findById(Mockito.any(SOPQuery.class))).thenReturn(Optional.of(view));
 
-        mvc.perform(get("/internal/sop/{id}", id))
+        mvc.perform(get("/internal/sops/{id}", id))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.id").value(id.toString()))
             .andExpect(jsonPath("$.name").value("Ringsted Data/IT"))
@@ -66,7 +66,7 @@ public class InternalSOPControllerTest {
         when(directory.findById(Mockito.any(SOPQuery.class)))
             .thenReturn(Optional.empty());
 
-        mvc.perform(get("/internal/sop/{id}", UUID.randomUUID()))
+        mvc.perform(get("/internal/sops/{id}", UUID.randomUUID()))
             .andExpect(status().isNotFound());
     }
 }

@@ -14,9 +14,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.persistence.Version;
-import local.sop.common.libs.sharedkernel.enums.ConsentPurpose;
 import local.sop.common.libs.sharedkernel.enums.ConsentStatus;
-import local.sop.common.libs.sharedkernel.enums.ConsentType;
 import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 import local.sop.datawarehouse.consent.interfaceadapters.persistence.jpa.consentstatement.ConsentStatementEntity;
 
@@ -43,14 +41,6 @@ public class ConsentEntity {
     @Column(name = "status", nullable = false)
     private ConsentStatus status;
 
-     @Enumerated(EnumType.STRING)
-    @Column(name = "purpose", nullable = false)
-    private ConsentPurpose purpose;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "type", nullable = false)
-    private ConsentType type;
-
     protected ConsentEntity() {
         // JPA kræver en default constructor
     }
@@ -59,17 +49,13 @@ public class ConsentEntity {
             UUID id,
             UUID personReference,
             ConsentStatementEntity consentStatement,
-            ConsentStatus status,
-             ConsentPurpose purpose, 
-             ConsentType type
+            ConsentStatus status
         ) {
-        this.id = id;
-        this.personReference = personReference;
-        this.consentStatement = consentStatement;
-        this.status = status;
-        this.purpose = purpose;
-        this.type = type;
-    }
+            this.id = id;
+            this.personReference = personReference;
+            this.consentStatement = consentStatement;
+            this.status = status;
+        }
 
     /* Withers */
     public ConsentEntity withConsentStatement(ConsentStatementEntity consentStatement) {
@@ -81,17 +67,6 @@ public class ConsentEntity {
         this.status = status;
         return this;
     }
-
-    public ConsentEntity withConsentPurpose(ConsentPurpose consentPurpose) {
-        this.purpose = consentPurpose;
-        return this;
-    }
-
-    public ConsentEntity withConsentType(ConsentType consentType) {
-        this.type = consentType;
-        return this;
-    }
-
 
     /* Getters */
 
@@ -114,14 +89,6 @@ public class ConsentEntity {
         return status;
     }
 
-        public ConsentPurpose getConsentPurpose() {
-        return purpose;
-    }
-
-    public ConsentType getConsentType() {
-        return type;
-    }   
-
     /* Buiilder factory */
     public static Builder builder() { return new Builder(); }
 
@@ -131,8 +98,6 @@ public class ConsentEntity {
         private UUID personReference;
         private ConsentStatementEntity consentStatement;
         private ConsentStatus status;
-        private ConsentPurpose consentPurpose;
-        private ConsentType consentType;
 
         public Builder id(UUID id) {
             this.id = id;
@@ -154,20 +119,10 @@ public class ConsentEntity {
             return this;
         }
 
-        public Builder consentPurpose(ConsentPurpose consentPurpose) {
-            this.consentPurpose = consentPurpose;
-            return this;
-        }
-
-        public Builder consentType(ConsentType consentType) {
-            this.consentType = consentType;
-            return this;
-        }
-
         public ConsentEntity build() {
             if(id == null) { throw new ValidationException("key.invalid", Map.of("field", "id")); }
             if(consentStatement == null) { throw new ValidationException("consent.consentstatement.invalid", Map.of("field", "consentStatement")); }
-            return new ConsentEntity(id, personReference, consentStatement, status, consentPurpose, consentType);
+            return new ConsentEntity(id, personReference, consentStatement, status);
         }
     }
 }

@@ -1,0 +1,12 @@
+{"properties": [
+  {
+    "name": "registration-saga.base-url",
+    "type": "java.lang.String",
+    "description": "A description for 'registration-saga.base-url'"
+  },
+  {
+    "name": "sop.base-url",
+    "type": "java.lang.String",
+    "description": "A description for 'sop.base-url'"
+  }
+]}

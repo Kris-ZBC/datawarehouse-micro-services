@@ -1,4 +1,5 @@
 package local.sop.datawarehouse.organisation.application.api;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -6,4 +7,5 @@ import local.sop.datawarehouse.organisation.application.api.dto.OrganisationResp
 
 public interface OrganisationDirectory {
     public Optional<OrganisationResponse> findById(UUID id);
+    public List<OrganisationResponse> findAll();
 }

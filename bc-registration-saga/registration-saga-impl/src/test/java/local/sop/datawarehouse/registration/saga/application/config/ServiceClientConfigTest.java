@@ -30,6 +30,8 @@ class ServiceClientConfigTest {
     @Mock
     private ConsentProps consentProps;
     @Mock
+    private ConsentSagaProps consentSagaProps;
+    @Mock
     private EducationLineProps educationLineProps;
     @Mock
     private InstructorProps instructorProps;
@@ -53,6 +55,7 @@ class ServiceClientConfigTest {
         when(apprenticeProps.baseUrl()).thenReturn("A");
         when(auditlogProps.baseurl()).thenReturn("B");
         when(consentProps.baseUrl()).thenReturn("C");
+        when(consentSagaProps.baseUrl()).thenReturn("CS");
         when(educationLineProps.baseUrl()).thenReturn("D");
         when(instructorProps.baseUrl()).thenReturn("E");
         when(loginProps.baseUrl()).thenReturn("F");
@@ -66,6 +69,7 @@ class ServiceClientConfigTest {
         config.apprentice(clientFactory, apprenticeProps);
         config.auditlog(clientFactory, auditlogProps);
         config.consent(clientFactory, consentProps);
+        config.consentSaga(clientFactory, consentSagaProps);
         config.educationline(clientFactory, educationLineProps);
         config.instructor(clientFactory, instructorProps);
         config.login(clientFactory, loginProps);
@@ -76,6 +80,7 @@ class ServiceClientConfigTest {
         verify(clientFactory).createMtlsClient("apprentice", "A");
         verify(clientFactory).createMtlsClient("auditlog", "B");
         verify(clientFactory).createMtlsClient("consent", "C");
+        verify(clientFactory).createMtlsClient("consent-saga", "CS");
         verify(clientFactory).createMtlsClient("educationline", "D");
         verify(clientFactory).createMtlsClient("instructor", "E");
         verify(clientFactory).createMtlsClient("login", "F");

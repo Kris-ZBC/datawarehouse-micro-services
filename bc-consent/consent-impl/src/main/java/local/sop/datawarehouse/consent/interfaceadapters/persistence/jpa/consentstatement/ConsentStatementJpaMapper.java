@@ -25,6 +25,8 @@ public class ConsentStatementJpaMapper {
                 .id(new ConsentStatementRef(entity.getId()))
                 .statementText(new ConsentStatementValue(entity.getStatementText()))
                 .active(entity.isActive())
+                .purpose(entity.getPurpose())
+                .type(entity.getType())
                 .consents(entity.getConsents() != null ? entity.getConsents().stream()
                     .map(this::mapConsentEntityToDomain)
                     .collect(Collectors.toSet()) : Set.of())
@@ -40,8 +42,6 @@ public class ConsentStatementJpaMapper {
                 .personRef(new PersonRef(consentEntity.getPersonReference()))
                 .consentStatementRef(new ConsentStatementRef(consentEntity.getConsentStatement().getId()))
                 .status(consentEntity.getStatus())
-                .purpose(consentEntity.getConsentPurpose())
-                .type(consentEntity.getConsentType())
                 .build();
     }
 
@@ -53,6 +53,8 @@ public class ConsentStatementJpaMapper {
                 .id(domain.getId().value())
                 .statementText(domain.getStatementText())
                 .active(domain.isActive())
+                .purpose(domain.getPurpose())
+                .type(domain.getType())
                 .build();
 
         // Map consents med reference til parent entity
@@ -77,8 +79,6 @@ public class ConsentStatementJpaMapper {
                 .personReference(consent.getPersonRef().value())
                 .consentStatement(parentEntity) // ← Reference til parent
                 .status(consent.getStatus())
-                .consentPurpose(consent.getPurpose())
-                .consentType(consent.getType())
                 .build();
     }
 

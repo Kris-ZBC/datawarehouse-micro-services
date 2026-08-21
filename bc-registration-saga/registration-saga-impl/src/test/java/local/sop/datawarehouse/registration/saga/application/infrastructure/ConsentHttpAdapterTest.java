@@ -1,7 +1,6 @@
 package local.sop.datawarehouse.registration.saga.application.infrastructure;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -16,22 +15,21 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.client.RestClient;
 
-import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
-import local.sop.common.libs.sharedkernel.sagas.compensate.request.PayloadCompensateCreate;
-import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
+import local.sop.common.libs.sharedkernel.enums.ConsentPurpose;
+import local.sop.common.libs.sharedkernel.enums.ConsentType;
 import local.sop.datawarehouse.registration.saga.application.api.dto.consent.ConsentResponse;
-import local.sop.datawarehouse.registration.saga.application.api.dto.consent.ConsentStatementResponse;
-import local.sop.datawarehouse.registration.saga.application.api.dto.consent.GrantConsentCmd;
 import local.sop.datawarehouse.registration.saga.application.infrastructure.consent.ConsentHttpAdapter;
 
+/**
+ * Tests ConsentHttpAdapter — the direct-to-bc-consent READ path.
+ * getById() only: getConsentStatementById() was removed entirely
+ * (registration-saga has no legitimate reason to know anything about a
+ * ConsentStatement — that's consent's own concern), so there's nothing
+ * left to test on that side. ConsentSagaHttpAdapterTest covers the
+ * consent-saga-routed WRITE path (grant / compensateConsent).
+ */
 @ExtendWith(MockitoExtension.class)
- class ConsentHttpAdapterTest {
-    
-     /*
-     * ----------------------------------------------------------- *
-     * ConsentHttpAdapterTest tests
-     * -----------------------------------------------------------
-     */
+class ConsentHttpAdapterTest {
 
     @Mock(name = "consent")
     private RestClient consentClient;
@@ -49,7 +47,7 @@ import local.sop.datawarehouse.registration.saga.application.infrastructure.cons
     @Test
     void consent_get_shouldReturnConsentFromDownstream() {
         UUID id = UUID.randomUUID();
-        var expected = new ConsentResponse(id, UUID.randomUUID(), "ACTIVE", UUID.randomUUID(), "consentStatement", "consentPurpose", "constentType", true);
+        var expected = new ConsentResponse(id, UUID.randomUUID(), "ACTIVE", UUID.randomUUID(), "consentStatement", ConsentPurpose.RESEARCH, ConsentType.ONE_TIME, true);
         var mockRequestHeadersSpec = mock(RestClient.RequestHeadersSpec.class);
         var mockResponseSpec = mock(RestClient.ResponseSpec.class);
 
@@ -65,77 +63,5 @@ import local.sop.datawarehouse.registration.saga.application.infrastructure.cons
         verify(consentClient).get();
         verify(mockRequestHeadersUriSpec).uri("/internal/consents/consent/{id}", id);
         verify(mockResponseSpec).body(ConsentResponse.class);
-    }
-
-    
-    @Test
-    void consentStatement_get_shouldReturnConsentFromDownstream() {
-        UUID id = UUID.randomUUID();
-        var expected = new ConsentStatementResponse(id, "statement", true);
-        var mockRequestHeadersSpec = mock(RestClient.RequestHeadersSpec.class);
-        var mockResponseSpec = mock(RestClient.ResponseSpec.class);
-
-        doReturn(mockRequestHeadersUriSpec).when(consentClient).get();
-        doReturn(mockRequestHeadersSpec).when(mockRequestHeadersUriSpec)
-                .uri("/internal/consent/statements/statements?id={id}", id);
-        when(mockRequestHeadersSpec.retrieve()).thenReturn(mockResponseSpec);
-        when(mockResponseSpec.body(ConsentStatementResponse.class)).thenReturn(expected);
-
-        ConsentStatementResponse result = consentAdapter.getConsentStatementById(id);
-
-        assertEquals(expected, result);
-        verify(consentClient).get();
-        verify(mockRequestHeadersUriSpec).uri("/internal/consent/statements/statements?id={id}", id);
-        verify(mockResponseSpec).body(ConsentStatementResponse.class);
-    }
-
-    @Test
-    void consent_compensate_shouldReturnResultFromDownstream() {
-        UUID id = UUID.randomUUID();
-        SagaOutcome state = SagaOutcome.COMPENSATED;
-        var request = new PayloadCompensateCreate(ConsentHttpAdapter.class, state);
-        var expectedResult = new ResponseCompensated(SagaOutcome.COMPENSATED, true);
-
-        var mockRequestBodyUriSpec = mock(RestClient.RequestBodyUriSpec.class);
-        var mockRequestBodySpec = mock(RestClient.RequestBodySpec.class);
-        var mockResponseSpec = mock(RestClient.ResponseSpec.class);
-
-        when(consentClient.put()).thenReturn(mockRequestBodyUriSpec);
-        when(mockRequestBodyUriSpec.uri("/internal/consent/statements/{id}/compensate/create", id))
-                .thenReturn(mockRequestBodySpec);
-        when(mockRequestBodySpec.body(any(PayloadCompensateCreate.class))).thenReturn(mockRequestBodySpec);
-        when(mockRequestBodySpec.retrieve()).thenReturn(mockResponseSpec);
-        when(mockResponseSpec.body(ResponseCompensated.class)).thenReturn(expectedResult);
-
-        ResponseCompensated result = consentAdapter.compensate(id, ConsentHttpAdapter.class, state);
-
-        assertEquals(expectedResult.sagaState(), result.sagaState());
-        assertEquals(expectedResult.success(), result.success());
-        verify(consentClient).put();
-        verify(mockRequestBodyUriSpec).uri("/internal/consent/statements/{id}/compensate/create", id);
-        verify(mockRequestBodySpec).body(request);
-        verify(mockResponseSpec).body(ResponseCompensated.class);
-    }
-    @Test
-    void consent_grant_shouldReturnUuidFromDownstream() {
-        UUID expectedId = UUID.randomUUID();
-        var request = new GrantConsentCmd(UUID.randomUUID(), UUID.randomUUID(), null, null, null );
-
-        var mockRequestBodyUriSpec = mock(RestClient.RequestBodyUriSpec.class);
-        var mockRequestBodySpec = mock(RestClient.RequestBodySpec.class);
-        var mockResponseSpec = mock(RestClient.ResponseSpec.class);
-
-        when(consentClient.post()).thenReturn(mockRequestBodyUriSpec);
-        when(mockRequestBodyUriSpec.uri("/internal/consents/consent/grant")).thenReturn(mockRequestBodySpec);
-        when(mockRequestBodySpec.body(any(GrantConsentCmd.class))).thenReturn(mockRequestBodySpec);
-        when(mockRequestBodySpec.retrieve()).thenReturn(mockResponseSpec);
-        when(mockResponseSpec.body(UUID.class)).thenReturn(expectedId);
-
-        UUID result = consentAdapter.grant(request);
-        assertEquals(expectedId, result);
-        verify(consentClient).post();
-        verify(mockRequestBodyUriSpec).uri("/internal/consents/consent/grant");
-        verify(mockRequestBodySpec).body(request);
-        verify(mockResponseSpec).body(UUID.class);
     }
 }

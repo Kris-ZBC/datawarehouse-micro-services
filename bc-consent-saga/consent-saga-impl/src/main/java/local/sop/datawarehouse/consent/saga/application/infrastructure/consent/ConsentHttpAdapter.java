@@ -26,12 +26,11 @@ public class ConsentHttpAdapter implements ConsentPort {
     public ConsentHttpAdapter(@Qualifier("consent") RestClient consent) {
         this.consent = consent;
     }
-
     @Override
-    public UUID create(Boolean active, String text) {
+    public UUID create(Boolean active, String text, ConsentPurpose purpose, ConsentType type) {
            return consent.post()
                 .uri("/internal/consents/statements")
-                .body(new PayloadConsentCreate(active, text))
+                .body(new PayloadConsentCreate(active, text, purpose, type))
                 .retrieve()
                 .body(ConsentStatementResponse.class).consentStatementId();
     }
@@ -61,11 +60,10 @@ public class ConsentHttpAdapter implements ConsentPort {
             .body(ResponseCompensated.class);
     }
     @Override
-    public ConsentResponse grant(UUID personRef, UUID consentStatementRef, ConsentPurpose purpose, ConsentType type,
-            ConsentStatus status) {
+    public ConsentResponse grant(UUID personRef, UUID consentStatementRef, ConsentStatus status) {
         return consent.post()
             .uri("/internal/consents/consent/grant")
-            .body(new PayloadGrantConsent(personRef, consentStatementRef, purpose, type, status))
+            .body(new PayloadGrantConsent(personRef, consentStatementRef, status))
             .retrieve()
             .body(ConsentResponse.class);
     }

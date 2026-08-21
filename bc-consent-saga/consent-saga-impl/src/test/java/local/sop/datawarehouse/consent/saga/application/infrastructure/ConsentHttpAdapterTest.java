@@ -55,7 +55,7 @@ public class ConsentHttpAdapterTest {
     @Test
     void consent_create_shouldReturnConsentStatementIdFromDownstream() {
         UUID expectedId = UUID.randomUUID();
-        var request = new PayloadConsentCreate(true, "some text");
+        var request = new PayloadConsentCreate(true, "some text", ConsentPurpose.ANALYTICS, ConsentType.ONE_TIME);
 
         var mockRequestBodyUriSpec = mock(RestClient.RequestBodyUriSpec.class);
         var mockRequestBodySpec    = mock(RestClient.RequestBodySpec.class);
@@ -66,9 +66,9 @@ public class ConsentHttpAdapterTest {
         when(mockRequestBodySpec.body(any(PayloadConsentCreate.class))).thenReturn(mockRequestBodySpec);
         when(mockRequestBodySpec.retrieve()).thenReturn(mockResponseSpec);
         when(mockResponseSpec.body(ConsentStatementResponse.class))
-                .thenReturn(new ConsentStatementResponse(expectedId, "some text", true));
+                .thenReturn(new ConsentStatementResponse(expectedId, "some text", true, ConsentPurpose.ANALYTICS.name(), ConsentType.ONE_TIME.name()));
 
-        UUID result = consentAdapter.create(request.active(), request.text());
+        UUID result = consentAdapter.create(request.active(), request.text(), request.purpose(), request.type());
 
         assertEquals(expectedId, result);
         verify(consentClient).post();
@@ -80,7 +80,7 @@ public class ConsentHttpAdapterTest {
     @Test
     void consent_get_shouldReturnConsentStatementFromDownstream() {
         UUID id = UUID.randomUUID();
-        var expected = new ConsentStatementResponse(id, "some text", true);
+        var expected = new ConsentStatementResponse(id, "some text", true, ConsentPurpose.ANALYTICS.name(), ConsentType.ONE_TIME.name());
         var mockRequestHeadersSpec    = mock(RestClient.RequestHeadersSpec.class);
         var mockResponseSpec          = mock(RestClient.ResponseSpec.class);
 
@@ -131,7 +131,7 @@ public class ConsentHttpAdapterTest {
         UUID expectedId = UUID.randomUUID();
         UUID personRef = UUID.randomUUID();
         UUID consentStatementRef = UUID.randomUUID();
-        ConsentResponse expectedConsentResponse = new ConsentResponse(expectedId, personRef, "ACTIVE", consentStatementRef, "Statement Text", ConsentPurpose.ANALYTICS.name(), ConsentType.ONE_TIME.name(), true);
+        ConsentResponse expectedConsentResponse = new ConsentResponse(expectedId, personRef, "ACTIVE", consentStatementRef, "Statement Text", ConsentPurpose.ANALYTICS, ConsentType.ONE_TIME, true);
         
         var mockRequestBodyUriSpec = mock(RestClient.RequestBodyUriSpec.class);
         var mockRequestBodySpec    = mock(RestClient.RequestBodySpec.class);
@@ -144,15 +144,13 @@ public class ConsentHttpAdapterTest {
         when(mockResponseSpec.body(ConsentResponse.class))
                 .thenReturn(expectedConsentResponse);
 
-        ConsentResponse result = consentAdapter.grant(
-                personRef, consentStatementRef, ConsentPurpose.ANALYTICS, ConsentType.ONE_TIME, ConsentStatus.ACTIVE
-        );
+        ConsentResponse result = consentAdapter.grant(personRef, consentStatementRef, ConsentStatus.ACTIVE);      
 
         assertEquals(expectedConsentResponse.active(), result.active());
         assertEquals(personRef, result.personReference());
         assertEquals(consentStatementRef, result.consentStatementId());
-        assertEquals(ConsentPurpose.ANALYTICS.name(), result.consentPurpose());
-        assertEquals(ConsentType.ONE_TIME.name(), result.consentType());
+        assertEquals(ConsentPurpose.ANALYTICS, result.consentStatementPurpose());
+        assertEquals(ConsentType.ONE_TIME, result.consentStatementType());
         assertEquals(ConsentStatus.ACTIVE.name(), result.status());
 
         verify(consentClient).post();
@@ -242,8 +240,8 @@ public class ConsentHttpAdapterTest {
                 "ACTIVE",
                 UUID.randomUUID(),
                 "statement text",
-                ConsentPurpose.ANALYTICS.name(),
-                ConsentType.ONE_TIME.name(),
+                ConsentPurpose.ANALYTICS,
+                ConsentType.ONE_TIME,
                 true);
 
         var mockRequestHeadersUriSpec = mock(RestClient.RequestHeadersUriSpec.class);
@@ -267,8 +265,8 @@ public class ConsentHttpAdapterTest {
         assertEquals(expected.consentId(), result.consentId());
         assertEquals(expected.status(), result.status());
         assertEquals(expected.consentStatementId(), result.consentStatementId());
-        assertEquals(expected.consentPurpose(), result.consentPurpose());
-        assertEquals(expected.consentType(), result.consentType());
+        assertEquals(expected.consentStatementPurpose(), result.consentStatementPurpose());
+        assertEquals(expected.consentStatementType(), result.consentStatementType());
         assertEquals(expected.active(), result.active());
 
         verify(consentClient).get();

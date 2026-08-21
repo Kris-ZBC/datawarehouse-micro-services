@@ -3,6 +3,8 @@ package local.sop.datawarehouse.consent.interfaceadapters.persistence.jpa.consen
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+import local.sop.common.libs.sharedkernel.enums.ConsentPurpose;
+import local.sop.common.libs.sharedkernel.enums.ConsentType;
 import local.sop.datawarehouse.consent.domain.model.valueobject.ConsentStatementRef;
 import local.sop.datawarehouse.consent.interfaceadapters.persistence.jpa.consentstatement.ConsentStatementEntity;
 
@@ -12,10 +14,14 @@ import local.sop.datawarehouse.consent.interfaceadapters.persistence.jpa.consent
 public class TestStatementEntityFactory implements StatementEntityFactory {
     @Override
     public ConsentStatementEntity createStatementEntity(ConsentStatementRef statementRef) {
+        // CHANGED: purpose/type are now required on ConsentStatementEntity
+        // (see its Builder), so this stub needs defaults to satisfy that.
         return statementRef != null ?
             ConsentStatementEntity.builder()
                 .id(statementRef.value())
                 .statementText("test")
+                .purpose(ConsentPurpose.REQUIRED_SERVICE)
+                .type(ConsentType.REQUIRED)
                 .active(true)
                 .build() : null;
     }

@@ -43,8 +43,6 @@ public class ConsentJpaMapper {
                     new PersonRef(entity.getPersonReference()) : null)
                 .consentStatementRef(new ConsentStatementRef(entity.getConsentStatement().getId()))
                 .status(entity.getStatus())
-                .purpose(entity.getConsentPurpose())
-                .type(entity.getConsentType())
                 .build();
     }
 
@@ -70,8 +68,6 @@ public class ConsentJpaMapper {
             .personReference(domain.getPersonRef().value())
             .consentStatement(statementEntity)
             .status(domain.getStatus())
-            .consentPurpose(domain.getPurpose())
-            .consentType(domain.getType())
             .build();
     }
 
