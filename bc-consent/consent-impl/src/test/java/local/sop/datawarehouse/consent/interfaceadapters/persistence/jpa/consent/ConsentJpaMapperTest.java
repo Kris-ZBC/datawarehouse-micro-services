@@ -33,52 +33,51 @@ import local.sop.datawarehouse.consent.interfaceadapters.persistence.jpa.consent
 @ExtendWith(MockitoExtension.class)
 public class ConsentJpaMapperTest {
 
-    @InjectMocks
+        @InjectMocks
     private ConsentJpaMapper mapper;
-
+ 
     @Mock
     private StatementEntityFactory statementFactory;
-
+ 
     private static final UUID CONSENT_ID = UUID.fromString("111e4567-e89b-12d3-a456-426614174111");
     private static final UUID PERSON_REF = UUID.fromString("222e4567-e89b-12d3-a456-426614174222");
     private static final UUID STATEMENT_ID = UUID.fromString("333e4567-e89b-12d3-a456-426614174333");
-
+ 
     // ========== ENTITY TO DOMAIN TESTS ==========
-
+ 
     @Test
     @DisplayName("Should map basic ConsentEntity to domain")
     void shouldMapBasicEntityToDomain() {
-        // Given
+        // Given — CHANGED: purpose/type live on the statement now, not
+        // on ConsentEntity/Consent.
         ConsentStatementEntity statementEntity = ConsentStatementEntity.builder()
                 .id(STATEMENT_ID)
                 .statementText("Marketing consent")
+                .purpose(ConsentPurpose.MARKETING)
+                .type(ConsentType.OPTIONAL)
                 .active(true)
                 .build();
-
+ 
         ConsentEntity entity = ConsentEntity.builder()
                 .id(CONSENT_ID)
                 .personReference(PERSON_REF)
                 .consentStatement(statementEntity)
                 .status(ConsentStatus.ACTIVE)
-                .consentPurpose(ConsentPurpose.MARKETING)
-                .consentType(ConsentType.OPTIONAL)
                 .build();
-
+ 
         // When
         Consent result = mapper.toDomain(entity);
-
+ 
         // Then
         assertEquals(CONSENT_ID, result.getId().value());
         assertEquals(PERSON_REF, result.getPersonRef().value());
         assertEquals(STATEMENT_ID, result.getConsentStatementRef().value());
         assertEquals(ConsentStatus.ACTIVE, result.getStatus());
-        assertEquals(ConsentPurpose.MARKETING, result.getPurpose());
-        assertEquals(ConsentType.OPTIONAL, result.getType());
-
+ 
     }
-
+ 
      // ========== DOMAIN TO ENTITY TESTS ==========
-
+ 
     @Test
     @DisplayName("Should map basic domain to entity")
     void shouldMapBasicDomainToEntity() {
@@ -88,49 +87,47 @@ public class ConsentJpaMapperTest {
                 .personRef(PersonRef.of(PERSON_REF))
                 .consentStatementRef(ConsentStatementRef.of(STATEMENT_ID))
                 .status(ConsentStatus.ACTIVE)
-                .purpose(ConsentPurpose.MARKETING)
-                .type(ConsentType.OPTIONAL)
                 .build();
-
+ 
         ConsentStatementEntity expectedStatement = ConsentStatementEntity.builder()
                 .id(STATEMENT_ID)
                 .statementText("test")
+                .purpose(ConsentPurpose.MARKETING)
+                .type(ConsentType.OPTIONAL)
                 .active(true)
                 .build();
-
+ 
         when(statementFactory.createStatementEntity(any(ConsentStatementRef.class)))
                 .thenReturn(expectedStatement);
-
+ 
         // When
         ConsentEntity result = mapper.toEntity(domain);
-
+ 
         // Then
         assertEquals(CONSENT_ID, result.getId());
         assertEquals(PERSON_REF, result.getPersonReference());
         assertEquals(ConsentStatus.ACTIVE, result.getStatus());
-        assertEquals(ConsentPurpose.MARKETING, result.getConsentPurpose());
-        assertEquals(ConsentType.OPTIONAL, result.getConsentType());
         assertNotNull(result.getConsentStatement());
         assertEquals(STATEMENT_ID, result.getConsentStatement().getId());
         assertEquals("test", result.getConsentStatement().getStatementText());
         verify(statementFactory).createStatementEntity(ConsentStatementRef.of(STATEMENT_ID));
     }
-
+ 
     @Test
     @DisplayName("Should handle null domain")
     void shouldHandleNullDomain() {
         // When
         ConsentEntity result = mapper.toEntity(null);
-
+ 
         // Then
         assertNull(result);
     }
-
+ 
     @Test
     @DisplayName("Should throw exception when domain has null ID")
     void shouldThrowExceptionWhenDomainHasNullId() {
         // Given
-
+ 
         // When & Then
         ValidationException exception = assertThrows(ValidationException.class, 
             () -> { 
@@ -139,16 +136,14 @@ public class ConsentJpaMapperTest {
                 .personRef(PersonRef.of(PERSON_REF))
                 .consentStatementRef(ConsentStatementRef.of(STATEMENT_ID))
                 .status(ConsentStatus.ACTIVE)
-                .purpose(ConsentPurpose.MARKETING)
-                .type(ConsentType.OPTIONAL)
                 .build());
             });
         assertEquals("consent.consentstatement.invalid", exception.getMessage());
     }
-
-
+ 
+ 
     // ========== EDGE CASES ==========
-
+ 
     @Test
     @DisplayName("Should verify statement entity only has ID when mapped from domain")
     void shouldVerifyStatementEntityOnlyHasIdWhenMappedFromDomain() {
@@ -158,25 +153,24 @@ public class ConsentJpaMapperTest {
                 .personRef(PersonRef.of(PERSON_REF))
                 .consentStatementRef(ConsentStatementRef.of(STATEMENT_ID))
                 .status(ConsentStatus.ACTIVE)
-                .purpose(ConsentPurpose.MARKETING)
-                .type(ConsentType.OPTIONAL)
-
                 .build();
-
-
+ 
+ 
          ConsentStatementEntity expectedStatement = ConsentStatementEntity.builder()
                 .id(STATEMENT_ID)
                 .statementText("test")
+                .purpose(ConsentPurpose.MARKETING)
+                .type(ConsentType.OPTIONAL)
                 .active(true)
                 .build();
-
+ 
         when(statementFactory.createStatementEntity(any(ConsentStatementRef.class)))
                 .thenReturn(expectedStatement);
-
-        
+ 
+ 
         // When
         ConsentEntity result = mapper.toEntity(domain);
-
+ 
         // Then
         assertNotNull(result.getConsentStatement());
         assertEquals(STATEMENT_ID, result.getConsentStatement().getId());
@@ -185,10 +179,14 @@ public class ConsentJpaMapperTest {
         assertTrue(result.getConsentStatement().getConsents().isEmpty()); // Should not be null
         verify(statementFactory).createStatementEntity(ConsentStatementRef.of(STATEMENT_ID));
     }
-
+ 
     @Test
-    @DisplayName("Should handle all enum combinations")
+    @DisplayName("Should handle all status values, statement carrying every purpose/type combination")
     void shouldHandleAllEnumCombinations() {
+        // CHANGED: purpose/type are no longer axes of Consent itself, so
+        // the combinatorial sweep now varies status (Consent's own
+        // remaining enum) against every purpose/type combination on the
+        // STATEMENT being referenced, rather than all three on Consent.
         for (ConsentStatus status : ConsentStatus.values()) {
             for (ConsentPurpose purpose : ConsentPurpose.values()) {
                 for (ConsentType type : ConsentType.values()) {
@@ -198,27 +196,27 @@ public class ConsentJpaMapperTest {
                             .personRef(PersonRef.of(PERSON_REF))
                             .consentStatementRef(ConsentStatementRef.of(STATEMENT_ID))
                             .status(status)
-                            .purpose(purpose)
-                            .type(type)
                             .build();
-
+ 
                     ConsentStatementEntity expectedStatement = ConsentStatementEntity.builder()
                         .id(STATEMENT_ID)
                         .statementText("test")
+                        .purpose(purpose)
+                        .type(type)
                         .active(true)
                     .build();
-
+ 
                     when(statementFactory.createStatementEntity(any(ConsentStatementRef.class)))
                         .thenReturn(expectedStatement);
-
-
+ 
+ 
                     // When
                     ConsentEntity result = mapper.toEntity(domain);
-
+ 
                     // Then
                     assertEquals(status, result.getStatus());
-                    assertEquals(purpose, result.getConsentPurpose());
-                    assertEquals(type, result.getConsentType());
+                    assertEquals(purpose, result.getConsentStatement().getPurpose());
+                    assertEquals(type, result.getConsentStatement().getType());
                     verify(statementFactory).createStatementEntity(ConsentStatementRef.of(STATEMENT_ID));
                     reset(statementFactory);
                 }

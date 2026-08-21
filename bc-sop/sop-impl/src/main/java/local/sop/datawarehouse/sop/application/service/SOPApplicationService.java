@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -38,5 +38,13 @@ public class SOPApplicationService implements SOPDirectory {
             log.warn("SOP record not found for UUID: {}", query.uuid());
             throw new NotFoundException("sop.notFound", Map.of("id", query.uuid().toString()));
         }));
+    }
+
+    @Override
+    public List<SopResponse> findAll() {
+        log.info("Fetching all SOP records");
+        return repository.findAll().stream()
+                .map(entity -> new SopResponse(entity.getId(), entity.getName(), entity.getAddress(), entity.getEducation()))
+                .toList();
     }
 }

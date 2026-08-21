@@ -2,8 +2,10 @@ package local.sop.datawarehouse.consent.saga.application.interfaceweb;
 
 import java.net.URI;
 import java.util.Objects;
+import java.util.UUID;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,6 +13,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
+import local.sop.common.libs.sharedkernel.sagas.compensate.request.PayloadCompensateCreate;
+import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 import local.sop.datawarehouse.consent.saga.application.api.ConsentSagaDirectory;
 import local.sop.datawarehouse.consent.saga.application.api.dto.ConsentResponse;
 import local.sop.datawarehouse.consent.saga.application.api.dto.ConsentStatementResponse;
@@ -48,6 +52,12 @@ public class ConsentSagaController {
     @PostMapping(path = "/consent/withdraw", produces = "application/json")
     public ResponseEntity<ConsentResponse> withdraw(@Valid @RequestBody RevokeConsentCmd cmd) {
         ConsentResponse response = consentDirectory.withdraw(cmd);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping(path = "/consent/{id}/compensate", produces = "application/json")
+    public ResponseEntity<ResponseCompensated> compensate(@PathVariable UUID id, @Valid @RequestBody PayloadCompensateCreate payload) {
+        ResponseCompensated response = consentDirectory.compensateConsent(id, payload.clazz(), payload.sagaState());
         return ResponseEntity.ok(response);
     }
 }

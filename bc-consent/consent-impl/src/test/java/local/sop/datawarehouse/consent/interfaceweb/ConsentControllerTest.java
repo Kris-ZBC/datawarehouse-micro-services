@@ -50,31 +50,34 @@ import local.sop.datawarehouse.consent.application.api.dto.*;
 class ConsentControllerTest {
         @Autowired
         private MockMvc mockMvc;
-
+ 
         @MockitoBean
         private ConsentDirectory consentDirectory;
-
+ 
         private ObjectMapper objectMapper;
-
+ 
         @BeforeEach
         void setUp() {
                 objectMapper = new ObjectMapper();
                 objectMapper.registerModule(new JavaTimeModule());
                 objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         }
-
+ 
         @Test
         void testCreateConsentStatement_ShouldReturnCreatedResponse() throws Exception {
-                // Given
-                CreateConsentStatementCmd cmd = new CreateConsentStatementCmd(true, "Test statement");
+                // Given — CreateConsentStatementCmd now requires purpose/type
+                CreateConsentStatementCmd cmd = new CreateConsentStatementCmd(true, "Test statement", ConsentPurpose.MARKETING, ConsentType.ONE_TIME);
+                // ConsentStatementResponse now carries purpose/type too
                 ConsentStatementResponse expectedResponse = new ConsentStatementResponse(
                                 UUID.randomUUID(),
                                 "Test statement",
-                                true);
-
+                                true,
+                                "MARKETING",
+                                "ONE_TIME");
+ 
                 when(consentDirectory.createConsentStatement(cmd))
                                 .thenReturn(expectedResponse);
-
+ 
                 // When & Then
                 mockMvc.perform(post("/internal/consents/statements")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -85,29 +88,40 @@ class ConsentControllerTest {
                                                 .value(expectedResponse.consentStatementId().toString()))
                                 .andExpect(jsonPath("$.statementText").value("Test statement"))
                                 .andExpect(jsonPath("$.active").value(true))
+                                .andExpect(jsonPath("$.purpose").value("MARKETING"))
+                                .andExpect(jsonPath("$.type").value("ONE_TIME"))
                                 .andExpect(header().string("Location", "/internal/consents/statements"
                                                 + expectedResponse.consentStatementId()));
         }
-
+ 
         @Test
         void testCreateConsentStatement_WithInvalidData_ShouldReturnBadRequest() throws Exception {
                 // Given - invalid command (empty statementText)
-                CreateConsentStatementCmd cmd = new CreateConsentStatementCmd(true, "");
+                CreateConsentStatementCmd cmd = new CreateConsentStatementCmd(true, "", ConsentPurpose.MARKETING, ConsentType.ONE_TIME);
                 // When & Then
                 mockMvc.perform(post("/internal/consents/statements")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(cmd)))
                                 .andExpect(status().isBadRequest());
         }
-
+ 
+        @Test
+        void testCreateConsentStatement_WithMissingPurpose_ShouldReturnBadRequest() throws Exception {
+                // Given — purpose/type are now required on creation
+                CreateConsentStatementCmd cmd = new CreateConsentStatementCmd(true, "Test statement", null, ConsentType.ONE_TIME);
+                // When & Then
+                mockMvc.perform(post("/internal/consents/statements")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(cmd)))
+                                .andExpect(status().isBadRequest());
+        }
+ 
         @Test
         void testGrantConsent_ShouldReturnOkResponse() throws Exception {
-                // Given
+                // Given — GrantConsentCmd no longer carries purpose/type
                 GrantConsentCmd cmd = new GrantConsentCmd(
                                 UUID.randomUUID(),
                                 UUID.randomUUID(),
-                                ConsentPurpose.MARKETING,
-                                ConsentType.ONE_TIME,
                                 ConsentStatus.ACTIVE);
                 ConsentResponse expectedResponse = new ConsentResponse(
                                 UUID.randomUUID(),
@@ -118,10 +132,10 @@ class ConsentControllerTest {
                                 "MARKETING",
                                 "ONE_TIME",
                                 true);
-
+ 
                 when(consentDirectory.grantConsent(cmd))
                                 .thenReturn(expectedResponse);
-
+ 
                 // When & Then
                 mockMvc.perform(post("/internal/consents/consent/grant")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -139,20 +153,18 @@ class ConsentControllerTest {
                                 .andExpect(jsonPath("$.consentType").value("ONE_TIME"))
                                 .andExpect(jsonPath("$.active").value(true));
         }
-
+ 
         @Test
         void testGrantConsent_WithNonExistentStatement_ShouldReturnNotFound() throws Exception {
                 // Given
                 GrantConsentCmd cmd = new GrantConsentCmd(
                                 UUID.randomUUID(),
                                 UUID.randomUUID(),
-                                ConsentPurpose.MARKETING,
-                                ConsentType.ONE_TIME,
                                 ConsentStatus.ACTIVE);
-
+ 
                 when(consentDirectory.grantConsent(cmd))
                                 .thenThrow(new NotFoundException("consentstatement.notfound", Map.of()));
-
+ 
                 // When & Then
                 mockMvc.perform(post("/internal/consents/consent/grant")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -164,7 +176,7 @@ class ConsentControllerTest {
                                 .andExpect(jsonPath("$.detail").value("consentstatement.notfound"))
                                 .andExpect(jsonPath("$.key").value("consentstatement.notfound"));
         }
-
+ 
         @Test
         void testGetConsent_ShouldReturnOkResponse() throws Exception {
                 // Given
@@ -178,10 +190,10 @@ class ConsentControllerTest {
                                 "MARKETING",
                                 "ONE_TIME",
                                 true);
-
+ 
                 when(consentDirectory.getConsent(consentId))
                                 .thenReturn(Optional.of(expectedResponse));
-
+ 
                 // When & Then
                 mockMvc.perform(get("/internal/consents/consent/{id}", consentId)
                                 .contentType(MediaType.APPLICATION_JSON))
@@ -198,21 +210,21 @@ class ConsentControllerTest {
                                 .andExpect(jsonPath("$.consentType").value("ONE_TIME"))
                                 .andExpect(jsonPath("$.active").value(true));
         }
-
+ 
         @Test
         void testGetConsent_WithNonExistentConsent_ShouldReturnNoContent() throws Exception {
                 // Given
                 UUID consentId = UUID.randomUUID();
                 when(consentDirectory.getConsent(consentId))
                                 .thenReturn(Optional.empty());
-
+ 
                 // When & Then
                 mockMvc.perform(get("/internal/consents/consent/{id}", consentId)
                                 .contentType(MediaType.APPLICATION_JSON))
                                 .andExpect(status().isNoContent())
                                 .andExpect(content().string(""));
         }
-
+ 
         @Test
         void testWithdrawConsent_ShouldReturnOkResponse() throws Exception {
                 // Given
@@ -226,10 +238,10 @@ class ConsentControllerTest {
                                 "MARKETING",
                                 "ONE_TIME",
                                 false);
-
+ 
                 when(consentDirectory.withdrawConsent(cmd))
                                 .thenReturn(expectedResponse);
-
+ 
                 // When & Then
                 mockMvc.perform(post("/internal/consents/consent/withdraw")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -247,7 +259,7 @@ class ConsentControllerTest {
                                 .andExpect(jsonPath("$.consentType").value("ONE_TIME"))
                                 .andExpect(jsonPath("$.active").value(false));
         }
-
+ 
         @Test
         void testUpdateConsentStatement_ShouldReturnOkResponse() throws Exception {
                 // Given
@@ -259,11 +271,13 @@ class ConsentControllerTest {
                 ConsentStatementResponse expectedResponse = new ConsentStatementResponse(
                                 UUID.randomUUID(),
                                 "Updated statement text",
-                                false);
-
+                                false,
+                                "MARKETING",
+                                "ONE_TIME");
+ 
                 when(consentDirectory.updateConsentStatement(cmd))
                                 .thenReturn(expectedResponse);
-
+ 
                 // When & Then
                 mockMvc.perform(put("/internal/consents/statements/statement")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -275,7 +289,34 @@ class ConsentControllerTest {
                                 .andExpect(jsonPath("$.statementText").value("Updated statement text"))
                                 .andExpect(jsonPath("$.active").value(false));
         }
-
+ 
+        @Test
+        void testUpdateConsentStatement_WithPurposeAndType_ShouldReturnOkResponse() throws Exception {
+                // Given — the previously-dead purpose/type fields, now real
+                UpdateConsentStatementCmd cmd = new UpdateConsentStatementCmd(
+                                UUID.randomUUID(),
+                                "Updated statement text",
+                                ConsentPurpose.ANALYTICS,
+                                ConsentType.REQUIRED);
+                ConsentStatementResponse expectedResponse = new ConsentStatementResponse(
+                                UUID.randomUUID(),
+                                "Updated statement text",
+                                false,
+                                "ANALYTICS",
+                                "REQUIRED");
+ 
+                when(consentDirectory.updateConsentStatement(cmd))
+                                .thenReturn(expectedResponse);
+ 
+                // When & Then
+                mockMvc.perform(put("/internal/consents/statements/statement")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(cmd)))
+                                .andExpect(status().isOk())
+                                .andExpect(jsonPath("$.purpose").value("ANALYTICS"))
+                                .andExpect(jsonPath("$.type").value("REQUIRED"));
+        }
+ 
         @Test
         void testGetConsentStatement_ShouldReturnOkResponse() throws Exception {
                 // Given
@@ -283,11 +324,13 @@ class ConsentControllerTest {
                 ConsentStatementResponse expectedResponse = new ConsentStatementResponse(
                                 UUID.randomUUID(),
                                 "Test statement",
-                                true);
-
+                                true,
+                                "MARKETING",
+                                "ONE_TIME");
+ 
                 when(consentDirectory.getConsentStatement(any(FetchConsentStatementQuery.class)))
                                 .thenReturn(Optional.of(expectedResponse));
-
+ 
                 // When & Then
                 mockMvc.perform(get("/internal/consents/statements/statement")
                                 .param("id", id.toString()))
@@ -298,37 +341,41 @@ class ConsentControllerTest {
                                 .andExpect(jsonPath("$.statementText").value("Test statement"))
                                 .andExpect(jsonPath("$.active").value(true));
         }
-
+ 
         @Test
         void testGetConsentStatement_WithNonExistentStatement_ShouldReturnNoContent() throws Exception {
                 // Given
                 UUID id = UUID.randomUUID();
-
+ 
                 when(consentDirectory.getConsentStatement(any(FetchConsentStatementQuery.class)))
                                 .thenReturn(Optional.empty());
-
+ 
                 // When & Then
                 mockMvc.perform(get("/internal/consents/statements/statement")
                                 .param("id", id.toString()))
                                 .andExpect(status().isNoContent())
                                 .andExpect(content().string(""));
         }
-
+ 
         @Test
         void testGetAllConsentStatements_ShouldReturnListOfStatements() throws Exception {
                 // Given
                 ConsentStatementResponse response1 = new ConsentStatementResponse(
                                 UUID.randomUUID(),
                                 "Statement 1",
-                                true);
+                                true,
+                                "MARKETING",
+                                "ONE_TIME");
                 ConsentStatementResponse response2 = new ConsentStatementResponse(
                                 UUID.randomUUID(),
                                 "Statement 2",
-                                false);
-
+                                false,
+                                "ANALYTICS",
+                                "OPTIONAL");
+ 
                 when(consentDirectory.getAllConsentStatements())
                                 .thenReturn(List.of(response1, response2));
-
+ 
                 // When & Then
                 mockMvc.perform(get("/internal/consents/statements"))
                                 .andExpect(status().isOk())
@@ -339,10 +386,10 @@ class ConsentControllerTest {
                                 .andExpect(jsonPath("$[0].active").value(true))
                                 .andExpect(jsonPath("$[1].statementText").value("Statement 2"))
                                 .andExpect(jsonPath("$[1].active").value(false));
-
+ 
                 verify(consentDirectory).getAllConsentStatements();
         }
-
+ 
         @Test
         void compensate_WhenServiceReturnsResult_ShouldReturn200() throws Exception {
                 // Given
@@ -353,10 +400,10 @@ class ConsentControllerTest {
                 ResponseCompensated expectedResult = new ResponseCompensated(
                                 SagaOutcome.COMPENSATED,
                                 true);
-
+ 
                 when(consentDirectory.compensate(statementId, cmd.clazz(), cmd.sagaState()))
                                 .thenReturn(expectedResult);
-
+ 
                 // When & Then
                 mockMvc.perform(post("/internal/consents/statements/{id}/compensate/create", statementId)
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -366,7 +413,7 @@ class ConsentControllerTest {
                                 .andExpect(jsonPath("$.sagaState").value("COMPENSATED"))
                                 .andExpect(jsonPath("$.success").value(true));
         }
-
+ 
         @Test
         void compensate_WhenServiceReturnsNull_ShouldReturn204() throws Exception {
                 // Given
@@ -374,10 +421,10 @@ class ConsentControllerTest {
                 CompensateConsentStatementCmd cmd = new CompensateConsentStatementCmd(
                                 String.class,
                                 SagaOutcome.COMPENSATE);
-
+ 
                 when(consentDirectory.compensate(statementId, cmd.clazz(), cmd.sagaState()))
                                 .thenReturn(null);
-
+ 
                 // When & Then
                 mockMvc.perform(post("/internal/consents/statements/{id}/compensate/create", statementId)
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -385,12 +432,12 @@ class ConsentControllerTest {
                                 .andExpect(status().isNoContent())
                                 .andExpect(content().string(""));
         }
-
+ 
         @Test
         void getConsentForPersonAndPurpose_WhenConsentExists_ShouldReturnOk() throws Exception {
                 // Given
                 UUID personId = UUID.randomUUID();
-
+ 
                 ConsentResponse response = new ConsentResponse(
                                 UUID.randomUUID(),
                                 personId,
@@ -400,10 +447,10 @@ class ConsentControllerTest {
                                 "MARKETING",
                                 "ONE_TIME",
                                 true);
-
+ 
                 when(consentDirectory.getConsentForPersonAndPurpose(any()))
                                 .thenReturn(Optional.of(response));
-
+ 
                 // When & Then
                 mockMvc.perform(get("/internal/consents/consent")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -417,15 +464,15 @@ class ConsentControllerTest {
                                 .andExpect(jsonPath("$.status").value("ACTIVE"))
                                 .andExpect(jsonPath("$.consentPurpose").value("MARKETING"));
         }
-
+ 
         @Test
         void getConsentForPersonAndPurpose_WhenConsentDoesNotExist_ShouldReturnNoContent() throws Exception {
                 // Given
                 UUID personId = UUID.randomUUID();
-
+ 
                 when(consentDirectory.getConsentForPersonAndPurpose(any()))
                                 .thenReturn(Optional.empty());
-
+ 
                 // When & Then
                 mockMvc.perform(get("/internal/consents/consent")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -437,23 +484,23 @@ class ConsentControllerTest {
                                                 """.formatted(personId)))
                                 .andExpect(status().isNoContent());
         }
-
+ 
         @Test
         void compensateConsent_Create_WhenSuccess_ShouldReturnOk() throws Exception {
                 // Given
                 UUID id = UUID.randomUUID();
-
+ 
                 PayloadCompensateCreate payload = new PayloadCompensateCreate(
                                 String.class,
                                 SagaOutcome.COMPENSATE);
-
+ 
                 ResponseCompensated response = new ResponseCompensated(
                                 SagaOutcome.COMPENSATED,
                                 true);
-
+ 
                 when(consentDirectory.compensateConsent(any(), any(), any()))
                                 .thenReturn(response);
-
+ 
                 // When & Then
                 mockMvc.perform(put("/internal/consents/consent/{id}/compensate/create", id)
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -462,42 +509,42 @@ class ConsentControllerTest {
                                 .andExpect(jsonPath("$.sagaState").value("COMPENSATED"))
                                 .andExpect(jsonPath("$.success").value(true));
         }
-
+ 
         @Test
         void compensateConsent_Create_WhenNull_ShouldReturnNoContent() throws Exception {
                 // Given
                 UUID id = UUID.randomUUID();
-
+ 
                 PayloadCompensateCreate payload = new PayloadCompensateCreate(
                                 String.class,
                                 SagaOutcome.COMPENSATE);
-
+ 
                 when(consentDirectory.compensateConsent(any(), any(), any()))
                                 .thenReturn(null);
-
+ 
                 // When & Then
                 mockMvc.perform(put("/internal/consents/consent/{id}/compensate/create", id)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(payload)))
                                 .andExpect(status().isNoContent());
         }
-
+ 
         @Test
         void compensateConsent_Update_WhenSuccess_ShouldReturnOk() throws Exception {
                 // Given
                 UUID id = UUID.randomUUID();
-
+ 
                 PayloadCompensateCreate payload = new PayloadCompensateCreate(
                                 String.class,
                                 SagaOutcome.COMPENSATE);
-
+ 
                 ResponseCompensated response = new ResponseCompensated(
                                 SagaOutcome.COMPENSATED,
                                 true);
-
+ 
                 when(consentDirectory.compensateConsentWithdrawalUpdate(any(), any(), any()))
                                 .thenReturn(response);
-
+ 
                 // When & Then
                 mockMvc.perform(post("/internal/consents/consent/{id}/compensate/update", id)
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -506,5 +553,4 @@ class ConsentControllerTest {
                                 .andExpect(jsonPath("$.sagaState").value("COMPENSATED"))
                                 .andExpect(jsonPath("$.success").value(true));
         }
-
 }

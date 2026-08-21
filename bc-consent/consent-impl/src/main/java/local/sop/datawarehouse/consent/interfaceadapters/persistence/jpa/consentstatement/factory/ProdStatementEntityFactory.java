@@ -10,12 +10,12 @@ import local.sop.datawarehouse.consent.domain.model.valueobject.ConsentStatement
 import local.sop.datawarehouse.consent.interfaceadapters.persistence.jpa.consentstatement.ConsentStatementEntity;
 import local.sop.datawarehouse.consent.interfaceadapters.persistence.jpa.consentstatement.ConsentStatementSpringDataRepository;
 
-// Infrastructure - Production implementation  
+// Infrastructure - Production implementation
 @Component
 @Profile("!test")
 public class ProdStatementEntityFactory implements StatementEntityFactory {
     private final ConsentStatementSpringDataRepository repository;
-
+ 
     public ProdStatementEntityFactory(ConsentStatementSpringDataRepository repository) {
         this.repository = repository;
     }
@@ -27,5 +27,5 @@ public class ProdStatementEntityFactory implements StatementEntityFactory {
                         "consentstatement.notfound",
                         Map.of("field", "consentStatementRef", "id", statementRef.value())));
     }
-
+ 
 }

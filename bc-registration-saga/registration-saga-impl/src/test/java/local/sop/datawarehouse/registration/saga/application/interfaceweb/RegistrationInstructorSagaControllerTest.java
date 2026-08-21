@@ -24,9 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import local.sop.common.libs.infrastructure.security.DisableSecurity;
 import local.sop.common.libs.infrastructure.web.exception.EndpointExceptionHandler;
-import local.sop.common.libs.sharedkernel.enums.ConsentPurpose;
 import local.sop.common.libs.sharedkernel.enums.ConsentStatus;
-import local.sop.common.libs.sharedkernel.enums.ConsentType;
 import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
 import local.sop.datawarehouse.registration.saga.application.api.RegistrationDirectory;
 import local.sop.datawarehouse.registration.saga.application.api.dto.CreateInstructorRegistrationCmd;
@@ -67,10 +65,7 @@ class RegistrationInstructorSagaControllerTest {
                 phoneCmd,
                 "dani423j",
                 "ACTIVE",
-                UUID.randomUUID(),
-                ConsentPurpose.REQUIRED_SERVICE,
-                ConsentType.REQUIRED,
-                ConsentStatus.ACTIVE);
+                List.of(new CreateInstructorRegistrationCmd.ConsentStatement(UUID.randomUUID(), ConsentStatus.ACTIVE)));
 
         registrationResponse = new CreatedInstructorResponse(registrationId);
     }

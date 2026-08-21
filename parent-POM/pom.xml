@@ -18,7 +18,8 @@ Parent pom for multi-module project aggregator and BOM (dependency management)
     <packaging>pom</packaging>
     <name>Datawarehouse - Parent POM</name>
     
-    <modules>       
+    <modules>     
+        <module>../shared-lib</module>  
         <module>../coverage-report</module>
         
         <!-- Bounded Context -->
@@ -79,6 +80,10 @@ Parent pom for multi-module project aggregator and BOM (dependency management)
 
         <module>../bc-registration-saga/registration-saga-api</module>
         <module>../bc-registration-saga/registration-saga-impl</module>
+
+        <!-- Gateways-->
+        <module>../gw-admin</module>
+        <module>../gw-common</module>
         
     </modules>
 

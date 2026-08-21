@@ -99,9 +99,7 @@ public class ConsentRepositoryJpaAdapter implements ConsentRepositoryPort {
     public Consent update(Consent consent) {
         ConsentEntity entity = repository.findById(consent.getId().value())
                 .orElseThrow(() -> new NotFoundException("consent.notfound", Map.of("id", consent.getId().value())));
-        entity = entity.withStatus(consent.getStatus())
-                       .withConsentPurpose(consent.getPurpose())
-                       .withConsentType(consent.getType());
+        entity = entity.withStatus(consent.getStatus());
         ConsentEntity updatedEntity = repository.save(entity);
 
         var statementEntity = statementRepository.findById(updatedEntity.getConsentStatement().getId()).orElseThrow(() -> new NotFoundException("consentstatement.notfound", Map.of("statementRef", updatedEntity.getConsentStatement().getId())));

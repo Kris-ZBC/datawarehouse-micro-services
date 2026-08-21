@@ -26,6 +26,11 @@ public class ServiceClientConfig {
 		return clientFactory.createMtlsClient("consent", consentProps.baseUrl());
 	}
 
+	@Bean("consent-saga")
+	RestClient consentSaga(MtlsClientFactory clientFactory, ConsentSagaProps consentSagaProps) {
+		return clientFactory.createMtlsClient("consent-saga", consentSagaProps.baseUrl());
+	}
+
 	@Bean("educationline")
 	RestClient educationline(MtlsClientFactory clientFactory, EducationLineProps educationLineProps) {
 		return clientFactory.createMtlsClient("educationline", educationLineProps.baseUrl());

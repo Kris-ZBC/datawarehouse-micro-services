@@ -7,10 +7,11 @@ import local.sop.datawarehouse.sop.application.api.SOPDirectory;
 import local.sop.datawarehouse.sop.application.api.dto.SOPQuery;
 import local.sop.datawarehouse.sop.application.api.dto.SopResponse;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("internal/sop")
+@RequestMapping("internal/sops")
 public class InternalSOPController {
     private final SOPDirectory directory;
     
@@ -21,6 +22,11 @@ public class InternalSOPController {
     @GetMapping(path = "/{id}", produces = "application/json")
     public ResponseEntity<SopResponse> findById(@PathVariable UUID id) {
         return directory.findById(new SOPQuery(id)).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping(produces = "application/json")
+    public ResponseEntity<List<SopResponse>> findAll() {
+        return ResponseEntity.ok(directory.findAll());
     }
 
     // Ping endpoint

@@ -90,7 +90,7 @@ public class ConsentController {
     }
 
     @PutMapping(path ="consent/{id}/compensate/create", produces = "application/json")
-    public ResponseEntity<ResponseCompensated> compensateConstent(@PathVariable UUID id, @Valid @RequestBody PayloadCompensateCreate payload) {
+    public ResponseEntity<ResponseCompensated> compensateConsent(@PathVariable UUID id, @Valid @RequestBody PayloadCompensateCreate payload) {
         ResponseCompensated result = consentDirectory.compensateConsent(id, payload.clazz(), payload.sagaState());
         return result != null ? ResponseEntity.ok(result) : ResponseEntity.noContent().build();
     }
