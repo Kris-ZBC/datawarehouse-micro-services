@@ -44,6 +44,9 @@ public class LoginEntity {
 	@Column(name = "created_at", nullable = false)
 	private LocalDateTime createdAtTimestamp;
 
+	@Column(name = "is_activated", nullable = false)
+	private Boolean isActivated = false;
+
 	@OneToMany(mappedBy = "login", fetch = FetchType.LAZY,
            cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<SessionEntity> sessions = new ArrayList<>();
@@ -51,30 +54,31 @@ public class LoginEntity {
 
 	protected LoginEntity() {} // Required by JPA
 
-	private LoginEntity(UUID id, UUID personRef, String username, String password, LoginStatus status, LocalDateTime createdAtTimestamp, List<SessionEntity> sessions) {
+	private LoginEntity(UUID id, UUID personRef, String username, String password, LoginStatus status, LocalDateTime createdAtTimestamp, Boolean isActivated, List<SessionEntity> sessions) {
 		this.id = id;
 		this.personRef = personRef;
 		this.username = username;
 		this.password = password;
 		this.status = status;
 		this.createdAtTimestamp = createdAtTimestamp != null ? createdAtTimestamp : LocalDateTime.now();
+		this.isActivated = isActivated != null ? isActivated : false;
 		this.sessions = sessions != null ? sessions : new ArrayList<>();
 	}
 
 	public LoginEntity withPersonRef(UUID personRef) {
-		return new LoginEntity(this.id, personRef, this.username, this.password, this.status, this.createdAtTimestamp, this.sessions);
+		return new LoginEntity(this.id, personRef, this.username, this.password, this.status, this.createdAtTimestamp, this.isActivated, this.sessions);
 	}
 
 	public LoginEntity withUsername(String username) {
-		return new LoginEntity(this.id, this.personRef, username, this.password, this.status, this.createdAtTimestamp, this.sessions);
+		return new LoginEntity(this.id, this.personRef, username, this.password, this.status, this.createdAtTimestamp, this.isActivated, this.sessions);
 	}
 
 	public LoginEntity withPassword(String password) {
-		return new LoginEntity(this.id, this.personRef, this.username, password, this.status, this.createdAtTimestamp, this.sessions);
+		return new LoginEntity(this.id, this.personRef, this.username, password, this.status, this.createdAtTimestamp, this.isActivated, this.sessions);
 	}
 
 	public LoginEntity withStatus(LoginStatus status) {
-		return new LoginEntity(this.id, this.personRef, this.username, this.password, status, this.createdAtTimestamp, this.sessions);
+		return new LoginEntity(this.id, this.personRef, this.username, this.password, status, this.createdAtTimestamp, this.isActivated, this.sessions);
 	}
 
 	public UUID getId() { return this.id; }
@@ -83,6 +87,7 @@ public class LoginEntity {
 	public String getPassword() { return this.password; }
 	public LoginStatus getStatus() { return this.status; }
 	public LocalDateTime getCreatedAtTimestamp() { return this.createdAtTimestamp; }
+	public Boolean getIsActivated() { return this.isActivated; }
 	public List<SessionEntity> getSessions() { return sessions; }
 
 	public static Builder builder() { return new Builder(); }
@@ -94,6 +99,7 @@ public class LoginEntity {
 		private String password;
 		private LoginStatus status;
 		private LocalDateTime createdAtTimestamp;
+		private Boolean isActivated;
 		private List<SessionEntity> sessions;
 
 		public Builder id(UUID id) {
@@ -131,13 +137,18 @@ public class LoginEntity {
 			return this;
 		}
 
+		public Builder isActivated(Boolean isActivated) {
+			this.isActivated = isActivated;
+			return this;
+		}
+
 		public Builder sessions(List<SessionEntity> sessions) {
 			this.sessions = sessions;
 			return this;
 		}
 
 		public LoginEntity build() {
-			return new LoginEntity(this.id, this.personRef, this.username, this.password, this.status, this.createdAtTimestamp, this.sessions);
+			return new LoginEntity(this.id, this.personRef, this.username, this.password, this.status, this.createdAtTimestamp, this.isActivated, this.sessions);
 		}
 	}
 
