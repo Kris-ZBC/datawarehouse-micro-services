@@ -6,9 +6,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
-import local.sop.common.libs.sharedkernel.enums.ConsentPurpose;
-import local.sop.common.libs.sharedkernel.enums.ConsentStatus;
-import local.sop.common.libs.sharedkernel.enums.ConsentType;
+import local.sop.datawarehouse.sharedlib.enums.ConsentPurpose;
+import local.sop.datawarehouse.sharedlib.enums.ConsentStatus;
+import local.sop.datawarehouse.sharedlib.enums.ConsentType;
 import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
 import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 import local.sop.datawarehouse.consent.saga.application.api.dto.ConsentResponse;
@@ -26,12 +26,11 @@ public class ConsentHttpAdapter implements ConsentPort {
     public ConsentHttpAdapter(@Qualifier("consent") RestClient consent) {
         this.consent = consent;
     }
-
     @Override
-    public UUID create(Boolean active, String text) {
+    public UUID create(Boolean active, String text, ConsentPurpose purpose, ConsentType type) {
            return consent.post()
                 .uri("/internal/consents/statements")
-                .body(new PayloadConsentCreate(active, text))
+                .body(new PayloadConsentCreate(active, text, purpose, type))
                 .retrieve()
                 .body(ConsentStatementResponse.class).consentStatementId();
     }
@@ -61,11 +60,10 @@ public class ConsentHttpAdapter implements ConsentPort {
             .body(ResponseCompensated.class);
     }
     @Override
-    public ConsentResponse grant(UUID personRef, UUID consentStatementRef, ConsentPurpose purpose, ConsentType type,
-            ConsentStatus status) {
+    public ConsentResponse grant(UUID personRef, UUID consentStatementRef, ConsentStatus status) {
         return consent.post()
             .uri("/internal/consents/consent/grant")
-            .body(new PayloadGrantConsent(personRef, consentStatementRef, purpose, type, status))
+            .body(new PayloadGrantConsent(personRef, consentStatementRef, status))
             .retrieve()
             .body(ConsentResponse.class);
     }

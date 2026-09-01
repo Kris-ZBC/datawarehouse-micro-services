@@ -6,8 +6,14 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import local.sop.common.libs.sharedkernel.enums.ActorType;
+import local.sop.datawarehouse.sharedlib.enums.ConsentPurpose;
+import local.sop.datawarehouse.sharedlib.enums.ConsentType;
 import local.sop.common.libs.sharedkernel.enums.Severity;
 
+// CHANGED: purpose/type added — mirrors bc-consent's own
+// CreateConsentStatementCmd, which now requires both since they're
+// properties of the statement itself (see bc-consent's domain model
+// change: purpose/type moved from Consent to ConsentStatement).
 public record CreateConsentStatementCmd(
     @NotNull(message = "{saga.sessionid.required}") UUID sessionId,
     @NotNull(message= "{consentstatement.active.required}") Boolean active,
@@ -15,6 +21,8 @@ public record CreateConsentStatementCmd(
     @NotBlank(message= "{consent.statementtext.invalid}") 
     @Size(max=1000, message= "{consent.statementtext.length.invalid}")
     String statementText,
+    @NotNull(message = "{consentstatement.purpose.invalid}") ConsentPurpose purpose,
+    @NotNull(message = "{consentstatement.type.invalid}") ConsentType type,
     @NotNull(message= "{log.actorref.required}") UUID actorRef,
     @NotNull(message= " {log.actortype.required}") ActorType actorType,
     @NotNull(message= "{log.severity.required}") Severity severity,

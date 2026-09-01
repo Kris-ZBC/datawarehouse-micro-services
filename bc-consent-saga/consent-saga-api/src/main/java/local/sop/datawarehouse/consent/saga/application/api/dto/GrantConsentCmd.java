@@ -5,17 +5,13 @@ import java.util.UUID;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import local.sop.common.libs.sharedkernel.enums.ActorType;
-import local.sop.common.libs.sharedkernel.enums.ConsentPurpose;
-import local.sop.common.libs.sharedkernel.enums.ConsentStatus;
-import local.sop.common.libs.sharedkernel.enums.ConsentType;
+import local.sop.datawarehouse.sharedlib.enums.ConsentStatus;
 import local.sop.common.libs.sharedkernel.enums.Severity;
 
 public record GrantConsentCmd(
         @NotNull(message = "{saga.sessionid.required}") UUID sessionId,
         @NotNull(message="{consent.personref.invalid}") UUID personRef,
         @NotNull(message="{consent.consentstatementref.invalid}") UUID consentStatementRef,
-        @NotNull(message = "{consent.purpose.invalid}") ConsentPurpose purpose,
-        @NotNull(message = "{consent.type.invalid}") ConsentType type,
         @NotNull(message= "{consent.status.invalid}") ConsentStatus status,
         @NotNull(message= "{log.actorref.required}") UUID actorRef,
         @NotNull(message= " {log.actortype.required}") ActorType actorType,

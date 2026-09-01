@@ -17,6 +17,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import local.sop.common.libs.sharedkernel.enums.ActorType;
+import local.sop.datawarehouse.sharedlib.enums.ConsentPurpose;
+import local.sop.datawarehouse.sharedlib.enums.ConsentType;
 import local.sop.common.libs.sharedkernel.enums.Severity;
 import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
 import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
@@ -60,8 +62,7 @@ class ConsentSagaHandlerIntegrationTest {
         auditlogId         = UUID.randomUUID();
 
         statementResponse = new ConsentStatementResponse(
-            consentStatementId, "Test consent statement text", true);
-
+        consentStatementId, "Test consent statement text", true, "TestPurpose", "TestType");
         compensatedOk = new ResponseCompensated(SagaOutcome.COMPENSATED, true);
     }
 
@@ -70,7 +71,7 @@ class ConsentSagaHandlerIntegrationTest {
     @Test
     void handler_firstCall_shouldSucceed() {
         when(sagaLock.tryLock(any())).thenReturn(true);
-        when(consents.create(any(), any())).thenReturn(consentStatementId);
+        when(consents.create(any(), any(), any(), any())).thenReturn(consentStatementId);
         when(consents.getStatement(consentStatementId)).thenReturn(statementResponse);
         when(auditlogs.create(any(), any(), any(), any(), any(), any(), any(), any()))
             .thenReturn(auditlogId);
@@ -94,7 +95,7 @@ class ConsentSagaHandlerIntegrationTest {
 
         assertEquals("saga.already.running", ex.getMessage());
         // SAGA never started downstream
-        verify(consents, never()).create(any(), any());
+        verify(consents, never()).create(any(), any(), any(), any());
     }
 
     // ── Scenario 3: Concurrent duplicate delivery — same sessionId ─────────────
@@ -110,7 +111,7 @@ class ConsentSagaHandlerIntegrationTest {
             return lockAcquiredCount.getAndIncrement() == 0;
         });
 
-        when(consents.create(any(), any())).thenReturn(consentStatementId);
+        when(consents.create(any(), any(), any(), any())).thenReturn(consentStatementId);
         when(consents.getStatement(consentStatementId)).thenReturn(statementResponse);
         when(auditlogs.create(any(), any(), any(), any(), any(), any(), any(), any()))
             .thenReturn(auditlogId);
@@ -144,7 +145,7 @@ class ConsentSagaHandlerIntegrationTest {
         // Exactly one succeeded, exactly one was rejected
         assertEquals(1, lockAcquiredCount.get() - lockRejectedCount.get());
         // Downstream called exactly once
-        verify(consents, times(1)).create(any(), any());
+        verify(consents, times(1)).create(any(), any(), any(), any());
     }
 
     // ── Scenario 4: Handler retries with new sessionId after compensation ──────
@@ -155,7 +156,7 @@ class ConsentSagaHandlerIntegrationTest {
         UUID firstSessionId = UUID.randomUUID();
         when(sagaLock.tryLock(argThat(l -> l != null && l.sessionId().equals(firstSessionId))))
             .thenReturn(true);
-        when(consents.create(any(), any())).thenReturn(consentStatementId)
+        when(consents.create(any(), any(), any(), any())).thenReturn(consentStatementId)
             .thenReturn(UUID.randomUUID()); // second attempt creates a new one
         when(consents.getStatement(consentStatementId))
             .thenThrow(new RuntimeException("timeout on first attempt"));
@@ -169,11 +170,11 @@ class ConsentSagaHandlerIntegrationTest {
         UUID secondSessionId = UUID.randomUUID();
         UUID secondConsentId = UUID.randomUUID();
         ConsentStatementResponse secondResponse =
-            new ConsentStatementResponse(secondConsentId, "text", true);
+            new ConsentStatementResponse(secondConsentId, "text", true, "purpose", "type");
 
         when(sagaLock.tryLock(argThat(l ->l != null && l.sessionId().equals(secondSessionId))))
             .thenReturn(true);
-        when(consents.create(any(), any())).thenReturn(secondConsentId); // ← return secondConsentId
+        when(consents.create(any(), any(), any(), any())).thenReturn(secondConsentId); // ← return secondConsentId
         when(consents.getStatement(secondConsentId)).thenReturn(secondResponse); // ← stub for secondConsentId
         when(auditlogs.create(any(), any(), any(), any(), any(), any(), any(), any()))
             .thenReturn(auditlogId);
@@ -200,13 +201,13 @@ class ConsentSagaHandlerIntegrationTest {
         when(sagaLock.tryLock(argThat(l -> l != null && l.sessionId().equals(sessionB))))
             .thenReturn(true);
 
-        when(consents.create(any(), any()))
+        when(consents.create(any(), any(), any(), any()))
             .thenReturn(consentA)
             .thenReturn(consentB);
         when(consents.getStatement(consentA))
-            .thenReturn(new ConsentStatementResponse(consentA, "text A", true));
+            .thenReturn(new ConsentStatementResponse(consentA, "text A", true, "purpose A", "type A"));
         when(consents.getStatement(consentB))
-            .thenReturn(new ConsentStatementResponse(consentB, "text B", true));
+            .thenReturn(new ConsentStatementResponse(consentB, "text B", true, "purpose B", "type B"));
         when(auditlogs.create(any(), any(), any(), any(), any(), any(), any(), any()))
             .thenReturn(UUID.randomUUID());
 
@@ -228,7 +229,7 @@ class ConsentSagaHandlerIntegrationTest {
     @Test
     void handler_observesConflictException_whenCompensationCompletes() {
         when(sagaLock.tryLock(any())).thenReturn(true);
-        when(consents.create(any(), any())).thenReturn(consentStatementId);
+        when(consents.create(any(), any(), any(), any())).thenReturn(consentStatementId);
         when(consents.getStatement(consentStatementId)).thenReturn(statementResponse);
         when(auditlogs.create(any(), any(), any(), any(), any(), any(), any(), any()))
             .thenThrow(new RuntimeException("auditlog BC unreachable"));
@@ -255,6 +256,7 @@ class ConsentSagaHandlerIntegrationTest {
     private CreateConsentStatementCmd buildCmd(UUID sessionId) {
         return new CreateConsentStatementCmd(
             sessionId, true, "Test consent statement text",
+            ConsentPurpose.MARKETING, ConsentType.OPTIONAL,
             UUID.randomUUID(), ActorType.USER, Severity.INFO,
             "originSystem", "originService", "originComponent",
             "data", "description"

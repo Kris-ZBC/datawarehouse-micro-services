@@ -1,6 +1,6 @@
 package local.sop.datawarehouse.consent.application.service;
 
-import local.sop.common.libs.sharedkernel.enums.ConsentStatus;
+import local.sop.datawarehouse.sharedlib.enums.ConsentStatus;
 import local.sop.common.libs.sharedkernel.exceptions.NotFoundException;
 import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
 import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
@@ -34,35 +34,36 @@ public class ConsentApplicationService implements ConsentDirectory {
 	private static final Logger log = LoggerFactory.getLogger(ConsentApplicationService.class);
     private final ConsentRepositoryPort consentRepositoryPort;
     private final ConsentStatementRepositoryPort consentStatementRepository;
-
+ 
     public ConsentApplicationService(
             ConsentRepositoryPort consentRepositoryPort,
             ConsentStatementRepositoryPort consentStatementRepository
     ) {
         this.consentRepositoryPort = consentRepositoryPort;
         this.consentStatementRepository = consentStatementRepository;
-
+ 
     }
-
+ 
     @Override
     public ConsentStatementResponse createConsentStatement(CreateConsentStatementCmd cmd) {
         var statement = consentStatementRepository.save(ConsentStatement.builder()
                 .statementText(new ConsentStatementValue(cmd.statementText()))
-                .active(cmd.active()).build()
+                .active(cmd.active())
+                .purpose(cmd.purpose())
+                .type(cmd.type())
+                .build()
         );
-        
-
+ 
         log.info("Created consent statement: {}", statement);
-
-        return new ConsentStatementResponse(statement.getId().value(), statement.getStatementText(), statement.isActive());
-
+ 
+        return toStatementResponse(statement);
     }
-
-
+ 
+ 
     @Transactional
     @Override
     public ConsentResponse grantConsent(GrantConsentCmd cmd) {
-
+ 
         var personRef = PersonRef.of(cmd.personRef());
         var statementRef = ConsentStatementRef.of(cmd.consentStatementRef());
         
@@ -75,141 +76,98 @@ public class ConsentApplicationService implements ConsentDirectory {
                 consentStatement = consentStatement.withActive(true);
         }
         
-        // Opret consent
+        // Opret consent — status only; purpose/type come from the statement, not the grant
         var consent = Consent.builder()
                 .personRef(personRef)
                 .consentStatementRef(statementRef)
                 .status(cmd.status())
-                .purpose(cmd.purpose())
-                .type(cmd.type())
                 .build();
-
+ 
         // Add consent to statement
         Set<Consent> allConsents = new HashSet<>(consentStatement.getConsents());
         allConsents.add(consent);
         consentStatement = consentStatement.withConsents(allConsents);
-
+ 
         // Save statement with the new consent
         consentStatementRepository.save(consentStatement);
-
+ 
         log.info("Added consent to statement: {}", consentStatement.toString());
-
+ 
         // Save consent
         var savedConsent = consentRepositoryPort.save(consent);
         log.info("Granted consent: {}", savedConsent);
-
-        return new ConsentResponse(
-                savedConsent.getId().value(),
-                savedConsent.getPersonRef().value(),
-                savedConsent.getStatus().name(),
-                savedConsent.getConsentStatementRef().value(),
-                consentStatement.getStatementText(),
-                savedConsent.getPurpose().name(),
-                savedConsent.getType().name(),
-                consentStatement.isActive()
-        );
+ 
+        return toConsentResponse(savedConsent, consentStatement);
     }
-
+ 
     @Transactional(readOnly = true)
     @Override
     public Optional<ConsentResponse> getConsent(UUID id) {
         Consent consent = consentRepositoryPort.findById(ConsentId.of(id))
                 .orElseThrow(() -> new NotFoundException("consent.notfound", Map.of("consentId", id)));
-
+ 
         var statement = consentStatementRepository.findById(ConsentStatementRef.of(consent.getConsentStatementRef().value()))
                 .orElseThrow(() -> new NotFoundException("consentstatement.notfound", Map.of("statementRef", consent.getConsentStatementRef())));
-
-        return Optional.ofNullable(new ConsentResponse(
-                consent.getId().value(),
-                consent.getPersonRef().value(),
-                consent.getStatus().name(),
-                consent.getConsentStatementRef().value(),
-                statement.getStatementText(),
-                consent.getPurpose().name(),
-                consent.getType().name(),
-                statement.isActive()
-        ));
+ 
+        return Optional.ofNullable(toConsentResponse(consent, statement));
     }
-
+ 
     @Transactional(readOnly = true)
     @Override
     public Optional<ConsentResponse> getConsentForPersonAndPurpose(FetchConsentForPersonAndPurposeQuery query) {
         Consent consent = consentRepositoryPort.findByPersonAndPurpose(PersonRef.of(query.personId()), query.purpose())
                 .orElseThrow(() -> new NotFoundException("consent.notfound", Map.of("personId", query.personId(), "purpose", query.purpose())));
-
+ 
         var statement = consentStatementRepository.findById(ConsentStatementRef.of(consent.getConsentStatementRef().value()))
                 .orElseThrow(() -> new NotFoundException("consentstatement.notfound", Map.of("statementRef", consent.getConsentStatementRef())));
-
-        return Optional.ofNullable(new ConsentResponse(
-                consent.getId().value(),
-                consent.getPersonRef().value(),
-                consent.getStatus().name(),
-                consent.getConsentStatementRef().value(),
-                statement.getStatementText(),
-                consent.getPurpose().name(),
-                consent.getType().name(),
-                statement.isActive()
-        ));
+ 
+        return Optional.ofNullable(toConsentResponse(consent, statement));
     }
-
+ 
     @Transactional
     @Override
     public ConsentResponse withdrawConsent(RevokeConsentCmd cmd) {
         var consent = consentRepositoryPort.findById(ConsentId.of(cmd.consentId()))
                 .orElseThrow(() -> new NotFoundException("consent.notfound", Map.of("consentId", cmd.consentId()
                 )));
-
+ 
         consent = consent.withStatus(ConsentStatus.WITHDRAWN);
         var updatedConsent = consentRepositoryPort.update(consent);
-
+ 
         log.info("Withdrawn consent: {}", updatedConsent);
-
+ 
         var statement = consentStatementRepository.findById(ConsentStatementRef.of(updatedConsent.getConsentStatementRef().value()))
                 .orElseThrow(() -> new NotFoundException("consentstatement.notfound", Map.of("statementRef", updatedConsent.getConsentStatementRef())));
-
-        return new ConsentResponse(
-                updatedConsent.getId().value(),
-                updatedConsent.getPersonRef().value(),
-                updatedConsent.getStatus().name(),
-                updatedConsent.getConsentStatementRef().value(),
-                statement.getStatementText(),
-                updatedConsent.getPurpose().name(),
-                updatedConsent.getType().name(),
-                statement.isActive()
-        );
+ 
+        return toConsentResponse(updatedConsent, statement);
     }
-
+ 
     @Transactional
     @Override
     public ConsentStatementResponse updateConsentStatement(UpdateConsentStatementCmd cmd) {
         var statement = consentStatementRepository.findById(ConsentStatementRef.of(cmd.consentStatementId()))
                 .orElseThrow(() -> new NotFoundException("consentstatement.notfound", Map.of("statementId", cmd.consentStatementId())));
-
-        statement = statement.withStatementText(new ConsentStatementValue(cmd.statementText()));
-        var updatedStatement = consentStatementRepository.updateStatement(statement.getId(), statement.isActive(), statement.getStatementText());
-
+ 
+        // CHANGED: purpose/type now actually passed through (previously
+        // dead fields on the cmd). Both nullable in updateStatement —
+        // null leaves the existing value unchanged.
+        var updatedStatement = consentStatementRepository.updateStatement(
+                statement.getId(), statement.isActive(), cmd.statementText(), cmd.purpose(), cmd.type());
+ 
         log.info("Updated consent statement: {}", updatedStatement);
-
-        return new ConsentStatementResponse(
-                updatedStatement.getId().value(),
-                updatedStatement.getStatementText(),
-                updatedStatement.isActive()
-        );
+ 
+        return toStatementResponse(updatedStatement);
     }
-
+ 
     @Transactional(readOnly = true)
     @Override
     public Optional<ConsentStatementResponse> getConsentStatement(FetchConsentStatementQuery query) {
         var statement = consentStatementRepository.findById(ConsentStatementRef.of(query.consentStatementId()))
                 .orElseThrow(() -> new NotFoundException("consentstatement.notfound", Map.of("statementId", query.consentStatementId())));
-
-        return Optional.ofNullable(new ConsentStatementResponse(
-                statement.getId().value(),
-                statement.getStatementText(),
-                statement.isActive()
-        ));
+ 
+        return Optional.ofNullable(toStatementResponse(statement));
     }
-
+ 
     @Transactional(readOnly = true)
     @Override
     public List<ConsentResponse> getAllConsents() {
@@ -217,32 +175,19 @@ public class ConsentApplicationService implements ConsentDirectory {
                 .map(consent -> {
                     var statement = consentStatementRepository.findById(ConsentStatementRef.of(consent.getConsentStatementRef().value()))
                             .orElseThrow(() -> new NotFoundException("consentstatement.notfound", Map.of("statementRef", consent.getConsentStatementRef())));
-                    return new ConsentResponse(
-                            consent.getId().value(),
-                            consent.getPersonRef().value(),
-                            consent.getStatus().name(),
-                            consent.getConsentStatementRef().value(),
-                            statement.getStatementText(),
-                            consent.getPurpose().name(),
-                            consent.getType().name(),
-                            statement.isActive()
-                    );
+                    return toConsentResponse(consent, statement);
                 })
                 .toList();
     }
-
+ 
     @Transactional(readOnly = true)
     @Override
     public List<ConsentStatementResponse> getAllConsentStatements() {
         return consentStatementRepository.findAll().stream()
-                .map(statement -> new ConsentStatementResponse(
-                        statement.getId().value(),
-                        statement.getStatementText(),
-                        statement.isActive()
-                ))
+                .map(this::toStatementResponse)
                 .toList();
     }
-
+ 
     @Transactional(readOnly = true)
     @Override
     public List<ConsentResponse> getAllConsentsForPerson(FetchAllConsentsForPersonQuery query) {
@@ -250,21 +195,39 @@ public class ConsentApplicationService implements ConsentDirectory {
                 .map(consent -> {
                     var statement = consentStatementRepository.findById(ConsentStatementRef.of(consent.getConsentStatementRef().value()))
                             .orElseThrow(() -> new NotFoundException("consentstatement.notfound", Map.of("statementRef", consent.getConsentStatementRef())));
-                    return new ConsentResponse(
-                            consent.getId().value(),
-                            consent.getPersonRef().value(),
-                            consent.getStatus().name(),
-                            consent.getConsentStatementRef().value(),
-                            statement.getStatementText(),
-                            consent.getPurpose().name(),
-                            consent.getType().name(),
-                            statement.isActive()
-                    );
+                    return toConsentResponse(consent, statement);
                 })
                 .toList();
     }
-
-
+ 
+    // Builds a ConsentResponse pulling status from the Consent and
+    // purpose/type from the ConsentStatement it references — the point
+    // of this whole change: those two attributes no longer live on the
+    // same object.
+    private ConsentResponse toConsentResponse(Consent consent, ConsentStatement statement) {
+        return new ConsentResponse(
+                consent.getId().value(),
+                consent.getPersonRef().value(),
+                consent.getStatus().name(),
+                consent.getConsentStatementRef().value(),
+                statement.getStatementText(),
+                statement.getPurpose().name(),
+                statement.getType().name(),
+                statement.isActive()
+        );
+    }
+ 
+    private ConsentStatementResponse toStatementResponse(ConsentStatement statement) {
+        return new ConsentStatementResponse(
+                statement.getId().value(),
+                statement.getStatementText(),
+                statement.isActive(),
+                statement.getPurpose().name(),
+                statement.getType().name()
+        );
+    }
+ 
+ 
     @Override
     public ResponseCompensated compensate(UUID id, Class<?> clazz, SagaOutcome sagaState) {
         log.info("Compensate called from class {}", clazz.getSimpleName());
@@ -278,7 +241,7 @@ public class ConsentApplicationService implements ConsentDirectory {
         }
         return new ResponseCompensated(SagaOutcome.IDEMPOTENT, true);
    }
-
+ 
     @Override
     public ResponseCompensated compensateConsent(UUID id, Class<?> clazz, SagaOutcome sagaState) {
         log.info("Compensate called from class {}", clazz.getSimpleName());
@@ -292,7 +255,7 @@ public class ConsentApplicationService implements ConsentDirectory {
         }
         return new ResponseCompensated(SagaOutcome.IDEMPOTENT, true);
     }
-
+ 
     @Override
     @Transactional
     public ResponseCompensated compensateConsentWithdrawalUpdate(UUID id, Class<?> clazz, SagaOutcome sagaState) {
@@ -300,17 +263,17 @@ public class ConsentApplicationService implements ConsentDirectory {
         if (consentOpt.isEmpty()) {
                 return new ResponseCompensated(SagaOutcome.IDEMPOTENT, false);
         }
-
+ 
         var consent = consentOpt.get();
-
+ 
         if (consent.getStatus() != ConsentStatus.WITHDRAWN) {
                 return new ResponseCompensated(SagaOutcome.IDEMPOTENT, true);
         }
-
+ 
         var restored = consent.withStatus(ConsentStatus.ACTIVE);
         consentRepositoryPort.update(restored);
-
+ 
         return new ResponseCompensated(SagaOutcome.COMPENSATED, true);
     }
-
+ 
 }

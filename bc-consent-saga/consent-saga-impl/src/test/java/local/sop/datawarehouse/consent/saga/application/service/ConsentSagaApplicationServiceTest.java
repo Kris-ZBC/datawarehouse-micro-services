@@ -15,9 +15,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import local.sop.common.libs.sharedkernel.enums.ActorType;
-import local.sop.common.libs.sharedkernel.enums.ConsentPurpose;
-import local.sop.common.libs.sharedkernel.enums.ConsentStatus;
-import local.sop.common.libs.sharedkernel.enums.ConsentType;
+import local.sop.datawarehouse.sharedlib.enums.ConsentPurpose;
+import local.sop.datawarehouse.sharedlib.enums.ConsentStatus;
+import local.sop.datawarehouse.sharedlib.enums.ConsentType;
 import local.sop.common.libs.sharedkernel.enums.Severity;
 import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
 import local.sop.common.libs.sharedkernel.exceptions.DomainException;
@@ -67,18 +67,19 @@ class ConsentSagaApplicationServiceTest {
 
         createCmd = new CreateConsentStatementCmd(
             sessionId, true, "Test consent statement text",
+            ConsentPurpose.MARKETING, ConsentType.OPTIONAL,
             UUID.randomUUID(), ActorType.USER, Severity.INFO,
             "originSystem", "originService", "originComponent",
             "data", "description"
         );
 
         statementResponse = new ConsentStatementResponse(
-            consentStatementId, createCmd.statementText(), createCmd.active());
+            consentStatementId, createCmd.statementText(), createCmd.active(), createCmd.purpose().name(), createCmd.type().name());
 
         consentResponse = new ConsentResponse(
             consentId, personId, ConsentStatus.ACTIVE.name(),
             consentStatementId, createCmd.statementText(),
-            ConsentPurpose.COMMUNICATION.name(), ConsentType.REQUIRED.name(),
+            ConsentPurpose.COMMUNICATION, ConsentType.REQUIRED,
             createCmd.active());
 
         compensatedOk     = new ResponseCompensated(SagaOutcome.COMPENSATED, true);
@@ -107,7 +108,7 @@ class ConsentSagaApplicationServiceTest {
             assertThrows(ConflictException.class,
                 () -> service.createConsentStatement(createCmd));
 
-            verify(consents, never()).create(any(), any());
+            verify(consents, never()).create(any(), any(), any(), any());
         }
 
         @Test
@@ -123,7 +124,7 @@ class ConsentSagaApplicationServiceTest {
         @Test
         void createConsentStatement_shouldReleaseLock_whenAllStepsSucceed() {
             when(sagaLock.tryLock(any())).thenReturn(true);
-            when(consents.create(any(), any())).thenReturn(consentStatementId);
+            when(consents.create(any(), any(), any(), any())).thenReturn(consentStatementId);
             when(consents.getStatement(consentStatementId)).thenReturn(statementResponse);
             when(auditlogs.create(any(), any(), any(), any(), any(), any(), any(), any()))
                 .thenReturn(auditlogId);
@@ -136,7 +137,7 @@ class ConsentSagaApplicationServiceTest {
         @Test
         void createConsentStatement_shouldReleaseLock_whenConsentCreateFails() {
             when(sagaLock.tryLock(any())).thenReturn(true);
-            when(consents.create(any(), any()))
+            when(consents.create(any(), any(), any(), any()))
                 .thenThrow(new RuntimeException("downstream unavailable"));
 
             assertThrows(ConflictException.class,
@@ -148,7 +149,7 @@ class ConsentSagaApplicationServiceTest {
         @Test
         void createConsentStatement_shouldReleaseLock_afterCompensation() {
             when(sagaLock.tryLock(any())).thenReturn(true);
-            when(consents.create(any(), any())).thenReturn(consentStatementId);
+            when(consents.create(any(), any(), any(), any())).thenReturn(consentStatementId);
             when(consents.getStatement(consentStatementId)).thenReturn(null);
             when(consents.compensate(any(), any(), any())).thenReturn(compensatedOk);
 
@@ -161,7 +162,7 @@ class ConsentSagaApplicationServiceTest {
         @Test
         void createConsentStatement_shouldReleaseLock_evenWhenCompensationFails() {
             when(sagaLock.tryLock(any())).thenReturn(true);
-            when(consents.create(any(), any())).thenReturn(consentStatementId);
+            when(consents.create(any(), any(), any(), any())).thenReturn(consentStatementId);
             when(consents.getStatement(consentStatementId)).thenReturn(null);
             when(consents.compensate(any(), any(), any()))
                 .thenThrow(new RuntimeException("compensation also failed"));
@@ -186,7 +187,7 @@ class ConsentSagaApplicationServiceTest {
 
         @Test
         void createConsentStatement_shouldReturnStatementResponse_whenAllStepsSucceed() {
-            when(consents.create(createCmd.active(), createCmd.statementText()))
+            when(consents.create(createCmd.active(), createCmd.statementText(), createCmd.purpose(), createCmd.type()))
                 .thenReturn(consentStatementId);
             when(consents.getStatement(consentStatementId)).thenReturn(statementResponse);
             when(auditlogs.create(any(), any(), any(), any(), any(), any(), any(), any()))
@@ -202,7 +203,7 @@ class ConsentSagaApplicationServiceTest {
 
         @Test
         void createConsentStatement_shouldInvokeAllStepsInOrder() {
-            when(consents.create(any(), any())).thenReturn(consentStatementId);
+            when(consents.create(any(), any(), any(), any())).thenReturn(consentStatementId);
             when(consents.getStatement(consentStatementId)).thenReturn(statementResponse);
             when(auditlogs.create(any(), any(), any(), any(), any(), any(), any(), any()))
                 .thenReturn(auditlogId);
@@ -210,14 +211,14 @@ class ConsentSagaApplicationServiceTest {
             service.createConsentStatement(createCmd);
 
             var inOrder = inOrder(consents, auditlogs);
-            inOrder.verify(consents).create(createCmd.active(), createCmd.statementText());
+            inOrder.verify(consents).create(createCmd.active(), createCmd.statementText(), createCmd.purpose(), createCmd.type());
             inOrder.verify(consents).getStatement(consentStatementId);
             inOrder.verify(auditlogs).create(any(), any(), any(), any(), any(), any(), any(), any());
         }
 
         @Test
         void createConsentStatement_shouldNeverCallCompensate_whenAllStepsSucceed() {
-            when(consents.create(any(), any())).thenReturn(consentStatementId);
+            when(consents.create(any(), any(), any(), any())).thenReturn(consentStatementId);
             when(consents.getStatement(consentStatementId)).thenReturn(statementResponse);
             when(auditlogs.create(any(), any(), any(), any(), any(), any(), any(), any()))
                 .thenReturn(auditlogId);
@@ -233,7 +234,7 @@ class ConsentSagaApplicationServiceTest {
             GrantConsentCmd cmd = buildGrantCmd();
 
             when(consents.getStatement(consentStatementId)).thenReturn(statementResponse);
-            when(consents.grant(any(), any(), any(), any(), any())).thenReturn(consentResponse);
+            when(consents.grant(any(), any(), any())).thenReturn(consentResponse);
             when(consents.getConsent(consentId)).thenReturn(consentResponse);
             when(auditlogs.create(any(), any(), any(), any(), any(), any(), any(), any()))
                 .thenReturn(auditlogId);
@@ -250,7 +251,7 @@ class ConsentSagaApplicationServiceTest {
             GrantConsentCmd cmd = buildGrantCmd();
 
             when(consents.getStatement(consentStatementId)).thenReturn(statementResponse);
-            when(consents.grant(any(), any(), any(), any(), any())).thenReturn(consentResponse);
+            when(consents.grant(any(), any(), any())).thenReturn(consentResponse);
             when(consents.getConsent(consentId)).thenReturn(consentResponse);
             when(auditlogs.create(any(), any(), any(), any(), any(), any(), any(), any()))
                 .thenReturn(auditlogId);
@@ -302,7 +303,7 @@ class ConsentSagaApplicationServiceTest {
 
         @Test
         void shouldThrowConflictException_whenConsentCreateThrowsRuntimeException() {
-            when(consents.create(any(), any()))
+            when(consents.create(any(), any(), any(), any()))
                 .thenThrow(new RuntimeException("downstream unavailable"));
 
             assertThrows(ConflictException.class,
@@ -311,7 +312,7 @@ class ConsentSagaApplicationServiceTest {
 
         @Test
         void shouldNotProceedToGetOrAuditlog_whenConsentCreateFails() {
-            when(consents.create(any(), any()))
+            when(consents.create(any(), any(), any(), any()))
                 .thenThrow(new RuntimeException("downstream unavailable"));
 
             assertThrows(ConflictException.class,
@@ -323,7 +324,7 @@ class ConsentSagaApplicationServiceTest {
 
         @Test
         void shouldNotCompensate_whenConsentCreateFails() {
-            when(consents.create(any(), any()))
+            when(consents.create(any(), any(), any(), any()))
                 .thenThrow(new RuntimeException("downstream unavailable"));
 
             assertThrows(ConflictException.class,
@@ -336,7 +337,7 @@ class ConsentSagaApplicationServiceTest {
         void shouldRethrowDomainException_whenConsentCreateThrowsDomainException() {
             var domainEx = new DomainException(ErrorCode.CONFLICT, "some.domain.error",
                 Map.of("id", consentStatementId.toString()));
-            when(consents.create(any(), any())).thenThrow(domainEx);
+            when(consents.create(any(), any(), any(), any())).thenThrow(domainEx);
 
             DomainException thrown = assertThrows(DomainException.class,
                 () -> service.createConsentStatement(createCmd));
@@ -352,7 +353,7 @@ class ConsentSagaApplicationServiceTest {
         @BeforeEach
         void lockAcquiredAndStep1Succeeds() {
             when(sagaLock.tryLock(any())).thenReturn(true);
-            when(consents.create(any(), any())).thenReturn(consentStatementId);
+            when(consents.create(any(), any(), any(), any())).thenReturn(consentStatementId);
         }
 
         @Test
@@ -442,7 +443,7 @@ class ConsentSagaApplicationServiceTest {
         @BeforeEach
         void lockAcquiredAndSteps1And2Succeed() {
             when(sagaLock.tryLock(any())).thenReturn(true);
-            when(consents.create(any(), any())).thenReturn(consentStatementId);
+            when(consents.create(any(), any(), any(), any())).thenReturn(consentStatementId);
             when(consents.getStatement(consentStatementId)).thenReturn(statementResponse);
         }
 
@@ -523,7 +524,7 @@ class ConsentSagaApplicationServiceTest {
             assertThrows(ConflictException.class,
                 () -> service.grant(buildGrantCmd()));
 
-            verify(consents, never()).grant(any(), any(), any(), any(), any());
+            verify(consents, never()).grant(any(), any(), any());
         }
 
         @Test
@@ -539,7 +540,7 @@ class ConsentSagaApplicationServiceTest {
         @Test
         void shouldThrowConflictException_whenGrantFails() {
             when(consents.getStatement(consentStatementId)).thenReturn(statementResponse);
-            when(consents.grant(any(), any(), any(), any(), any()))
+            when(consents.grant(any(), any(), any()))
                 .thenThrow(new RuntimeException("grant failed"));
 
             assertThrows(ConflictException.class,
@@ -549,7 +550,7 @@ class ConsentSagaApplicationServiceTest {
         @Test
         void shouldCompensateConsent_whenSanityCheckAfterGrantReturnsNull() {
             when(consents.getStatement(consentStatementId)).thenReturn(statementResponse);
-            when(consents.grant(any(), any(), any(), any(), any())).thenReturn(consentResponse);
+            when(consents.grant(any(), any(), any())).thenReturn(consentResponse);
             when(consents.getConsent(consentId)).thenReturn(null);
             when(consents.compensateConsentUpdate(any(), any(), any())).thenReturn(compensatedOk);
 
@@ -565,7 +566,7 @@ class ConsentSagaApplicationServiceTest {
         @Test
         void shouldCompensateConsent_whenAuditlogFailsAfterGrant() {
             when(consents.getStatement(consentStatementId)).thenReturn(statementResponse);
-            when(consents.grant(any(), any(), any(), any(), any())).thenReturn(consentResponse);
+            when(consents.grant(any(), any(), any())).thenReturn(consentResponse);
             when(consents.getConsent(consentId)).thenReturn(consentResponse);
             when(auditlogs.create(any(), any(), any(), any(), any(), any(), any(), any()))
                 .thenThrow(new RuntimeException("auditlog down"));
@@ -641,7 +642,7 @@ class ConsentSagaApplicationServiceTest {
         @Test
         void shouldSetSagaStatusToCompensating_whenConsentGetFailsAfterGrant() {
             when(consents.getStatement(consentStatementId)).thenReturn(statementResponse);
-            when(consents.grant(any(), any(), any(), any(), any())).thenReturn(consentResponse);
+            when(consents.grant(any(), any(), any())).thenReturn(consentResponse);
 
             when(consents.getConsent(consentId))
                     .thenThrow(new RuntimeException("db down"));
@@ -656,7 +657,7 @@ class ConsentSagaApplicationServiceTest {
         @Test
         void shouldCallCompensateConsent_whenConsentGetFailsAfterGrant() {
             when(consents.getStatement(consentStatementId)).thenReturn(statementResponse);
-            when(consents.grant(any(), any(), any(), any(), any())).thenReturn(consentResponse);
+            when(consents.grant(any(), any(), any())).thenReturn(consentResponse);
             when(consents.compensateConsentUpdate(any(), any(), any())).thenReturn(compensatedOk);
 
             when(consents.getConsent(consentId))
@@ -676,7 +677,7 @@ class ConsentSagaApplicationServiceTest {
         @Test
         void shouldRethrowDomainException_whenConsentGetFailsAfterGrant() {
             when(consents.getStatement(consentStatementId)).thenReturn(statementResponse);
-            when(consents.grant(any(), any(), any(), any(), any())).thenReturn(consentResponse);
+            when(consents.grant(any(), any(), any())).thenReturn(consentResponse);
             when(consents.compensateConsentUpdate(any(), any(), any())).thenReturn(compensatedOk);
             DomainException ex = new DomainException(
                     ErrorCode.CONFLICT,
@@ -703,7 +704,7 @@ class ConsentSagaApplicationServiceTest {
         void shouldReleaseLockAndThrowConflictException_whenConsentGetThrowsRuntimeException() {
             // given
             when(consents.getStatement(consentStatementId)).thenReturn(statementResponse);
-            when(consents.grant(any(), any(), any(), any(), any())).thenReturn(consentResponse);
+            when(consents.grant(any(), any(), any())).thenReturn(consentResponse);
 
             when(consents.getConsent(consentId))
                     .thenThrow(new RuntimeException("db down"));
@@ -725,7 +726,7 @@ class ConsentSagaApplicationServiceTest {
         void shouldUpdateStatusAndCompensateUpdate_whenConsentGetThrowsRuntimeException() {
             // given
             when(consents.getStatement(consentStatementId)).thenReturn(statementResponse);
-            when(consents.grant(any(), any(), any(), any(), any())).thenReturn(consentResponse);
+            when(consents.grant(any(), any(), any())).thenReturn(consentResponse);
             when(consents.compensateConsentUpdate(any(), any(), any())).thenReturn(compensatedOk);
 
             when(consents.getConsent(consentId))
@@ -752,7 +753,7 @@ class ConsentSagaApplicationServiceTest {
         void shouldUpdateStatusAndCompensateUpdate_whenConsentGetThrowsDomainException() {
             // given
             when(consents.getStatement(consentStatementId)).thenReturn(statementResponse);
-            when(consents.grant(any(), any(), any(), any(), any())).thenReturn(consentResponse);
+            when(consents.grant(any(), any(), any())).thenReturn(consentResponse);
             when(consents.compensateConsentUpdate(any(), any(), any())).thenReturn(compensatedOk);
             DomainException ex = new DomainException(
                     ErrorCode.CONFLICT,
@@ -875,7 +876,7 @@ class ConsentSagaApplicationServiceTest {
 
         @Test
         void shouldStillThrowConflictException_evenWhenCompensationFails() {
-            when(consents.create(any(), any())).thenReturn(consentStatementId);
+            when(consents.create(any(), any(), any(), any())).thenReturn(consentStatementId);
             when(consents.getStatement(consentStatementId)).thenReturn(null);
             when(consents.compensate(any(), any(), any())).thenReturn(compensatedFailed);
 
@@ -885,7 +886,7 @@ class ConsentSagaApplicationServiceTest {
 
         @Test
         void shouldStillReleaseLock_evenWhenCompensationReturnsFailure() {
-            when(consents.create(any(), any())).thenReturn(consentStatementId);
+            when(consents.create(any(), any(), any(), any())).thenReturn(consentStatementId);
             when(consents.getStatement(consentStatementId)).thenReturn(null);
             when(consents.compensate(any(), any(), any())).thenReturn(compensatedFailed);
 
@@ -897,7 +898,7 @@ class ConsentSagaApplicationServiceTest {
 
         @Test
         void shouldStillReleaseLock_evenWhenCompensationThrows() {
-            when(consents.create(any(), any())).thenReturn(consentStatementId);
+            when(consents.create(any(), any(), any(), any())).thenReturn(consentStatementId);
             when(consents.getStatement(consentStatementId)).thenReturn(null);
             when(consents.compensate(any(), any(), any()))
                 .thenThrow(new RuntimeException("compensation also failed"));
@@ -910,7 +911,7 @@ class ConsentSagaApplicationServiceTest {
 
         @Test
         void shouldCompensateWithCorrectSagaOutcome() {
-            when(consents.create(any(), any())).thenReturn(consentStatementId);
+            when(consents.create(any(), any(), any(), any())).thenReturn(consentStatementId);
             when(consents.getStatement(consentStatementId)).thenReturn(null);
             when(consents.compensate(any(), any(), any())).thenReturn(compensatedOk);
 
@@ -922,7 +923,7 @@ class ConsentSagaApplicationServiceTest {
 
         @Test
         void shouldPassServiceClassToCompensate() {
-            when(consents.create(any(), any())).thenReturn(consentStatementId);
+            when(consents.create(any(), any(), any(), any())).thenReturn(consentStatementId);
             when(consents.getStatement(consentStatementId)).thenReturn(null);
             when(consents.compensate(any(), any(), any())).thenReturn(compensatedOk);
 
@@ -945,7 +946,7 @@ class ConsentSagaApplicationServiceTest {
     private GrantConsentCmd buildGrantCmd() {
         return new GrantConsentCmd(
             sessionId, personId, consentStatementId,
-            ConsentPurpose.COMMUNICATION, ConsentType.REQUIRED, ConsentStatus.ACTIVE,
+            ConsentStatus.ACTIVE,
             personId, ActorType.USER, Severity.INFO,
             "originSystem", "originService", "originComponent",
             "data", "description"

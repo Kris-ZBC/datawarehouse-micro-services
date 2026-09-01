@@ -1,8 +1,8 @@
 package local.sop.datawarehouse.consent.interfaceadapters.persistence.jpa.consent;
 
-import local.sop.common.libs.sharedkernel.enums.ConsentPurpose;
-import local.sop.common.libs.sharedkernel.enums.ConsentStatus;
-import local.sop.common.libs.sharedkernel.enums.ConsentType;
+import local.sop.datawarehouse.sharedlib.enums.ConsentPurpose;
+import local.sop.datawarehouse.sharedlib.enums.ConsentStatus;
+import local.sop.datawarehouse.sharedlib.enums.ConsentType;
 import local.sop.common.libs.sharedkernel.valueobjects.DomainId;
 import local.sop.datawarehouse.consent.domain.model.Consent;
 import local.sop.datawarehouse.consent.domain.ports.out.ConsentRepositoryPort;
@@ -99,9 +99,7 @@ public class ConsentRepositoryJpaAdapter implements ConsentRepositoryPort {
     public Consent update(Consent consent) {
         ConsentEntity entity = repository.findById(consent.getId().value())
                 .orElseThrow(() -> new NotFoundException("consent.notfound", Map.of("id", consent.getId().value())));
-        entity = entity.withStatus(consent.getStatus())
-                       .withConsentPurpose(consent.getPurpose())
-                       .withConsentType(consent.getType());
+        entity = entity.withStatus(consent.getStatus());
         ConsentEntity updatedEntity = repository.save(entity);
 
         var statementEntity = statementRepository.findById(updatedEntity.getConsentStatement().getId()).orElseThrow(() -> new NotFoundException("consentstatement.notfound", Map.of("statementRef", updatedEntity.getConsentStatement().getId())));

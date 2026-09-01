@@ -112,6 +112,16 @@
         </dependency>
         <dependency>
             <groupId>local.sop.datawarehouse</groupId>
+            <artifactId>login-api</artifactId>
+            <version>${revision}</version>
+        </dependency>
+         <dependency>
+            <groupId>local.sop.datawarehouse</groupId>
+            <artifactId>login-impl</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>local.sop.datawarehouse</groupId>
             <artifactId>organisation-api</artifactId>
             <version>${revision}</version>
         </dependency>
@@ -140,6 +150,16 @@
             <artifactId>sop-impl</artifactId>
             <version>${revision}</version>
         </dependency>
+         <dependency>
+                <groupId>local.sop.datawarehouse</groupId>
+                <artifactId>sop-education-api</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>local.sop.datawarehouse</groupId>
+                <artifactId>sop-education-impl</artifactId>
+                <version>${revision}</version>
+        </dependency>
         <dependency>
             <groupId>local.sop.datawarehouse</groupId>
             <artifactId>consent-saga-api</artifactId>
@@ -148,6 +168,16 @@
         <dependency>
             <groupId>local.sop.datawarehouse</groupId>
             <artifactId>consent-saga-impl</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>local.sop.datawarehouse</groupId>
+            <artifactId>login-saga-api</artifactId>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>local.sop.datawarehouse</groupId>
+            <artifactId>login-saga-impl</artifactId>
             <version>${revision}</version>
         </dependency>
 		<dependency>
@@ -181,16 +211,6 @@
              <artifactId>anonymize-saga-impl</artifactId>
              <version>${revision}</version>
          </dependency>
-         <dependency>
-                <groupId>local.sop.datawarehouse</groupId>
-                <artifactId>sop-education-api</artifactId>
-                <version>${revision}</version>
-            </dependency>
-            <dependency>
-                <groupId>local.sop.datawarehouse</groupId>
-                <artifactId>sop-education-impl</artifactId>
-                <version>${revision}</version>
-            </dependency>
      </dependencies>
     <build>
     <plugins>

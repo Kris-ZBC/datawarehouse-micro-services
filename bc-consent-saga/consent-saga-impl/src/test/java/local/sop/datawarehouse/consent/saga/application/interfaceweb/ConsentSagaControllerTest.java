@@ -24,9 +24,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import local.sop.common.libs.infrastructure.security.DisableSecurity;
 import local.sop.common.libs.infrastructure.web.exception.EndpointExceptionHandler;
 import local.sop.common.libs.sharedkernel.enums.ActorType;
-import local.sop.common.libs.sharedkernel.enums.ConsentPurpose;
-import local.sop.common.libs.sharedkernel.enums.ConsentStatus;
-import local.sop.common.libs.sharedkernel.enums.ConsentType;
+import local.sop.datawarehouse.sharedlib.enums.ConsentPurpose;
+import local.sop.datawarehouse.sharedlib.enums.ConsentStatus;
+import local.sop.datawarehouse.sharedlib.enums.ConsentType;
 import local.sop.common.libs.sharedkernel.enums.Severity;
 import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
 import local.sop.datawarehouse.consent.saga.application.api.ConsentSagaDirectory;
@@ -69,6 +69,8 @@ class ConsentSagaControllerTest {
         UUID.randomUUID(), // sessionId
         true,
         "This is a valid consent statement text",
+        ConsentPurpose.REQUIRED_SERVICE,
+        ConsentType.REQUIRED,
         UUID.randomUUID(),
         ActorType.USER,
         Severity.INFO,
@@ -82,8 +84,6 @@ class ConsentSagaControllerTest {
         UUID.randomUUID(), // sessionId
         UUID.randomUUID(), // personRef
         UUID.randomUUID(), // consentStatementRef
-        ConsentPurpose.MARKETING,
-        ConsentType.REQUIRED,
         ConsentStatus.ACTIVE,
         UUID.randomUUID(),
         ActorType.USER,
@@ -112,7 +112,9 @@ class ConsentSagaControllerTest {
         consentStatementResponse = new ConsentStatementResponse(
         consentStatementId,
         validCmd.statementText(),
-        validCmd.active()
+        validCmd.active(),
+        validCmd.purpose().name(),
+        validCmd.type().name()
         );
     }
  
@@ -132,8 +134,8 @@ class ConsentSagaControllerTest {
                     "ACTIVE",
                     consentStatementId,
                     consentStatementResponse.statementText(),
-                    "MARKETING",
-                    "REQUIRED",
+                    validCmd.purpose(),
+                    validCmd.type(),
                     true
             ));
             when(consentDirectory.withdraw(any())).thenReturn(new ConsentResponse(
@@ -142,8 +144,8 @@ class ConsentSagaControllerTest {
                     "WITHDRAWN",
                     consentStatementId,
                     consentStatementResponse.statementText(),
-                    "MARKETING",
-                    "REQUIRED",
+                    validCmd.purpose(),
+                    validCmd.type(),
                     false
             ));
         }
@@ -517,6 +519,7 @@ class ConsentSagaControllerTest {
  
     private CreateConsentStatementCmd withActive(Boolean active) {
         return new CreateConsentStatementCmd(validCmd.sessionId(), active, validCmd.statementText(),
+                validCmd.purpose(), validCmd.type(),
                 validCmd.actorRef(), validCmd.actorType(), validCmd.severity(),
                 validCmd.originSystem(), validCmd.originService(), validCmd.originComponent(),
                 validCmd.data(), validCmd.description());
@@ -524,6 +527,7 @@ class ConsentSagaControllerTest {
  
     private CreateConsentStatementCmd withStatementText(String text) {
         return new CreateConsentStatementCmd(validCmd.sessionId(), validCmd.active(), text,
+                validCmd.purpose(), validCmd.type(),
                 validCmd.actorRef(), validCmd.actorType(), validCmd.severity(),
                 validCmd.originSystem(), validCmd.originService(), validCmd.originComponent(),
                 validCmd.data(), validCmd.description());
@@ -531,6 +535,7 @@ class ConsentSagaControllerTest {
  
     private CreateConsentStatementCmd withActorRef(UUID actorRef) {
         return new CreateConsentStatementCmd(validCmd.sessionId(), validCmd.active(), validCmd.statementText(),
+                validCmd.purpose(), validCmd.type(),
                 actorRef, validCmd.actorType(), validCmd.severity(),
                 validCmd.originSystem(), validCmd.originService(), validCmd.originComponent(),
                 validCmd.data(), validCmd.description());
@@ -538,6 +543,7 @@ class ConsentSagaControllerTest {
  
     private CreateConsentStatementCmd withActorType(ActorType actorType) {
         return new CreateConsentStatementCmd(validCmd.sessionId(), validCmd.active(), validCmd.statementText(),
+                validCmd.purpose(), validCmd.type(),
                 validCmd.actorRef(), actorType, validCmd.severity(),
                 validCmd.originSystem(), validCmd.originService(), validCmd.originComponent(),
                 validCmd.data(), validCmd.description());
@@ -545,6 +551,7 @@ class ConsentSagaControllerTest {
  
     private CreateConsentStatementCmd withSeverity(Severity severity) {
         return new CreateConsentStatementCmd(validCmd.sessionId(), validCmd.active(), validCmd.statementText(),
+                validCmd.purpose(), validCmd.type(),
                 validCmd.actorRef(), validCmd.actorType(), severity,
                 validCmd.originSystem(), validCmd.originService(), validCmd.originComponent(),
                 validCmd.data(), validCmd.description());
@@ -552,6 +559,7 @@ class ConsentSagaControllerTest {
  
     private CreateConsentStatementCmd withOriginSystem(String originSystem) {
         return new CreateConsentStatementCmd(validCmd.sessionId(), validCmd.active(), validCmd.statementText(),
+                validCmd.purpose(), validCmd.type(),
                 validCmd.actorRef(), validCmd.actorType(), validCmd.severity(),
                 originSystem, validCmd.originService(), validCmd.originComponent(),
                 validCmd.data(), validCmd.description());
@@ -559,6 +567,7 @@ class ConsentSagaControllerTest {
  
     private CreateConsentStatementCmd withOriginService(String originService) {
         return new CreateConsentStatementCmd(validCmd.sessionId(), validCmd.active(), validCmd.statementText(),
+                validCmd.purpose(), validCmd.type(),
                 validCmd.actorRef(), validCmd.actorType(), validCmd.severity(),
                 validCmd.originSystem(), originService, validCmd.originComponent(),
                 validCmd.data(), validCmd.description());
@@ -566,6 +575,7 @@ class ConsentSagaControllerTest {
  
     private CreateConsentStatementCmd withOriginComponent(String originComponent) {
         return new CreateConsentStatementCmd(validCmd.sessionId(), validCmd.active(), validCmd.statementText(),
+                validCmd.purpose(), validCmd.type(),
                 validCmd.actorRef(), validCmd.actorType(), validCmd.severity(),
                 validCmd.originSystem(), validCmd.originService(), originComponent,
                 validCmd.data(), validCmd.description());
@@ -573,6 +583,7 @@ class ConsentSagaControllerTest {
  
     private CreateConsentStatementCmd withData(String data) {
         return new CreateConsentStatementCmd(validCmd.sessionId(), validCmd.active(), validCmd.statementText(),
+                validCmd.purpose(), validCmd.type(),
                 validCmd.actorRef(), validCmd.actorType(), validCmd.severity(),
                 validCmd.originSystem(), validCmd.originService(), validCmd.originComponent(),
                 data, validCmd.description());
@@ -580,6 +591,7 @@ class ConsentSagaControllerTest {
  
     private CreateConsentStatementCmd withDescription(String description) {
         return new CreateConsentStatementCmd(validCmd.sessionId(), validCmd.active(), validCmd.statementText(),
+                validCmd.purpose(), validCmd.type(),
                 validCmd.actorRef(), validCmd.actorType(), validCmd.severity(),
                 validCmd.originSystem(), validCmd.originService(), validCmd.originComponent(),
                 validCmd.data(), description);

@@ -13,7 +13,11 @@
   <!-- API module dependencies -->
   <dependencies>
     <!-- shared-kernel inherited-->
-
+    <dependency>
+    <groupId>local.sop.datawarehouse</groupId>
+    <artifactId>shared-lib</artifactId>
+    <version>${revision}</version>
+  </dependency>
     <!-- Bean validation annotations for DTOs -->
     <dependency>
       <groupId>jakarta.validation</groupId>

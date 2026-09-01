@@ -18,7 +18,9 @@ import org.springframework.test.context.TestPropertySource;
     "spring.datasource.username=sa",
     "spring.datasource.password=",
     "spring.jpa.hibernate.ddl-auto=none",
-    "bc.qualifier=person"
+    "bc.qualifier=person",
+    "spring.application.name=person-impl",
+    "sop.application.name=datawarehouse"
 })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 class PersonMessageTest {

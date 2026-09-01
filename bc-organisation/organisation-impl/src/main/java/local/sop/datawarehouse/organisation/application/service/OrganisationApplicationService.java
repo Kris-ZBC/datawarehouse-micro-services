@@ -2,6 +2,7 @@ package local.sop.datawarehouse.organisation.application.service;
 
 import java.util.Optional;
 import java.util.UUID;
+import java.util.List;
 import java.util.Map;
 
 // Exception
@@ -49,5 +50,13 @@ public class OrganisationApplicationService implements OrganisationDirectory {
 			log.error("Error finding organisation with id: {}", id.toString(), e);
 			throw new ValidationException("organisation.failed.findById", Map.of("id", id));
 		}
+	}
+
+	@Override
+	public List<OrganisationResponse> findAll() {
+		log.info("Fetching all organisations");
+		return organisations.findAll().stream()
+				.map(entity -> new OrganisationResponse(entity.getId(), entity.getName(), entity.getCvr()))
+				.toList();
 	}
 }

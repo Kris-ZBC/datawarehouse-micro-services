@@ -18,7 +18,8 @@ Parent pom for multi-module project aggregator and BOM (dependency management)
     <packaging>pom</packaging>
     <name>Datawarehouse - Parent POM</name>
     
-    <modules>       
+    <modules>     
+        <module>../shared-lib</module>  
         <module>../coverage-report</module>
         
         <!-- Bounded Context -->
@@ -45,7 +46,10 @@ Parent pom for multi-module project aggregator and BOM (dependency management)
 
         <module>../bc-instructor/instructor-api</module>
         <module>../bc-instructor/instructor-impl</module>
-        
+
+        <module>../bc-login/login-api</module>
+        <module>../bc-login/login-impl</module>
+
         <module>../bc-person/person-api</module>
         <module>../bc-person/person-impl</module>
 
@@ -68,6 +72,9 @@ Parent pom for multi-module project aggregator and BOM (dependency management)
         <module>../bc-consent-saga/consent-saga-api</module>
         <module>../bc-consent-saga/consent-saga-impl</module>
 
+        <module>../bc-login-saga/login-saga-api</module>
+        <module>../bc-login-saga/login-saga-impl</module>
+
         <module>../bc-education-line-saga/education-line-saga-api</module>
         <module>../bc-education-line-saga/education-line-saga-impl</module>
 
@@ -79,6 +86,10 @@ Parent pom for multi-module project aggregator and BOM (dependency management)
 
         <module>../bc-registration-saga/registration-saga-api</module>
         <module>../bc-registration-saga/registration-saga-impl</module>
+
+        <!-- Gateways-->
+        <module>../gw-admin</module>
+        <module>../gw-common</module>
         
     </modules>
 
