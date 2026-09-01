@@ -13,7 +13,7 @@ import local.sop.datawarehouse.gateway.admin.handlers.user.api.UserHandlerDirect
 import local.sop.datawarehouse.gateway.admin.handlers.user.api.dto.request.RegisterInstructorRequest;
 import local.sop.datawarehouse.gateway.admin.handlers.user.api.dto.response.CreatedUserResponse;
 import local.sop.datawarehouse.gateway.admin.handlers.user.application.infrastructure.registation.RegistrationSagaAdapter;
-import local.sop.datawarehouse.shared.enums.UserRole;
+import local.sop.datawarehouse.sharedlib.enums.UserRole;
 
 @Service
 public class UserHandlerService implements UserHandlerDirectory {

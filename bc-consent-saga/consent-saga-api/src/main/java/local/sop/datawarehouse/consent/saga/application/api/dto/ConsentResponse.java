@@ -2,8 +2,8 @@ package local.sop.datawarehouse.consent.saga.application.api.dto;
 
 import java.util.UUID;
 
-import local.sop.common.libs.sharedkernel.enums.ConsentPurpose;
-import local.sop.common.libs.sharedkernel.enums.ConsentType;
+import local.sop.datawarehouse.sharedlib.enums.ConsentPurpose;
+import local.sop.datawarehouse.sharedlib.enums.ConsentType;
 
 public record ConsentResponse(
         UUID consentId,

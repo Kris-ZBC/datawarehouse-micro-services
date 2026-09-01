@@ -6,6 +6,7 @@ import local.sop.datawarehouse.login.domain.model.Login;
 import local.sop.datawarehouse.login.domain.model.valueobjects.HashedPassword;
 import local.sop.datawarehouse.login.domain.model.valueobjects.PersonRef;
 import local.sop.datawarehouse.login.domain.model.valueobjects.Username;
+import local.sop.datawarehouse.login.domain.model.valueobjects.IsAccepted;
 import local.sop.common.libs.sharedkernel.enums.LoginStatus;
 
 public class LoginDomainService implements LoginDomain {
@@ -17,6 +18,7 @@ public class LoginDomainService implements LoginDomain {
 			.username(Username.of(username))
 			.password(HashedPassword.of(password))
 			.status(status)
+			.isActivated(IsAccepted.of(true))
 			.build();
 	}
 

@@ -17,9 +17,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.client.RestClient;
 
-import local.sop.common.libs.sharedkernel.enums.ConsentPurpose;
-import local.sop.common.libs.sharedkernel.enums.ConsentStatus;
-import local.sop.common.libs.sharedkernel.enums.ConsentType;
+import local.sop.datawarehouse.sharedlib.enums.ConsentPurpose;
+import local.sop.datawarehouse.sharedlib.enums.ConsentStatus;
+import local.sop.datawarehouse.sharedlib.enums.ConsentType;
 import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
 import local.sop.common.libs.sharedkernel.sagas.compensate.request.PayloadCompensateCreate;
 import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;

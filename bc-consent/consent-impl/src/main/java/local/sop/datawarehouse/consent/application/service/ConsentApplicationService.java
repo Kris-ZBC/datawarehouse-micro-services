@@ -1,6 +1,6 @@
 package local.sop.datawarehouse.consent.application.service;
 
-import local.sop.common.libs.sharedkernel.enums.ConsentStatus;
+import local.sop.datawarehouse.sharedlib.enums.ConsentStatus;
 import local.sop.common.libs.sharedkernel.exceptions.NotFoundException;
 import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
 import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;

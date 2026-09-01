@@ -1,8 +1,8 @@
 package local.sop.datawarehouse.consent.interfaceadapters.persistence.jpa.consent;
 
-import local.sop.common.libs.sharedkernel.enums.ConsentPurpose;
-import local.sop.common.libs.sharedkernel.enums.ConsentStatus;
-import local.sop.common.libs.sharedkernel.enums.ConsentType;
+import local.sop.datawarehouse.sharedlib.enums.ConsentPurpose;
+import local.sop.datawarehouse.sharedlib.enums.ConsentStatus;
+import local.sop.datawarehouse.sharedlib.enums.ConsentType;
 import local.sop.common.libs.sharedkernel.valueobjects.DomainId;
 import local.sop.datawarehouse.consent.domain.model.Consent;
 import local.sop.datawarehouse.consent.domain.ports.out.ConsentRepositoryPort;

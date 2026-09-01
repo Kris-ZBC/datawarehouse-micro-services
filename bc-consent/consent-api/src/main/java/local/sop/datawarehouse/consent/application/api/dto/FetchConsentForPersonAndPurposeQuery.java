@@ -3,7 +3,7 @@ package local.sop.datawarehouse.consent.application.api.dto;
 import java.util.UUID;
 
 import jakarta.validation.constraints.NotNull;
-import local.sop.common.libs.sharedkernel.enums.ConsentPurpose;
+import local.sop.datawarehouse.sharedlib.enums.ConsentPurpose;
 
 public record FetchConsentForPersonAndPurposeQuery(
    @NotNull(message="{consent.personref.invalid}") UUID personId,

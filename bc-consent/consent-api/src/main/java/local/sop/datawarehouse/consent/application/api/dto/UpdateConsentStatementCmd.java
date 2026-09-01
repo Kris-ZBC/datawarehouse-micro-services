@@ -5,8 +5,8 @@ import java.util.UUID;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import local.sop.common.libs.sharedkernel.enums.ConsentPurpose;
-import local.sop.common.libs.sharedkernel.enums.ConsentType;
+import local.sop.datawarehouse.sharedlib.enums.ConsentPurpose;
+import local.sop.datawarehouse.sharedlib.enums.ConsentType;
 
 // CHANGED: consentPurpose/consentType were previously untyped Strings
 // marked "New - optional" and were never actually read by the service

@@ -3,8 +3,8 @@ package local.sop.datawarehouse.consent.application.api.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import local.sop.common.libs.sharedkernel.enums.ConsentPurpose;
-import local.sop.common.libs.sharedkernel.enums.ConsentType;
+import local.sop.datawarehouse.sharedlib.enums.ConsentPurpose;
+import local.sop.datawarehouse.sharedlib.enums.ConsentType;
 
 // CHANGED: purpose and type added — required at creation, since they're
 // now inherent properties of the statement itself (see ConsentStatement's
