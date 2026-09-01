@@ -6,8 +6,8 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
  
-import local.sop.common.libs.sharedkernel.enums.ConsentPurpose;
-import local.sop.common.libs.sharedkernel.enums.ConsentType;
+import local.sop.datawarehouse.sharedlib.enums.ConsentPurpose;
+import local.sop.datawarehouse.sharedlib.enums.ConsentType;
 import local.sop.datawarehouse.consent.domain.model.ConsentStatement;
 import local.sop.datawarehouse.consent.domain.model.valueobject.ConsentStatementRef;
 import local.sop.datawarehouse.consent.domain.model.valueobject.ConsentStatementValue;

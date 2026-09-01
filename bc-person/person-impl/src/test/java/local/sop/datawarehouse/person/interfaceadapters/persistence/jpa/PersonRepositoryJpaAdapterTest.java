@@ -30,7 +30,9 @@ import local.sop.datawarehouse.person.domain.model.valueobjects.PhoneNumberValue
 @DataJpaTest
 @TestPropertySource(properties = {
         "spring.flyway.enabled=false",
-        "spring.jpa.hibernate.ddl-auto=create-drop"
+        "spring.jpa.hibernate.ddl-auto=create-drop",
+        "spring.application.name=person-impl",
+        "sop.application.name=datawarehouse"
 })
 class PersonRepositoryJpaAdapterTest {
 

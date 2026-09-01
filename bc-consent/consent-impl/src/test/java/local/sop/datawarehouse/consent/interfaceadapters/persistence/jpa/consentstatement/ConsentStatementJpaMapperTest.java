@@ -17,9 +17,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import local.sop.common.libs.sharedkernel.enums.ConsentPurpose;
-import local.sop.common.libs.sharedkernel.enums.ConsentStatus;
-import local.sop.common.libs.sharedkernel.enums.ConsentType;
+import local.sop.datawarehouse.sharedlib.enums.ConsentPurpose;
+import local.sop.datawarehouse.sharedlib.enums.ConsentStatus;
+import local.sop.datawarehouse.sharedlib.enums.ConsentType;
 import local.sop.datawarehouse.consent.domain.model.Consent;
 import local.sop.datawarehouse.consent.domain.model.ConsentStatement;
 import local.sop.datawarehouse.consent.domain.model.valueobject.ConsentId;

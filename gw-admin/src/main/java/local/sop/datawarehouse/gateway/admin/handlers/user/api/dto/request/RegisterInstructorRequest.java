@@ -7,7 +7,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import local.sop.common.libs.sharedkernel.enums.ConsentStatus;
+import local.sop.datawarehouse.sharedlib.enums.ConsentStatus;
  
 /**
  * What the BFF sends the Handler. This is intentionally its own contract,

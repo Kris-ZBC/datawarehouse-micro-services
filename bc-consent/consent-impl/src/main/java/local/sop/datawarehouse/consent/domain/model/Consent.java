@@ -2,7 +2,7 @@ package local.sop.datawarehouse.consent.domain.model;
 
 import java.util.Map;
 
-import local.sop.common.libs.sharedkernel.enums.ConsentStatus;
+import local.sop.datawarehouse.sharedlib.enums.ConsentStatus;
 import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 import local.sop.common.libs.sharedkernel.valueobjects.DomainId;
 import local.sop.datawarehouse.consent.domain.model.valueobject.*;

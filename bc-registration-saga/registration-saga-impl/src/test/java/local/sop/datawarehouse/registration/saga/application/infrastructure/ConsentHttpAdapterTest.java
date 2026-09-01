@@ -15,8 +15,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.client.RestClient;
 
-import local.sop.common.libs.sharedkernel.enums.ConsentPurpose;
-import local.sop.common.libs.sharedkernel.enums.ConsentType;
+import local.sop.datawarehouse.sharedlib.enums.ConsentPurpose;
+import local.sop.datawarehouse.sharedlib.enums.ConsentType;
 import local.sop.datawarehouse.registration.saga.application.api.dto.consent.ConsentResponse;
 import local.sop.datawarehouse.registration.saga.application.infrastructure.consent.ConsentHttpAdapter;
 

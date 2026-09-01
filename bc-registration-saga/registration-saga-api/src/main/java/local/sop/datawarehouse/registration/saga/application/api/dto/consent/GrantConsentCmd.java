@@ -5,7 +5,7 @@ import java.util.UUID;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import local.sop.common.libs.sharedkernel.enums.ActorType;
-import local.sop.common.libs.sharedkernel.enums.ConsentStatus;
+import local.sop.datawarehouse.sharedlib.enums.ConsentStatus;
 import local.sop.common.libs.sharedkernel.enums.Severity;
 
 public record GrantConsentCmd(

@@ -24,7 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import local.sop.common.libs.infrastructure.security.DisableSecurity;
 import local.sop.common.libs.infrastructure.web.exception.EndpointExceptionHandler;
-import local.sop.common.libs.sharedkernel.enums.ConsentStatus;
+import local.sop.datawarehouse.sharedlib.enums.ConsentStatus;
 import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
 import local.sop.datawarehouse.registration.saga.application.api.RegistrationDirectory;
 import local.sop.datawarehouse.registration.saga.application.api.dto.CreateInstructorRegistrationCmd;

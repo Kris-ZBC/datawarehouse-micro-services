@@ -3,7 +3,7 @@ package local.sop.datawarehouse.consent.application.api.dto;
 import java.util.UUID;
 
 import jakarta.validation.constraints.NotNull;
-import local.sop.common.libs.sharedkernel.enums.ConsentStatus;
+import local.sop.datawarehouse.sharedlib.enums.ConsentStatus;
 
 // CHANGED: purpose and type removed. Both are properties of the
 // ConsentStatement being agreed to, not something the granter supplies —

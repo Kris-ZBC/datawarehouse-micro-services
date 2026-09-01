@@ -2,7 +2,7 @@ package local.sop.datawarehouse.consent.saga.application.infrastructure.request;
 
 import java.util.UUID;
 
-import local.sop.common.libs.sharedkernel.enums.ConsentStatus;
+import local.sop.datawarehouse.sharedlib.enums.ConsentStatus;
 
 // CHANGED: purpose/type removed — bc-consent's GrantConsentCmd no
 // longer accepts them.
