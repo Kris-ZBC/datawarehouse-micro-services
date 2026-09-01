@@ -266,11 +266,11 @@ These services own data and expose internal APIs, usually under `/internal/**`.
 | `bc-work-hour` | `9454` | Database-aware bounded context |
 | `bc-login` | `9455` | Database-aware bounded context |
 | `bc-message-person` | `9456` | Database-aware bounded context |
-| `bc-education-instructor` | `9457` | Check port ownership before running with `bc-sop-education` |
-| `bc-sop-education` | `9457` | Check port ownership before running with `bc-education-instructor` |
+| `bc-education-instructor` | `9457` | Database-aware bounded context |
 | `bc-sop-instructor` | `9458` | Database-aware bounded context |
 | `bc-education` | `9459` | Database-aware bounded context |
 | `bc-person-notification` | `9460` | Database-aware bounded context |
+| `bc-sop-education` | `9461` | Database-aware bounded context |
 | `bc-anonymize` | `9499` | Database-aware bounded context |
 
 ### Saga Services

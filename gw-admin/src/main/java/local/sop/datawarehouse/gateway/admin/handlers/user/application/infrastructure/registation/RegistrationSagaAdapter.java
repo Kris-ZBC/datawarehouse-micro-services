@@ -7,7 +7,7 @@ import org.springframework.web.client.RestClient;
 
 import local.sop.datawarehouse.gateway.admin.handlers.user.api.dto.request.RegisterInstructorRequest;
 import local.sop.datawarehouse.gateway.admin.handlers.user.api.dto.response.CreatedUserResponse;
-import local.sop.datawarehouse.shared.enums.UserRole;
+import local.sop.datawarehouse.sharedlib.enums.UserRole;
 
 /**
  *      

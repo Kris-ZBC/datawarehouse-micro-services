@@ -1,4 +1,4 @@
-package local.sop.datawarehouse.shared.enums;
+package local.sop.datawarehouse.sharedlib.enums;
 
 public enum UserRole {
     TECHUSER,

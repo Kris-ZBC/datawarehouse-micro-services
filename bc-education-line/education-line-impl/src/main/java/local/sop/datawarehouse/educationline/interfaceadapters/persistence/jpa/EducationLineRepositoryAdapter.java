@@ -42,7 +42,7 @@ public class EducationLineRepositoryAdapter implements EducationLineRepositoryPo
 			if (entity.getId() == null) {
 				entity.setId(UUID.randomUUID());
 			}
-			log.info("Creating new entity wtith id: {}", entity.getId().toString());
+			log.info("Creating new entity with id: {}", entity.getId().toString());
 			EducationLineEntity savedEntity = jpaRepository.save(entity);
 			log.info("New entity created: {}", savedEntity);
 			return mapper.toDomain(savedEntity);

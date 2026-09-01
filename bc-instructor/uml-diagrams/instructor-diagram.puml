@@ -14,7 +14,7 @@ skinparam nodesep 55
 
 folder "Instructor" #LightGrey {
 
-  package "sop.local.sopinfo" {
+  package "sop.local.datawarehouse" {
     package "instructor" #LightSteelBlue {
 
       package "interfaceweb" {

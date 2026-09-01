@@ -20,6 +20,12 @@
 
   <dependency>
     <groupId>local.sop.datawarehouse</groupId>
+    <artifactId>shared-lib</artifactId>
+    <version>${revision}</version>
+  </dependency>
+
+  <dependency>
+    <groupId>local.sop.datawarehouse</groupId>
     <artifactId>consent-api</artifactId>
     <version>${revision}</version>
   </dependency>
