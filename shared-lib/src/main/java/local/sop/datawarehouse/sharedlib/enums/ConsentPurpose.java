@@ -1,4 +1,4 @@
-package local.sop.common.libs.sharedkernel.enums;
+package local.sop.datawarehouse.sharedlib.enums;
 
 import java.util.Map;
 

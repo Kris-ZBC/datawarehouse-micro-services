@@ -14,6 +14,8 @@ public record ExpiresAtTimestamp(LocalDateTime value) {
 		if (!value.isAfter(LocalDateTime.now())) {
 			throw new ValidationException("login.expiresattimestamp.must.be.in.future", Map.of("field", "expiresAtTimestamp"));
 		}
+
+		
 	}
 
 	public static ExpiresAtTimestamp of(LocalDateTime instant) {
