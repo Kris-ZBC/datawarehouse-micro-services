@@ -1,0 +1,105 @@
+@startuml microservice-architecture
+title Server-Microservice architecture — all bounded contexts
+
+skinparam component {
+    BackgroundColor<<web>>         #D4F1E4
+    BorderColor<<web>>             #0F6E56
+    FontColor<<web>>               #085041
+
+    BackgroundColor<<application>> #EEEDFE
+    BorderColor<<application>>     #534AB7
+    FontColor<<application>>       #3C3489
+
+    BackgroundColor<<domain>>      #FAECE7
+    BorderColor<<domain>>          #993C1D
+    FontColor<<domain>>            #711B13
+
+    BackgroundColor<<port>>        #FBEAF0
+    BorderColor<<port>>            #993556
+    FontColor<<port>>              #72243E
+
+    BackgroundColor<<adapter>>     #E6F1FB
+    BorderColor<<adapter>>         #185FA5
+    FontColor<<adapter>>           #0C447C
+
+    BackgroundColor<<external>>    #FAEEDA
+    BorderColor<<external>>        #854F0B
+    FontColor<<external>>          #633806
+
+    BackgroundColor<<infra>>       #F1EFE8
+    BorderColor<<infra>>           #5F5E5A
+    FontColor<<infra>>             #2C2C2A
+}
+
+skinparam package {
+    BackgroundColor #FFFFFF
+    BorderColor     #888780
+    FontColor       #2C2C2A
+    FontStyle       bold
+}
+
+skinparam arrow {
+    Color           #5F5E5A
+    FontColor       #5F5E5A
+    FontSize        11
+}
+
+skinparam defaultFontName  Helvetica
+skinparam defaultFontSize  12
+skinparam shadowing        false
+skinparam roundCorner      12
+skinparam linetype         ortho
+
+' ── External callers ──────────────────────────────────────────
+component "Other BCs / saga handlers\n(via mTLS)" <<external>> as callers
+
+' ── Generic BC ────────────────────────────────────────────────
+package "bc-<service>" {
+
+    ' Interface web — inbound adapter
+    package "Interface web  [inbound adapter]" {
+        component "Internal<X>Controller\nREST endpoints · request/response mapping" <<web>> as controller
+    }
+
+    ' Application layer
+    package "Application layer" {
+        component "<X>Directory\n(public API interface)" <<application>> as directory
+        component "<X>ApplicationService\norchestrates use cases · calls domain + ports" <<application>> as appservice
+    }
+
+    ' Domain layer — pure business logic, no framework dependencies
+    package "Domain layer  [framework-free]" {
+        component "Domain model\n<X> aggregate root · value objects\nbusiness invariants enforced here" <<domain>> as model
+        component "<X>DomainService\nbusiness rules · domain events" <<domain>> as domainservice
+        component "<X>RepositoryPort\noutbound interface (dependency inversion)" <<port>> as port
+    }
+
+    ' Interface adapters — outbound
+    package "Interface adapters  [outbound]" {
+        component "Persistence\n<X>Entity · <X>SpringDataRepository\n<X>JpaMapper · Flyway V1__init.sql" <<adapter>> as persistence
+        component "Security\ncommon-security · mTLS\nSecurityConfig · @DisableSecurity (test)" <<infra>> as security
+        component "External systems\nMariaDB · TLS keystore\ncommon-data · common-web" <<external>> as external
+    }
+}
+
+' ── Pipeline & image ──────────────────────────────────────────
+package "CI/CD  [GitLab pipeline]" {
+    component "gen-dockerfiles.sh\ngen-compose.sh · gen-ddl.py\nmvn package · docker build/push" <<infra>> as pipeline
+}
+
+component "Docker image\neclipse-temurin:21-jre\ntls-entrypoint.sh baked in" <<infra>> as image
+
+' ── Relationships ──────────────────────────────────────────────
+callers       -->  controller   : HTTPS / mTLS
+controller    -->  directory    : delegates
+directory     -->  appservice   : implements
+appservice    -->  model        : creates / validates
+appservice    -->  domainservice: delegates rules
+appservice    -->  port         : calls (interface only)
+port          <..  persistence  : implements
+persistence   -->  external     : reads / writes
+security      -->  controller   : secures all endpoints
+pipeline      -->  image        : builds & pushes
+image         -->  controller   : runs as container
+
+@enduml
