@@ -59,6 +59,12 @@ public class ApprenticeRepositoryAdapter implements ApprenticeRepositoryPort {
                 .map(ApprenticeJpaMapper::toDomain)
                 .toList();
     }
+
+    @Override
+    public Optional<Apprentice> findByPersonRef(UUID personRef) {
+        return jpaRepository.findByPersonRef(personRef)
+                .map(ApprenticeJpaMapper::toDomain);
+    }
     @Override
     public Boolean compensate(ApprenticeId id, SagaOutcome sagaState) {
         if(sagaState != SagaOutcome.COMPENSATE)

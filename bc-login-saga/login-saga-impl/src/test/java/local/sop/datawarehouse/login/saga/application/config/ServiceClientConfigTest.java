@@ -28,6 +28,13 @@ class ServiceClientConfigTest {
     @Mock
     private RestClient auditlogClient;
 
+    // NEW: role resolution clients added alongside the SSO rework.
+    @Mock
+    private RestClient instructorClient;
+
+    @Mock
+    private RestClient apprenticeClient;
+
     private ServiceClientConfig config;
 
     @BeforeEach
@@ -66,5 +73,29 @@ class ServiceClientConfigTest {
 
         assertSame(auditlogClient, result);
         verify(clientFactory).createMtlsClient("auditlog", props.baseurl());
+    }
+
+    // NEW: coverage for the two role-resolution clients added
+    // alongside the SSO rework.
+    @Test
+    void instructor_shouldCreateMtlsClientWithInstructorServiceName() {
+        InstructorProps props = new InstructorProps("https://instructor.svc.local");
+        when(clientFactory.createMtlsClient("instructor", props.baseUrl())).thenReturn(instructorClient);
+
+        RestClient result = config.instructor(clientFactory, props);
+
+        assertSame(instructorClient, result);
+        verify(clientFactory).createMtlsClient("instructor", props.baseUrl());
+    }
+
+    @Test
+    void apprentice_shouldCreateMtlsClientWithApprenticeServiceName() {
+        ApprenticeProps props = new ApprenticeProps("https://apprentice.svc.local");
+        when(clientFactory.createMtlsClient("apprentice", props.baseUrl())).thenReturn(apprenticeClient);
+
+        RestClient result = config.apprentice(clientFactory, props);
+
+        assertSame(apprenticeClient, result);
+        verify(clientFactory).createMtlsClient("apprentice", props.baseUrl());
     }
 }

@@ -3,6 +3,7 @@ package local.sop.datawarehouse.instructor.interfaceadapters.persistence.jpa;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
@@ -42,6 +43,12 @@ public class InstructorRepositoryAdapter implements InstructorRepositoryPort {
     @Override
     public Optional<Instructor> findById(InstructorId id) {
         return jpaRepository.findById(id.value())
+                .map(InstructorJpaMapper::toDomain);
+    }
+
+    @Override
+    public Optional<Instructor> findByPersonRef(UUID personRef) {
+        return jpaRepository.findByPersonRef(personRef)
                 .map(InstructorJpaMapper::toDomain);
     }
 

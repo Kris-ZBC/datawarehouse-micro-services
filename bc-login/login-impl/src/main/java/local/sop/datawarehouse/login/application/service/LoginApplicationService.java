@@ -12,12 +12,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import local.sop.datawarehouse.login.application.api.LoginDirectory;
+import local.sop.datawarehouse.login.application.api.dto.AuthenticateCmd;
+import local.sop.datawarehouse.login.application.api.dto.AuthenticationResult;
 import local.sop.datawarehouse.login.application.api.dto.CreateLoginCmd;
+import local.sop.datawarehouse.login.application.api.dto.CreateSessionCmd;
 import local.sop.datawarehouse.login.application.api.dto.CreatedLoginResult;
-import local.sop.datawarehouse.login.application.api.dto.LoginCmd;
 import local.sop.datawarehouse.login.application.api.dto.LoginResult;
 import local.sop.datawarehouse.login.application.api.dto.LogoutCmd;
 import local.sop.datawarehouse.login.application.api.dto.SessionValidationResult;
+import local.sop.datawarehouse.login.application.api.dto.UpdateLoginStatusCmd;
 import local.sop.datawarehouse.login.application.api.dto.ValidateSessionCmd;
 import local.sop.datawarehouse.login.application.service.util.PasswordGenerator;
 import local.sop.datawarehouse.login.domain.model.Login;
@@ -32,6 +35,7 @@ import local.sop.datawarehouse.login.domain.ports.out.LoginRepositoryPort;
 import local.sop.datawarehouse.login.domain.ports.out.SessionRepositoryPort;
 import local.sop.datawarehouse.login.domain.service.LoginDomain;
 import local.sop.datawarehouse.sharedlib.enums.LoginStatus;
+import local.sop.datawarehouse.sharedlib.enums.UserRole;
 import local.sop.common.libs.sharedkernel.exceptions.NotFoundException;
 import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
@@ -91,28 +95,68 @@ public class LoginApplicationService implements LoginDirectory {
         }
     }
 
-    // ── login ──────────────────────────────────────────────────────────────────
+    // ── authenticate ───────────────────────────────────────────────────────────
+    // CHANGED: was login(LoginCmd) — this half of the old method only
+    // verifies credentials and identifies who logged in. Creates
+    // nothing (hence read-only), so there's nothing for a saga to
+    // compensate if a later step (role resolution, consent check)
+    // fails after this succeeds.
 
-    @Transactional
+    @Transactional(readOnly = true)
     @Override
-    public LoginResult login(LoginCmd query) {
+    public AuthenticationResult authenticate(AuthenticateCmd cmd) {
         try {
-            Login login = repo.findByUsername(Username.of(query.username()));
+            Login login = repo.findByUsername(Username.of(cmd.username()));
 
             if (login == null) {
                 throw new ValidationException("login.credentials.invalid",
-                    Map.of("username", query.username()));
+                    Map.of("username", cmd.username()));
             }
 
             if (login.getStatus() != LoginStatus.ACTIVATED) {
                 throw new ValidationException("login.deactivated",
-                    Map.of("username", query.username()));
+                    Map.of("username", cmd.username()));
             }
 
-            if (!encoder.matches(query.password(), login.getPassword().value())) {
+            if (!encoder.matches(cmd.password(), login.getPassword().value())) {
                 throw new ValidationException("login.credentials.invalid",
-                    Map.of("username", query.username()));
+                    Map.of("username", cmd.username()));
             }
+
+            return new AuthenticationResult(
+                login.getId().value(),
+                login.getPersonRef().value(),
+                login.getUsername().value());
+
+        } catch (ValidationException ex) {
+            throw ex;
+        } catch (RuntimeException ex) {
+            log.warn("Error in authenticate", ex);
+            throw new ValidationException("login.failed",
+                Map.of("function", "authenticate"));
+        }
+    }
+
+    // ── createSession ──────────────────────────────────────────────────────────
+    // CHANGED: was the other half of login(LoginCmd) — takes an already
+    // -authenticated loginId plus a role resolved by the caller
+    // (login-saga). Keeps the SSO reuse-existing-session behavior
+    // unchanged; the only thing added is storing role against the
+    // session.
+
+    @Transactional
+    @Override
+    public LoginResult createSession(CreateSessionCmd cmd) {
+        try {
+            Login login = repo.findById(LoginId.of(cmd.loginId()))
+                .orElseThrow(() -> new NotFoundException("login.not.found",
+                    Map.of("loginId", cmd.loginId())));
+
+            // CHANGED: cmd.role() is now a String (DTOs may not depend
+            // on shared-lib types) — parsed to the real enum here, at
+            // the application-service boundary, same as
+            // LoginStatus.parse(cmd.status()) already does elsewhere.
+            UserRole role = UserRole.parse(cmd.role());
 
             /*
              * SSO check — if a valid unexpired session already exists for this
@@ -124,13 +168,14 @@ public class LoginApplicationService implements LoginDirectory {
 
             if (existingSession.isPresent()) {
                 Session existing = existingSession.get();
-                log.info("SSO: returning existing valid session for username: {}, " +
-                    "token prefix: {}", query.username(),
+                log.info("SSO: returning existing valid session for loginId: {}, " +
+                    "token prefix: {}", cmd.loginId(),
                     existing.getToken().value().substring(0, 8));
                 return new LoginResult(
                     login.getId().value(),
                     login.getPersonRef().value(),
                     login.getUsername().value(),
+                    existing.getRole().name(),
                     existing.getToken().value(),
                     existing.getCreatedAt().value(),
                     existing.getExpiresAt().value());
@@ -149,26 +194,30 @@ public class LoginApplicationService implements LoginDirectory {
                 .login(login)
                 .sessionToken(new SessionToken(sessionToken))
                 .expiresAt(new ExpiresAtTimestamp(expiresAt))
+                .role(role)
                 .build();
 
             sessionRepo.save(session);
-            log.info("Login successful for username: {}, session created with " +
-                "token prefix: {}", query.username(), sessionToken.substring(0, 8));
+            log.info("Session created for loginId: {}, role: {}, token prefix: {}",
+                cmd.loginId(), role, sessionToken.substring(0, 8));
 
             return new LoginResult(
                 login.getId().value(),
                 login.getPersonRef().value(),
                 login.getUsername().value(),
+                session.getRole().name(),
                 session.getToken().value(),
                 session.getCreatedAt().value(),
                 session.getExpiresAt().value());
 
         } catch (ValidationException ex) {
             throw ex;
+        } catch (NotFoundException ex) {
+            throw ex;
         } catch (RuntimeException ex) {
-            log.warn("Error in login", ex);
-            throw new ValidationException("login.failed",
-                Map.of("function", "login"));
+            log.warn("Error in createSession", ex);
+            throw new ValidationException("session.create.failed",
+                Map.of("function", "createSession"));
         }
     }
 
@@ -221,8 +270,8 @@ public class LoginApplicationService implements LoginDirectory {
                  * Session expired — clean up and return invalid.
                  * @Transactional(readOnly=true) prevents writes, so we promote
                  * cleanup to the caller or accept the stale row until next login.
-                 * The session will be cleaned up on the next login() call via
-                 * deleteByLoginId() before a new session is created.
+                 * The session will be cleaned up on the next createSession() call
+                 * via deleteByLoginId() before a new session is created.
                  */
                 log.info("Session expired for token prefix: {}",
                     cmd.sessionToken().substring(0, 8));
@@ -230,8 +279,9 @@ public class LoginApplicationService implements LoginDirectory {
             }
 
             Login login = session.getLogin();
-            log.info("Session valid for username: {}, expires: {}",
+            log.info("Session valid for username: {}, role: {}, expires: {}",
                 login.getUsername().value(),
+                session.getRole(),
                 session.getExpiresAt().value());
 
             return new SessionValidationResult(
@@ -239,6 +289,7 @@ public class LoginApplicationService implements LoginDirectory {
                 login.getId().value(),
                 login.getPersonRef().value(),
                 login.getUsername().value(),
+                session.getRole().name(),
                 session.getExpiresAt().value());
 
         } catch (ValidationException ex) {
@@ -265,5 +316,46 @@ public class LoginApplicationService implements LoginDirectory {
             return new ResponseCompensated(SagaOutcome.COMPENSATED, true);
         }
         return new ResponseCompensated(SagaOutcome.IDEMPOTENT, true);
+    }
+
+    // ── updateLoginStatus ──────────────────────────────────────────────────────
+    // NEW: general-purpose disable/re-activate, not tech-user-specific.
+    // Persists the status change AND, when deactivating, clears any live
+    // session for that login. A "disabled" account that still has a
+    // valid session token floating around isn't actually disabled — the
+    // whole point is that the account can't act at all, not just that
+    // it can't authenticate again in the future.
+
+    @Transactional
+    @Override
+    public void updateLoginStatus(UpdateLoginStatusCmd cmd) {
+        try {
+            Login login = repo.findById(LoginId.of(cmd.loginId()))
+                .orElseThrow(() -> new NotFoundException("login.not.found",
+                    Map.of("loginId", cmd.loginId())));
+
+            // CHANGED: cmd.status() is now a String — parsed here,
+            // matching createLogin()'s existing LoginStatus.parse(cmd.status()).
+            LoginStatus status = LoginStatus.parse(cmd.status());
+
+            Login updated = login.withStatus(status);
+            repo.save(updated);
+
+            if (status == LoginStatus.DEACTIVATED) {
+                sessionRepo.deleteByLoginId(login.getId());
+                log.info("Login {} deactivated, any active session cleared", cmd.loginId());
+            } else {
+                log.info("Login {} status set to {}", cmd.loginId(), status);
+            }
+
+        } catch (ValidationException ex) {
+            throw ex;
+        } catch (NotFoundException ex) {
+            throw ex;
+        } catch (RuntimeException ex) {
+            log.warn("Error in updateLoginStatus", ex);
+            throw new ValidationException("login.status.update.failed",
+                Map.of("function", "updateLoginStatus"));
+        }
     }
 }

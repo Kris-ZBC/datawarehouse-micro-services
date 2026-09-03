@@ -9,6 +9,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import local.sop.datawarehouse.sharedlib.enums.LoginStatus;
+import local.sop.datawarehouse.sharedlib.login.WellKnownLogins;
 
 
 @Component 
@@ -26,7 +27,11 @@ public class LoginDataSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        UUID techUserId = UUID.fromString("00000000-0000-0000-0000-000000000001");
+        // CHANGED: was a locally hardcoded copy of this UUID — now the
+        // same shared constant TechUserValidatorAdapter and
+        // registration-saga both use, so all three can never silently
+        // disagree about which Login ID "the tech user" actually is.
+        UUID techUserId = WellKnownLogins.TECH_USER_ID;
         if (loginRepository.existsById(techUserId)) {
             return;
         }

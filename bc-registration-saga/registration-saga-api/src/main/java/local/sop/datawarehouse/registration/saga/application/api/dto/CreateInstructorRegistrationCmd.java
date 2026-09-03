@@ -15,7 +15,8 @@ public record CreateInstructorRegistrationCmd(
     List<@Valid CreatePhoneNumberCmd> phoneNumbers,
     String username,
     String status,
-    List<@Valid ConsentStatement> consentStatements
+    List<@Valid ConsentStatement> consentStatements,
+    UUID callerLoginId
     
 ) {
     public record ConsentStatement(UUID consentStatementRef, ConsentStatus status) {}

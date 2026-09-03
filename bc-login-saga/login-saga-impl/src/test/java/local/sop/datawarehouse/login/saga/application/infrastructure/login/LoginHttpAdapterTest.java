@@ -18,11 +18,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.client.RestClient;
 
 import local.sop.datawarehouse.login.saga.application.api.dto.LoginResult;
-import local.sop.datawarehouse.login.saga.application.infrastructure.request.PayloadCompensate;
-import local.sop.datawarehouse.login.saga.application.infrastructure.request.PayloadLogin;
-import local.sop.datawarehouse.login.saga.application.infrastructure.response.ResponseCompensated;
-import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.datawarehouse.login.saga.application.infrastructure.request.PayloadAuthenticate;
+import local.sop.datawarehouse.login.saga.application.infrastructure.request.PayloadCreateSession;
+import local.sop.datawarehouse.login.saga.application.infrastructure.request.PayloadLogout;
+import local.sop.datawarehouse.login.saga.application.ports.out.login.LoginPort.AuthenticationResult;
+import local.sop.datawarehouse.sharedlib.enums.UserRole;
 
+// CHANGED: was testing login()/compensate() — neither exists on
+// LoginHttpAdapter anymore (split into authenticate()/createSession(),
+// compensate() replaced by logout() — see LoginPort's own Javadoc).
 @ExtendWith(MockitoExtension.class)
 class LoginHttpAdapterTest {
 
@@ -37,55 +41,75 @@ class LoginHttpAdapterTest {
     }
 
     @Test
-    void login_shouldReturnLoginResultFromDownstream() {
-        UUID loginId = UUID.randomUUID();
-        LoginResult expected = new LoginResult(loginId, UUID.randomUUID(), "testuser",
-            "test-token", LocalDateTime.now(), LocalDateTime.now().plusHours(8));
-        PayloadLogin request = new PayloadLogin("testuser", "testpass");
+    void authenticate_shouldReturnAuthenticationResultFromDownstream() {
+        AuthenticationResult expected =
+            new AuthenticationResult(UUID.randomUUID(), UUID.randomUUID(), "testuser");
+        PayloadAuthenticate request = new PayloadAuthenticate("testuser", "testpass");
 
         RestClient.RequestBodyUriSpec requestBodyUriSpec = mock(RestClient.RequestBodyUriSpec.class);
         RestClient.RequestBodySpec requestBodySpec = mock(RestClient.RequestBodySpec.class);
         RestClient.ResponseSpec responseSpec = mock(RestClient.ResponseSpec.class);
 
         when(loginClient.post()).thenReturn(requestBodyUriSpec);
-        when(requestBodyUriSpec.uri("/internal/logins/sessions/login")).thenReturn(requestBodySpec);
-        when(requestBodySpec.body(any(PayloadLogin.class))).thenReturn(requestBodySpec);
+        when(requestBodyUriSpec.uri("/internal/logins/sessions/authenticate")).thenReturn(requestBodySpec);
+        when(requestBodySpec.body(any(PayloadAuthenticate.class))).thenReturn(requestBodySpec);
         when(requestBodySpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.body(LoginResult.class)).thenReturn(expected);
+        when(responseSpec.body(AuthenticationResult.class)).thenReturn(expected);
 
-        LoginResult result = loginAdapter.login(request.username(), request.password());
+        AuthenticationResult result = loginAdapter.authenticate(request.username(), request.password());
 
         assertEquals(expected, result);
         verify(loginClient).post();
-        verify(requestBodyUriSpec).uri("/internal/logins/sessions/login");
+        verify(requestBodyUriSpec).uri("/internal/logins/sessions/authenticate");
+        verify(requestBodySpec).body(eq(request));
+        verify(responseSpec).body(AuthenticationResult.class);
+    }
+
+    @Test
+    void createSession_shouldReturnLoginResultFromDownstream() {
+        UUID loginId = UUID.randomUUID();
+        LoginResult expected = new LoginResult(loginId, UUID.randomUUID(), "testuser",
+            "INSTRUCTOR", "test-token", LocalDateTime.now(), LocalDateTime.now().plusHours(8));
+        PayloadCreateSession request = new PayloadCreateSession(loginId, UserRole.INSTRUCTOR);
+
+        RestClient.RequestBodyUriSpec requestBodyUriSpec = mock(RestClient.RequestBodyUriSpec.class);
+        RestClient.RequestBodySpec requestBodySpec = mock(RestClient.RequestBodySpec.class);
+        RestClient.ResponseSpec responseSpec = mock(RestClient.ResponseSpec.class);
+
+        when(loginClient.post()).thenReturn(requestBodyUriSpec);
+        when(requestBodyUriSpec.uri("/internal/logins/sessions")).thenReturn(requestBodySpec);
+        when(requestBodySpec.body(any(PayloadCreateSession.class))).thenReturn(requestBodySpec);
+        when(requestBodySpec.retrieve()).thenReturn(responseSpec);
+        when(responseSpec.body(LoginResult.class)).thenReturn(expected);
+
+        LoginResult result = loginAdapter.createSession(loginId, UserRole.INSTRUCTOR);
+
+        assertEquals(expected, result);
+        verify(loginClient).post();
+        verify(requestBodyUriSpec).uri("/internal/logins/sessions");
         verify(requestBodySpec).body(eq(request));
         verify(responseSpec).body(LoginResult.class);
     }
 
     @Test
-    void compensate_shouldReturnCompensationResultFromDownstream() {
-        UUID id = UUID.randomUUID();
-        SagaOutcome state = SagaOutcome.COMPENSATED;
-        PayloadCompensate request = new PayloadCompensate(id, LoginHttpAdapter.class, state);
-        ResponseCompensated expected = new ResponseCompensated(state, true);
+    void logout_shouldPostToLogoutEndpoint() {
+        String sessionToken = UUID.randomUUID().toString();
+        PayloadLogout request = new PayloadLogout(sessionToken);
 
         RestClient.RequestBodyUriSpec requestBodyUriSpec = mock(RestClient.RequestBodyUriSpec.class);
         RestClient.RequestBodySpec requestBodySpec = mock(RestClient.RequestBodySpec.class);
         RestClient.ResponseSpec responseSpec = mock(RestClient.ResponseSpec.class);
 
         when(loginClient.post()).thenReturn(requestBodyUriSpec);
-        when(requestBodyUriSpec.uri("/internal/logins/compensate")).thenReturn(requestBodySpec);
-        when(requestBodySpec.body(any(PayloadCompensate.class))).thenReturn(requestBodySpec);
+        when(requestBodyUriSpec.uri("/internal/logins/sessions/logout")).thenReturn(requestBodySpec);
+        when(requestBodySpec.body(any(PayloadLogout.class))).thenReturn(requestBodySpec);
         when(requestBodySpec.retrieve()).thenReturn(responseSpec);
-        when(responseSpec.body(ResponseCompensated.class)).thenReturn(expected);
 
-        ResponseCompensated result = loginAdapter.compensate(id, LoginHttpAdapter.class, state);
+        loginAdapter.logout(sessionToken);
 
-        assertEquals(expected.sagaState(), result.sagaState());
-        assertEquals(expected.success(), result.success());
         verify(loginClient).post();
-        verify(requestBodyUriSpec).uri("/internal/logins/compensate");
+        verify(requestBodyUriSpec).uri("/internal/logins/sessions/logout");
         verify(requestBodySpec).body(eq(request));
-        verify(responseSpec).body(ResponseCompensated.class);
+        verify(responseSpec).toBodilessEntity();
     }
 }

@@ -53,6 +53,18 @@ public class InternalInstructorController {
         return response;
     }
 
+    // NEW: role resolution endpoint for login-saga. Returns 204 (not
+    // 404) when the person isn't an instructor — matches
+    // findByPersonRef()'s Optional semantics: this is a normal "no"
+    // answer, not an error.
+    @GetMapping("/by-person-ref/{personRef}")
+    public ResponseEntity<InstructorResponse> findByPersonRef(@PathVariable UUID personRef) {
+        log.info("Received request to fetch instructor by personRef={}", personRef);
+        return instructorDirectory.findByPersonRef(personRef)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.noContent().build());
+    }
+
     @PostMapping
     public CreatedInstructorResponse createInstructor(@Valid @RequestBody CreateInstructorCmd cmd) {
         log.info("Received request to create instructor with personRef={}", cmd.personRef());

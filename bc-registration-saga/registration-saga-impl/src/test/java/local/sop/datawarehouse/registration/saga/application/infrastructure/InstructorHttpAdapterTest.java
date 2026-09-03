@@ -47,7 +47,8 @@ class InstructorHttpAdapterTest {
     @Test
     void instructor_create_shouldReturnUuidFromDownstream() {
         UUID expectedId = UUID.randomUUID();
-        var request = new CreateInstructorCmd(UUID.randomUUID());
+        // CHANGED: CreateInstructorCmd now takes callerLoginId too.
+        var request = new CreateInstructorCmd(UUID.randomUUID(), UUID.randomUUID());
 
         var mockRequestBodyUriSpec = mock(RestClient.RequestBodyUriSpec.class);
         var mockRequestBodySpec = mock(RestClient.RequestBodySpec.class);

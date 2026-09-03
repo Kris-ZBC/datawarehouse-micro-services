@@ -67,6 +67,7 @@ class RegistrationDependenciesSagaApplicationTest {
     private static final UUID ORG_REF = UUID.randomUUID();
     private static final UUID EDUCATION_LINE_REF = UUID.randomUUID();
     private static final UUID CONSENT_STATEMENT_REF = UUID.randomUUID();
+    private static final UUID CALLER_LOGIN_ID = UUID.randomUUID();
 
     private CreateApprenticeRegistrationCmd apprenticeCmd;
     private CreateInstructorRegistrationCmd instructorCmd;
@@ -82,11 +83,13 @@ class RegistrationDependenciesSagaApplicationTest {
                 EDUCATION_LINE_REF, "danis", "ACTIVE",
                 List.of(new CreateApprenticeRegistrationCmd.ConsentStatement(CONSENT_STATEMENT_REF, ConsentStatus.ACTIVE)));
 
+        // CHANGED: CreateInstructorRegistrationCmd now carries callerLoginId too.
         instructorCmd = new CreateInstructorRegistrationCmd(
                 "Kris", "K", "kris@example.com", ORG_REF,
                 List.of(new CreatePhoneNumberCmd(PhoneUserType.SELF, "+4587654321")),
                 "krisk", "ACTIVE",
-                List.of(new CreateInstructorRegistrationCmd.ConsentStatement(CONSENT_STATEMENT_REF, ConsentStatus.ACTIVE)));
+                List.of(new CreateInstructorRegistrationCmd.ConsentStatement(CONSENT_STATEMENT_REF, ConsentStatus.ACTIVE)),
+                CALLER_LOGIN_ID);
     }
 
     // ---- organization check — shared by both flows ------------------------

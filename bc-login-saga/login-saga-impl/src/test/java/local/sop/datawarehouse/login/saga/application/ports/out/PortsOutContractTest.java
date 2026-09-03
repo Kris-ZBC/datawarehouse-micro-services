@@ -14,17 +14,26 @@ import local.sop.datawarehouse.login.saga.application.ports.out.consent.ConsentP
 import local.sop.datawarehouse.login.saga.application.ports.out.login.LoginPort;
 import local.sop.datawarehouse.sharedlib.enums.ActorType;
 import local.sop.datawarehouse.sharedlib.enums.Severity;
+import local.sop.datawarehouse.sharedlib.enums.UserRole;
 import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
 
 class PortsOutContractTest {
 
+    // CHANGED: LoginPort no longer has login(String,String) or
+    // compensate(UUID,Class,SagaOutcome) — see LoginPort's own Javadoc
+    // for why (split into authenticate()/createSession(), compensate
+    // replaced by logout() since authenticate/createSession create
+    // nothing for a generic id-based compensate to target).
     @Test
     void loginPort_shouldExposeExpectedContract() throws Exception {
-        Method login = LoginPort.class.getMethod("login", String.class, String.class);
-        assertEquals(LoginResult.class, login.getReturnType());
+        Method authenticate = LoginPort.class.getMethod("authenticate", String.class, String.class);
+        assertEquals(LoginPort.AuthenticationResult.class, authenticate.getReturnType());
 
-        Method compensate = LoginPort.class.getMethod("compensate", UUID.class, Class.class, SagaOutcome.class);
-        assertEquals(ResponseCompensated.class, compensate.getReturnType());
+        Method createSession = LoginPort.class.getMethod("createSession", UUID.class, UserRole.class);
+        assertEquals(LoginResult.class, createSession.getReturnType());
+
+        Method logout = LoginPort.class.getMethod("logout", String.class);
+        assertEquals(void.class, logout.getReturnType());
     }
 
     @Test

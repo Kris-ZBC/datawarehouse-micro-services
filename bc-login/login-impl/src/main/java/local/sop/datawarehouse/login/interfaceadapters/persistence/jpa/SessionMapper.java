@@ -33,6 +33,7 @@ public final class SessionMapper {
 			.sessionToken(SessionToken.of(entity.getSessionToken()))
 			.createdAt(CreatedAtTimestamp.of(entity.getCreatedAt()))
 			.expiresAt(ExpiresAtTimestamp.of(entity.getExpiresAt()))
+			.role(entity.getRole())
 			.build();
 	}
 
@@ -43,6 +44,7 @@ public final class SessionMapper {
 			.sessionToken(session.getToken().value())
 			.createdAt(session.getCreatedAt().value())
 			.expiresAt(session.getExpiresAt().value())
+			.role(session.getRole())
 			.build();
 	}
 }

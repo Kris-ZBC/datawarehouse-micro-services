@@ -23,4 +23,17 @@ public class ServiceClientConfig {
 	RestClient auditlog(MtlsClientFactory clientFactory, AuditlogProps auditLogProps) {
 		return clientFactory.createMtlsClient("auditlog", auditLogProps.baseurl());
 	}
+
+	// NEW: role resolution — login-saga calls these to determine
+	// whether a freshly-authenticated person is an instructor or
+	// apprentice, before creating their session.
+	@Bean("instructor")
+	RestClient instructor(MtlsClientFactory clientFactory, InstructorProps instructorProps) {
+		return clientFactory.createMtlsClient("instructor", instructorProps.baseUrl());
+	}
+
+	@Bean("apprentice")
+	RestClient apprentice(MtlsClientFactory clientFactory, ApprenticeProps apprenticeProps) {
+		return clientFactory.createMtlsClient("apprentice", apprenticeProps.baseUrl());
+	}
 }

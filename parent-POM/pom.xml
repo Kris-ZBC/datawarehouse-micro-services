@@ -90,6 +90,8 @@ Parent pom for multi-module project aggregator and BOM (dependency management)
         <!-- Gateways-->
         <module>../gw-admin</module>
         <module>../gw-common</module>
+
+
         
     </modules>
 
@@ -336,6 +338,7 @@ Parent pom for multi-module project aggregator and BOM (dependency management)
           <groupId>local.sop.datawarehouse</groupId>
           <artifactId>shared-lib</artifactId>
           <version>${revision}</version>
+          <optional>true</optional>
         </dependency>
       </dependencies>
     </profile>

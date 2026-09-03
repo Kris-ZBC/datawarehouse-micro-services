@@ -13,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -27,6 +28,7 @@ import local.sop.datawarehouse.login.domain.ports.out.LoginRepositoryPort;
 import local.sop.datawarehouse.login.domain.ports.out.SessionRepositoryPort;
 import local.sop.datawarehouse.login.domain.service.LoginDomain;
 import local.sop.datawarehouse.sharedlib.enums.LoginStatus;
+import local.sop.datawarehouse.sharedlib.enums.UserRole;
 import local.sop.common.libs.sharedkernel.exceptions.NotFoundException;
 import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
@@ -67,11 +69,17 @@ class LoginApplicationServiceTest {
             .status(LoginStatus.ACTIVATED)
             .build();
 
+        // CHANGED: role added. Without it, this @BeforeEach itself
+        // throws ValidationException (the domain Session.Builder
+        // requires role) — every single test in this class was
+        // failing at setup before this fix, not just the ones that
+        // exercise role-specific behavior.
         validSession = Session.builder()
             .id(new SessionId(UUID.randomUUID()))
             .login(activeLogin)
             .sessionToken(new SessionToken(SESSION_TOKEN_VAL))
             .expiresAt(new ExpiresAtTimestamp(LocalDateTime.now().plusHours(8)))
+            .role(UserRole.INSTRUCTOR)
             .build();
     }
 
@@ -133,58 +141,35 @@ class LoginApplicationServiceTest {
         }
     }
 
-    // ── login ──────────────────────────────────────────────────────────────────
+    // ── authenticate ───────────────────────────────────────────────────────────
+    // CHANGED: was the "login" @Nested class calling service.login(new
+    // LoginCmd(...)) — that method/DTO no longer exist. This half of
+    // the old flow covers credential verification only, so it never
+    // touches sessionRepo at all (see shouldNotTouchSessionRepo below).
 
     @Nested
-    class LoginTests {
+    class Authenticate {
 
         @Test
-        void shouldReturnLoginResult_whenCredentialsValid_andNoExistingSession() {
+        void shouldReturnAuthenticationResult_whenCredentialsValid() {
             when(repo.findByUsername(any())).thenReturn(activeLogin);
-            when(sessionRepo.findActiveByLoginId(any())).thenReturn(Optional.empty());
 
-            LoginResult result = service.login(new LoginCmd(USERNAME, PLAIN_PWD));
+            AuthenticationResult result =
+                service.authenticate(new AuthenticateCmd(USERNAME, PLAIN_PWD));
 
             assertNotNull(result);
+            assertEquals(LOGIN_ID_VAL, result.loginId());
+            assertEquals(PERSON_REF, result.personRef());
             assertEquals(USERNAME, result.username());
-            assertNotNull(result.sessionToken());
-            verify(sessionRepo).save(any());
         }
 
         @Test
-        void shouldReturnExistingSession_whenValidSessionAlreadyExists() {
+        void shouldNotTouchSessionRepo() {
             when(repo.findByUsername(any())).thenReturn(activeLogin);
-            when(sessionRepo.findActiveByLoginId(any())).thenReturn(Optional.of(validSession));
 
-            LoginResult result = service.login(new LoginCmd(USERNAME, PLAIN_PWD));
+            service.authenticate(new AuthenticateCmd(USERNAME, PLAIN_PWD));
 
-            assertEquals(SESSION_TOKEN_VAL, result.sessionToken());
-            verify(sessionRepo, never()).save(any());
-            verify(sessionRepo, never()).deleteByLoginId(any());
-        }
-
-        @Test
-        void shouldReturnSameToken_onSecondLoginFromDifferentDevice() {
-            when(repo.findByUsername(any())).thenReturn(activeLogin);
-            when(sessionRepo.findActiveByLoginId(any())).thenReturn(Optional.of(validSession));
-
-            LoginResult first  = service.login(new LoginCmd(USERNAME, PLAIN_PWD));
-            LoginResult second = service.login(new LoginCmd(USERNAME, PLAIN_PWD));
-
-            assertEquals(first.sessionToken(), second.sessionToken());
-            verify(sessionRepo, never()).save(any());
-        }
-
-        @Test
-        void shouldCleanupExpiredSessions_beforeCreatingNew() {
-            when(repo.findByUsername(any())).thenReturn(activeLogin);
-            when(sessionRepo.findActiveByLoginId(any())).thenReturn(Optional.empty());
-
-            service.login(new LoginCmd(USERNAME, PLAIN_PWD));
-
-            var inOrder = inOrder(sessionRepo);
-            inOrder.verify(sessionRepo).deleteByLoginId(new LoginId(LOGIN_ID_VAL));
-            inOrder.verify(sessionRepo).save(any());
+            verifyNoInteractions(sessionRepo);
         }
 
         @Test
@@ -192,9 +177,7 @@ class LoginApplicationServiceTest {
             when(repo.findByUsername(any())).thenReturn(null);
 
             assertThrows(ValidationException.class, () ->
-                service.login(new LoginCmd(USERNAME, PLAIN_PWD)));
-
-            verify(sessionRepo, never()).save(any());
+                service.authenticate(new AuthenticateCmd(USERNAME, PLAIN_PWD)));
         }
 
         @Test
@@ -203,7 +186,7 @@ class LoginApplicationServiceTest {
             when(repo.findByUsername(any())).thenReturn(deactivated);
 
             ValidationException ex = assertThrows(ValidationException.class, () ->
-                service.login(new LoginCmd(USERNAME, PLAIN_PWD)));
+                service.authenticate(new AuthenticateCmd(USERNAME, PLAIN_PWD)));
 
             assertEquals("login.deactivated", ex.messageKey());
         }
@@ -213,21 +196,110 @@ class LoginApplicationServiceTest {
             when(repo.findByUsername(any())).thenReturn(activeLogin);
 
             assertThrows(ValidationException.class, () ->
-                service.login(new LoginCmd(USERNAME, "WrongPassword5!")));
+                service.authenticate(new AuthenticateCmd(USERNAME, "WrongPassword5!")));
         }
 
         @Test
         void shouldUseGenericError_forBothUsernameAndPasswordFailures() {
             when(repo.findByUsername(any())).thenReturn(null);
             ValidationException notFound = assertThrows(ValidationException.class, () ->
-                service.login(new LoginCmd(USERNAME, PLAIN_PWD)));
+                service.authenticate(new AuthenticateCmd(USERNAME, PLAIN_PWD)));
 
             when(repo.findByUsername(any())).thenReturn(activeLogin);
             ValidationException wrongPwd = assertThrows(ValidationException.class, () ->
-                service.login(new LoginCmd(USERNAME, "WrongPassword5!")));
+                service.authenticate(new AuthenticateCmd(USERNAME, "WrongPassword5!")));
 
             assertEquals(notFound.messageKey(), wrongPwd.messageKey(),
                 "Same error key prevents username enumeration");
+        }
+    }
+
+    // ── createSession ──────────────────────────────────────────────────────────
+    // CHANGED: the other half of the old login() flow — takes an
+    // already-authenticated loginId plus a role resolved by the
+    // caller. Keeps all the original SSO reuse-existing-session
+    // coverage, translated to the new signature, plus new coverage for
+    // role itself.
+
+    @Nested
+    class CreateSessionTests {
+
+        @Test
+        void shouldReturnLoginResult_whenNoExistingSession() {
+            when(repo.findById(LoginId.of(LOGIN_ID_VAL))).thenReturn(Optional.of(activeLogin));
+            when(sessionRepo.findActiveByLoginId(any())).thenReturn(Optional.empty());
+
+            LoginResult result =
+                service.createSession(new CreateSessionCmd(LOGIN_ID_VAL, "INSTRUCTOR"));
+
+            assertNotNull(result);
+            assertEquals(USERNAME, result.username());
+            assertEquals("INSTRUCTOR", result.role());
+            assertNotNull(result.sessionToken());
+            verify(sessionRepo).save(any());
+        }
+
+        @Test
+        void shouldThrowNotFoundException_whenLoginDoesNotExist() {
+            when(repo.findById(LoginId.of(LOGIN_ID_VAL))).thenReturn(Optional.empty());
+
+            assertThrows(NotFoundException.class, () ->
+                service.createSession(new CreateSessionCmd(LOGIN_ID_VAL, "INSTRUCTOR")));
+        }
+
+        @Test
+        void shouldReturnExistingSession_whenValidSessionAlreadyExists() {
+            when(repo.findById(LoginId.of(LOGIN_ID_VAL))).thenReturn(Optional.of(activeLogin));
+            when(sessionRepo.findActiveByLoginId(any())).thenReturn(Optional.of(validSession));
+
+            LoginResult result =
+                service.createSession(new CreateSessionCmd(LOGIN_ID_VAL, "INSTRUCTOR"));
+
+            assertEquals(SESSION_TOKEN_VAL, result.sessionToken());
+            assertEquals(validSession.getRole().name(), result.role());
+            verify(sessionRepo, never()).save(any());
+            verify(sessionRepo, never()).deleteByLoginId(any());
+        }
+
+        @Test
+        void shouldReturnSameToken_onSecondCallFromDifferentDevice() {
+            when(repo.findById(LoginId.of(LOGIN_ID_VAL))).thenReturn(Optional.of(activeLogin));
+            when(sessionRepo.findActiveByLoginId(any())).thenReturn(Optional.of(validSession));
+
+            LoginResult first  = service.createSession(new CreateSessionCmd(LOGIN_ID_VAL, "INSTRUCTOR"));
+            LoginResult second = service.createSession(new CreateSessionCmd(LOGIN_ID_VAL, "INSTRUCTOR"));
+
+            assertEquals(first.sessionToken(), second.sessionToken());
+            verify(sessionRepo, never()).save(any());
+        }
+
+        @Test
+        void shouldCleanupExpiredSessions_beforeCreatingNew() {
+            when(repo.findById(LoginId.of(LOGIN_ID_VAL))).thenReturn(Optional.of(activeLogin));
+            when(sessionRepo.findActiveByLoginId(any())).thenReturn(Optional.empty());
+
+            service.createSession(new CreateSessionCmd(LOGIN_ID_VAL, "INSTRUCTOR"));
+
+            var inOrder = inOrder(sessionRepo);
+            inOrder.verify(sessionRepo).deleteByLoginId(new LoginId(LOGIN_ID_VAL));
+            inOrder.verify(sessionRepo).save(any());
+        }
+
+        // NEW: role is stored on the newly created session, not just
+        // echoed back in the response — this is the actual point of
+        // the SSO rework (every portal's later validateSession() call
+        // reads role from the persisted Session, not from this
+        // response).
+        @Test
+        void shouldStoreGivenRole_onNewSession() {
+            when(repo.findById(LoginId.of(LOGIN_ID_VAL))).thenReturn(Optional.of(activeLogin));
+            when(sessionRepo.findActiveByLoginId(any())).thenReturn(Optional.empty());
+
+            service.createSession(new CreateSessionCmd(LOGIN_ID_VAL, "APPRENTICE"));
+
+            ArgumentCaptor<Session> captor = ArgumentCaptor.forClass(Session.class);
+            verify(sessionRepo).save(captor.capture());
+            assertEquals(UserRole.APPRENTICE, captor.getValue().getRole());
         }
     }
 
@@ -290,6 +362,10 @@ class LoginApplicationServiceTest {
             assertEquals(LOGIN_ID_VAL, result.loginId());
             assertEquals(PERSON_REF, result.personRef());
             assertEquals(USERNAME, result.username());
+            // CHANGED: role assertion added — the actual point of the
+            // SSO rework is that this comes back for every portal to
+            // make an authorization decision with.
+            assertEquals("INSTRUCTOR", result.role());
             assertNotNull(result.expiresAt());
         }
 
@@ -308,6 +384,9 @@ class LoginApplicationServiceTest {
 
         @Test
         void shouldReturnInvalid_whenSessionIsExpired() {
+            // Mocked Session — getRole() is never reached here, since
+            // the expiry check short-circuits before validateSession()
+            // ever reads role, so it doesn't need stubbing.
             Session expiredSession = mock(Session.class);
             ExpiresAtTimestamp expiredAt = mock(ExpiresAtTimestamp.class);
 
@@ -351,6 +430,61 @@ class LoginApplicationServiceTest {
 
             assertThrows(ValidationException.class, () ->
                 service.validateSession(new ValidateSessionCmd(SESSION_TOKEN_VAL)));
+        }
+    }
+
+    // ── updateLoginStatus ──────────────────────────────────────────────────────
+    // NEW: coverage for the general-purpose disable/re-activate
+    // capability added as part of the tech-user lockout work.
+
+    @Nested
+    class UpdateLoginStatus {
+
+        @Test
+        void shouldDeactivateLogin_andSave() {
+            when(repo.findById(LoginId.of(LOGIN_ID_VAL))).thenReturn(Optional.of(activeLogin));
+
+            service.updateLoginStatus(new UpdateLoginStatusCmd(LOGIN_ID_VAL, "DEACTIVATED"));
+
+            ArgumentCaptor<Login> captor = ArgumentCaptor.forClass(Login.class);
+            verify(repo).save(captor.capture());
+            assertEquals(LoginStatus.DEACTIVATED, captor.getValue().getStatus());
+        }
+
+        @Test
+        void shouldClearActiveSession_whenDeactivating() {
+            when(repo.findById(LoginId.of(LOGIN_ID_VAL))).thenReturn(Optional.of(activeLogin));
+
+            service.updateLoginStatus(new UpdateLoginStatusCmd(LOGIN_ID_VAL, "DEACTIVATED"));
+
+            verify(sessionRepo).deleteByLoginId(activeLogin.getId());
+        }
+
+        @Test
+        void shouldNotClearSession_whenReactivating() {
+            Login deactivated = activeLogin.withStatus(LoginStatus.DEACTIVATED);
+            when(repo.findById(LoginId.of(LOGIN_ID_VAL))).thenReturn(Optional.of(deactivated));
+
+            service.updateLoginStatus(new UpdateLoginStatusCmd(LOGIN_ID_VAL, "ACTIVATED"));
+
+            verify(sessionRepo, never()).deleteByLoginId(any());
+        }
+
+        @Test
+        void shouldThrowNotFoundException_whenLoginDoesNotExist() {
+            when(repo.findById(LoginId.of(LOGIN_ID_VAL))).thenReturn(Optional.empty());
+
+            assertThrows(NotFoundException.class, () ->
+                service.updateLoginStatus(new UpdateLoginStatusCmd(LOGIN_ID_VAL, "DEACTIVATED")));
+        }
+
+        @Test
+        void shouldThrowValidationException_whenRepoThrows() {
+            when(repo.findById(LoginId.of(LOGIN_ID_VAL))).thenReturn(Optional.of(activeLogin));
+            when(repo.save(any())).thenThrow(new RuntimeException("db crash"));
+
+            assertThrows(ValidationException.class, () ->
+                service.updateLoginStatus(new UpdateLoginStatusCmd(LOGIN_ID_VAL, "DEACTIVATED")));
         }
     }
 

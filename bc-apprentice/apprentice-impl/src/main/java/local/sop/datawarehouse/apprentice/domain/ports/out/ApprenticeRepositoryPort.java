@@ -16,6 +16,9 @@ public interface ApprenticeRepositoryPort {
     List<Apprentice> findByEducationLineId(UUID educationLineId);
 
     List<Apprentice> findAll();
+
+        // NEW: role resolution for login-saga.
+    Optional<Apprentice> findByPersonRef(UUID personRef);
     
     Boolean compensate(ApprenticeId id, SagaOutcome sagaState);
 }

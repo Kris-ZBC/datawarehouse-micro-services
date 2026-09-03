@@ -54,6 +54,14 @@ public class ApprenticeController {
         List<ApprenticeResponse> response = directory.findAll();
         return ResponseEntity.ok(response);
     }
+
+    // NEW: role resolution endpoint for login-saga.
+    @GetMapping("/by-person-ref/{personRef}")
+    public ResponseEntity<ApprenticeResponse> findByPersonRef(@PathVariable UUID personRef) {
+        return directory.findByPersonRef(personRef)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.noContent().build());
+    }
     
     // Ping endpoint
     @GetMapping("/ping")

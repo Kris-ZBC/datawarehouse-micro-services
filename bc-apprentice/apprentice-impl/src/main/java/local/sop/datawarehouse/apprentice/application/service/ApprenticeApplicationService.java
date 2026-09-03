@@ -90,6 +90,21 @@ public class ApprenticeApplicationService implements ApprenticeDirectory {
                 .toList();
     }
 
+    // NEW: role resolution for login-saga — "is this person an
+    // apprentice at all". Optional, no throw-on-missing: this is a
+    // normal "no" (they might be an instructor instead), not an error.
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<ApprenticeResponse> findByPersonRef(UUID personRef) {
+        if (personRef == null) throw new ValidationException("person_ref.required", Map.of("function", "findByPersonRef"));
+        return apprentices.findByPersonRef(personRef)
+                .map(a -> new ApprenticeResponse(
+                        a.getApprenticeId().value(),
+                        a.getPersonRef().value(),
+                        a.getEducationLineRef().value()
+                ));
+    }
+
      @Override
     public ResponseCompensated compensate (UUID id, Class<?> clazz, SagaOutcome sagaState) {
         log.info("Compensate called from class {}", clazz.getSimpleName());

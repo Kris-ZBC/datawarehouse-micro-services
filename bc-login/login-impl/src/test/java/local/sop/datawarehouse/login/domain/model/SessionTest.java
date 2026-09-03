@@ -18,6 +18,7 @@ import local.sop.datawarehouse.login.domain.model.valueobjects.PersonRef;
 import local.sop.datawarehouse.login.domain.model.valueobjects.SessionToken;
 import local.sop.datawarehouse.login.domain.model.valueobjects.Username;
 import local.sop.datawarehouse.sharedlib.enums.LoginStatus;
+import local.sop.datawarehouse.sharedlib.enums.UserRole;
 import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 
 class SessionTest {
@@ -55,6 +56,7 @@ class SessionTest {
             .login(activeLogin)
             .sessionToken(new SessionToken(token))
             .expiresAt(new ExpiresAtTimestamp(expiresAt))
+            .role(UserRole.INSTRUCTOR)
             .build();
 
         assertNotNull(session.getId());
@@ -62,6 +64,7 @@ class SessionTest {
         assertEquals(activeLogin, session.getLogin());
         assertEquals(token, session.getToken().value());
         assertEquals(expiresAt, session.getExpiresAt().value());
+        assertEquals(UserRole.INSTRUCTOR, session.getRole());
     }
 
     @Test
@@ -70,6 +73,7 @@ class SessionTest {
             .login(activeLogin)
             .sessionToken(new SessionToken(UUID.randomUUID().toString()))
             .expiresAt(new ExpiresAtTimestamp(LocalDateTime.now().plusHours(8)))
+            .role(UserRole.INSTRUCTOR)
             .build();
 
         assertNotNull(session.getId());
@@ -82,6 +86,7 @@ class SessionTest {
             .sessionToken(new SessionToken(UUID.randomUUID().toString()))
             .createdAt(null)
             .expiresAt(new ExpiresAtTimestamp(LocalDateTime.now().plusHours(8)))
+            .role(UserRole.INSTRUCTOR)
             .build();
 
         assertNotNull(session.getCreatedAt());
@@ -95,6 +100,7 @@ class SessionTest {
             .login(activeLogin)
             .sessionToken(new SessionToken(UUID.randomUUID().toString()))
             .expiresAt(new ExpiresAtTimestamp(LocalDateTime.now().plusHours(8)))
+            .role(UserRole.INSTRUCTOR)
             .build();
 
         assertEquals(activeLogin.getId(), session.getLogin().getId());
@@ -122,6 +128,7 @@ class SessionTest {
             .login(activeLogin)
             .sessionToken(originalToken)
             .expiresAt(new ExpiresAtTimestamp(LocalDateTime.now().plusHours(8)))
+            .role(UserRole.INSTRUCTOR)
             .build();
 
         Session updated = original.withSessionToken(newToken);
@@ -143,6 +150,7 @@ class SessionTest {
             .sessionToken(new SessionToken(UUID.randomUUID().toString()))
             .createdAt(originalCreatedAt)
             .expiresAt(new ExpiresAtTimestamp(LocalDateTime.now().plusHours(8)))
+            .role(UserRole.INSTRUCTOR)
             .build();
 
         Session updated = original.withCreatedAt(newCreatedAt);
@@ -165,6 +173,19 @@ class SessionTest {
         assertNotSame(original, updated);
         assertEquals(newExpiresAt, updated.getExpiresAt());
         assertEquals(originalExpiresAt, original.getExpiresAt());
+        assertEquals(original.getId(), updated.getId());
+    }
+
+    // NEW: mirrors the other with-method tests, for the role field
+    // added alongside the SSO rework.
+    @Test
+    void shouldReturnNewInstance_whenRoleIsChanged() {
+        Session original = buildSession(activeLogin, LocalDateTime.now().plusHours(8));
+        Session updated  = original.withRole(UserRole.APPRENTICE);
+
+        assertNotSame(original, updated);
+        assertEquals(UserRole.APPRENTICE, updated.getRole());
+        assertEquals(UserRole.INSTRUCTOR, original.getRole());
         assertEquals(original.getId(), updated.getId());
     }
 
@@ -195,13 +216,29 @@ class SessionTest {
             .build());
     }
 
+    // NEW: role is now a required field on the builder (see
+    // Session.Builder.build()) — same reasoning as the three
+    // pre-existing null-field tests above.
+    @Test
+    void shouldThrowException_whenRoleIsNull() {
+        assertThrows(ValidationException.class, () -> Session.builder()
+            .login(activeLogin)
+            .sessionToken(new SessionToken(UUID.randomUUID().toString()))
+            .expiresAt(new ExpiresAtTimestamp(LocalDateTime.now().plusHours(8)))
+            .build());
+    }
+
     // ── helper ─────────────────────────────────────────────────────────────────
 
+    // CHANGED: role added. Fixed to INSTRUCTOR so every caller of this
+    // helper gets a deterministic value to assert against (see
+    // shouldReturnNewInstance_whenRoleIsChanged above).
     private Session buildSession(Login login, LocalDateTime expiresAt) {
         return Session.builder()
             .login(login)
             .sessionToken(new SessionToken(UUID.randomUUID().toString()))
             .expiresAt(ExpiresAtTimestamp.of(expiresAt))
+            .role(UserRole.INSTRUCTOR)
             .build();
     }
 }

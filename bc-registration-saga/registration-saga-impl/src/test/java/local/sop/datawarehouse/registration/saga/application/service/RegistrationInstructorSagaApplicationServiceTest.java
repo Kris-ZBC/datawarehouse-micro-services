@@ -16,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -31,6 +32,7 @@ import local.sop.datawarehouse.registration.saga.application.api.dto.CreateInstr
 import local.sop.datawarehouse.registration.saga.application.api.dto.auditlog.AuditlogResponse;
 import local.sop.datawarehouse.registration.saga.application.api.dto.consent.ConsentResponse;
 import local.sop.datawarehouse.registration.saga.application.api.dto.consent.GrantConsentCmd;
+import local.sop.datawarehouse.registration.saga.application.api.dto.instructor.CreateInstructorCmd;
 import local.sop.datawarehouse.registration.saga.application.api.dto.instructor.CreatedInstructorResponse;
 import local.sop.datawarehouse.registration.saga.application.api.dto.instructor.InstructorResponse;
 import local.sop.datawarehouse.registration.saga.application.api.dto.login.LoginResponse;
@@ -47,6 +49,7 @@ import local.sop.datawarehouse.registration.saga.application.ports.out.instructo
 import local.sop.datawarehouse.registration.saga.application.ports.out.login.LoginPort;
 import local.sop.datawarehouse.registration.saga.application.ports.out.organization.OrganizationPort;
 import local.sop.datawarehouse.registration.saga.application.ports.out.person.PersonPort;
+import local.sop.datawarehouse.sharedlib.login.WellKnownLogins;
 
 /**
  * Full rewrite against the CURRENT service — same reasoning as
@@ -78,6 +81,7 @@ class RegistrationInstructorSagaApplicationServiceTest {
     private static final UUID AUDITLOG_ID = UUID.randomUUID();
     private static final UUID CONSENT_STATEMENT_REF = UUID.randomUUID();
     private static final UUID CONSENT_ID = UUID.randomUUID();
+    private static final UUID CALLER_LOGIN_ID = UUID.randomUUID();
 
     private CreateInstructorRegistrationCmd cmd;
 
@@ -86,11 +90,13 @@ class RegistrationInstructorSagaApplicationServiceTest {
         service = new RegistrationSagaApplicationService(apprentices, auditlogs, educationLines, consentSagas,
                 consents, instructors, logins, organizations, persons);
 
+        // CHANGED: CreateInstructorRegistrationCmd now carries callerLoginId too.
         cmd = new CreateInstructorRegistrationCmd(
                 "Kris", "K", "kris@example.com", ORG_REF,
                 List.of(new CreatePhoneNumberCmd(PhoneUserType.SELF, "+4587654321")),
                 "krisk", "ACTIVE",
-                List.of(new ConsentStatement(CONSENT_STATEMENT_REF, ConsentStatus.ACTIVE)));
+                List.of(new ConsentStatement(CONSENT_STATEMENT_REF, ConsentStatus.ACTIVE)),
+                CALLER_LOGIN_ID);
     }
 
     // ---- shared stub helpers -------------------------------------------------
@@ -177,7 +183,8 @@ class RegistrationInstructorSagaApplicationServiceTest {
                     cmd.firstName(), cmd.lastName(), cmd.email(), cmd.organizationRef(), cmd.phoneNumbers(),
                     cmd.username(), cmd.status(),
                     List.of(new ConsentStatement(CONSENT_STATEMENT_REF, ConsentStatus.ACTIVE),
-                            new ConsentStatement(secondStatementRef, ConsentStatus.ACTIVE)));
+                            new ConsentStatement(secondStatementRef, ConsentStatus.ACTIVE)),
+                    cmd.callerLoginId());
 
             stubOrganizationOk();
             stubPersonOk();
@@ -199,6 +206,26 @@ class RegistrationInstructorSagaApplicationServiceTest {
             verify(consentSagas, times(2)).grant(any(GrantConsentCmd.class));
             verify(consents).getById(CONSENT_ID);
             verify(consents).getById(secondConsentId);
+        }
+
+        // NEW: confirms callerLoginId actually reaches bc-instructor —
+        // this is the whole point of the DTO change; a passing "happy
+        // path" test with any() matchers wouldn't have caught this
+        // silently not being threaded through.
+        @Test
+        void callerLoginId_isThreadedThroughToInstructorCreation() {
+            stubOrganizationOk();
+            stubPersonOk();
+            stubLoginOk();
+            stubInstructorOk();
+            stubConsentGrantOk();
+            stubAuditlogOk();
+
+            service.registerInstructor(cmd);
+
+            ArgumentCaptor<CreateInstructorCmd> captor = ArgumentCaptor.forClass(CreateInstructorCmd.class);
+            verify(instructors).create(captor.capture());
+            assertEquals(CALLER_LOGIN_ID, captor.getValue().callerLoginId());
         }
     }
 
@@ -422,6 +449,84 @@ class RegistrationInstructorSagaApplicationServiceTest {
             verify(instructors).compensate(eq(INSTRUCTOR_ID), any(), any());
             verify(logins).compensate(eq(LOGIN_ID), any(), any());
             verify(persons).compensate(eq(PERSON_ID), any(), any());
+        }
+    }
+
+    // ---- tech-user disable step (Step 8b) -----------------------------------
+    // NEW: no coverage existed at all for this before — a
+    // security-relevant side effect (see
+    // RegistrationSagaApplicationService's own comment on this step)
+    // that had never been exercised by a single test.
+
+    @Nested
+    class TechUserDisableStep {
+
+        @Test
+        void disablesTechUser_afterInstructorConfirmedCreated() {
+            stubOrganizationOk();
+            stubPersonOk();
+            stubLoginOk();
+            stubInstructorOk();
+            stubConsentGrantOk();
+            stubAuditlogOk();
+
+            service.registerInstructor(cmd);
+
+            verify(logins, times(1)).disableLogin(WellKnownLogins.TECH_USER_ID);
+        }
+
+        @Test
+        void disablesTechUser_unconditionally_evenWhenCallerWasNotTheTechUser() {
+            // Deliberately not the tech user — the disable step is
+            // unconditional (re-asserts the invariant regardless of who
+            // triggered this particular instructor creation), not
+            // conditioned on the caller's identity.
+            stubOrganizationOk();
+            stubPersonOk();
+            stubLoginOk();
+            stubInstructorOk();
+            stubConsentGrantOk();
+            stubAuditlogOk();
+
+            service.registerInstructor(cmd);
+
+            verify(logins).disableLogin(WellKnownLogins.TECH_USER_ID);
+        }
+
+        @Test
+        void doesNotFailRegistration_whenDisableLoginThrows() {
+            // Best-effort and non-fatal: a real instructor now exists,
+            // which is the actual outcome this registration exists to
+            // produce. Failing to disable the bootstrap account is
+            // logged, not propagated.
+            stubOrganizationOk();
+            stubPersonOk();
+            stubLoginOk();
+            stubInstructorOk();
+            stubConsentGrantOk();
+            stubAuditlogOk();
+            org.mockito.Mockito.doThrow(new RuntimeException("login service down"))
+                    .when(logins).disableLogin(any());
+
+            CreatedInstructorResponse result = service.registerInstructor(cmd);
+
+            assertEquals(INSTRUCTOR_ID, result.id());
+        }
+
+        @Test
+        void doesNotRun_whenInstructorCreationItselfFails() {
+            // If the instructor was never created, there's nothing new
+            // to react to — the disable step must not fire on a failed
+            // registration.
+            stubOrganizationOk();
+            stubPersonOk();
+            stubLoginOk();
+            when(instructors.create(any())).thenThrow(new RuntimeException("boom"));
+            stubAllCompensationsOk();
+
+            assertThrows(ConflictException.class, () -> service.registerInstructor(cmd));
+
+            verify(logins, never()).disableLogin(any());
         }
     }
 }

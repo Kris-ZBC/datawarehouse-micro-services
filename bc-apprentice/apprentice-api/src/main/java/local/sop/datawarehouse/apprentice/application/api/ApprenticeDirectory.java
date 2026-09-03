@@ -18,4 +18,7 @@ public interface ApprenticeDirectory extends Compensatable {
     List<ApprenticeResponse> findByEducationLineId(UUID educationLineId);
 
     List<ApprenticeResponse> findAll();
+
+    // NEW: role resolution for login-saga.
+    Optional<ApprenticeResponse> findByPersonRef(UUID personRef);
 }

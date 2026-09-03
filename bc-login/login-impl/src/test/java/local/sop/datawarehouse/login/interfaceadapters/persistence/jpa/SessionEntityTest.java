@@ -10,16 +10,19 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
 
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 import local.sop.datawarehouse.sharedlib.enums.LoginStatus;
+import local.sop.datawarehouse.sharedlib.enums.UserRole;
 
 @DataJpaTest
 @ActiveProfiles({"test", "h2"})
@@ -51,11 +54,17 @@ class SessionEntityTest {
         String token = UUID.randomUUID().toString();
         LocalDateTime expiresAt = LocalDateTime.now().plusHours(8);
 
+        // CHANGED: role added. The role column is NOT NULL at the DB
+        // level — without this, flush() below would fail with a
+        // DataIntegrityViolationException, not the builder (the
+        // builder's own validation only fires if .role() is called
+        // with an explicit null, not if it's never called at all).
         SessionEntity entity = SessionEntity.builder()
             .id(UUID.randomUUID())
             .login(persistedLogin)
             .sessionToken(token)
             .expiresAt(expiresAt)
+            .role(UserRole.INSTRUCTOR)
             .build();
         entityManager.persist(entity);
         entityManager.flush();
@@ -67,6 +76,26 @@ class SessionEntityTest {
         assertEquals(token, found.getSessionToken());
         assertNotNull(found.getCreatedAt());
         assertEquals(expiresAt, found.getExpiresAt());
+        assertEquals(UserRole.INSTRUCTOR, found.getRole());
+    }
+
+    // NEW: confirms the NOT NULL column constraint actually catches
+    // what the builder alone doesn't — a SessionEntity built without
+    // ever calling .role() persists fine in memory (role stays null)
+    // but must fail at the database on flush.
+    @Test
+    void shouldFailToPersist_whenRoleWasNeverSet() {
+        SessionEntity entity = SessionEntity.builder()
+            .id(UUID.randomUUID())
+            .login(persistedLogin)
+            .sessionToken(UUID.randomUUID().toString())
+            .expiresAt(LocalDateTime.now().plusHours(8))
+            .build();
+
+        assertThrows(ConstraintViolationException.class, () -> { //NOT A DataIntegrityViolationException, because the latter is a Spring wrapper around the former
+            entityManager.persist(entity);
+            entityManager.flush();
+        });
     }
 
     // ── with-methods ───────────────────────────────────────────────────────────
@@ -118,6 +147,20 @@ class SessionEntityTest {
         assertEquals(original.getLogin().getId(), updated.getLogin().getId());
     }
 
+    // NEW: mirrors the other with-method tests, for the role field
+    // added alongside the SSO rework.
+    @Test
+    void shouldReturnNewInstance_whenRoleChanged() {
+        SessionEntity original = buildSession();
+
+        SessionEntity updated = original.withRole(UserRole.APPRENTICE);
+
+        assertNotSame(original, updated);
+        assertEquals(UserRole.APPRENTICE, updated.getRole());
+        assertEquals(UserRole.INSTRUCTOR, original.getRole());
+        assertEquals(original.getId(), updated.getId());
+    }
+
     // ── isExpired ──────────────────────────────────────────────────────────────
 
     @Test
@@ -127,6 +170,7 @@ class SessionEntityTest {
             .login(persistedLogin)
             .sessionToken(UUID.randomUUID().toString())
             .expiresAt(LocalDateTime.now().minusHours(1))
+            .role(UserRole.INSTRUCTOR)
             .build();
 
         assertTrue(expired.isExpired());
@@ -139,6 +183,7 @@ class SessionEntityTest {
             .login(persistedLogin)
             .sessionToken(UUID.randomUUID().toString())
             .expiresAt(LocalDateTime.now().plusHours(1))
+            .role(UserRole.INSTRUCTOR)
             .build();
 
         assertFalse(valid.isExpired());
@@ -201,14 +246,34 @@ class SessionEntityTest {
                 .build());
     }
 
+    // NEW: unlike the other builder-validation tests above, role's
+    // validation only fires when .role() is explicitly called with
+    // null — an unset role passes the builder silently (see
+    // shouldFailToPersist_whenRoleWasNeverSet above for that case).
+    // This test covers the explicit-null path.
+    @Test
+    void shouldThrowException_whenRoleIsExplicitlyNull() {
+        assertThrows(ValidationException.class, () ->
+            SessionEntity.builder()
+                .id(UUID.randomUUID())
+                .login(persistedLogin)
+                .sessionToken(UUID.randomUUID().toString())
+                .expiresAt(LocalDateTime.now().plusHours(8))
+                .role(null)
+                .build());
+    }
+
     // ── helper ─────────────────────────────────────────────────────────────────
 
+    // CHANGED: role added, fixed to INSTRUCTOR for deterministic
+    // assertions in tests that build on top of this helper.
     private SessionEntity buildSession() {
         return SessionEntity.builder()
             .id(UUID.randomUUID())
             .login(persistedLogin)
             .sessionToken(UUID.randomUUID().toString())
             .expiresAt(LocalDateTime.now().plusHours(8))
+            .role(UserRole.INSTRUCTOR)
             .build();
     }
 }

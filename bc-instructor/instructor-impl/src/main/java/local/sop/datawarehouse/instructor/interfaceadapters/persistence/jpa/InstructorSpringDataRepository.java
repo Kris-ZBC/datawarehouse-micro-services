@@ -16,6 +16,9 @@ public interface InstructorSpringDataRepository extends JpaRepository<Instructor
         String lastName
     );
 
+        // NEW
+    Optional<InstructorEntity> findByPersonRef(UUID personRef);
+
     @Modifying(clearAutomatically = true)
 	@Query("DELETE FROM InstructorEntity i WHERE i.id = :id")
 	int delete(@Param("id") UUID id);

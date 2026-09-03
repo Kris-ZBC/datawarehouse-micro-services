@@ -1,6 +1,7 @@
 package local.sop.datawarehouse.instructor.application.api;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import local.sop.datawarehouse.instructor.application.api.dto.CreateInstructorCmd;
@@ -15,4 +16,7 @@ public interface InstructorDirectory extends Compensatable {
     List<InstructorResponse> findAll();
 
     InstructorResponse findById(UUID id);
+
+        // NEW: role resolution for login-saga.
+    Optional<InstructorResponse> findByPersonRef(UUID personRef);
 }

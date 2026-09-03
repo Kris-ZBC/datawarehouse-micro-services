@@ -105,6 +105,32 @@ class InternalInstructorControllerTest {
                 .andExpect(status().isOk());
     }
 
+    // NEW: coverage for the role-resolution endpoint added for
+    // login-saga.
+    @Test
+    void findByPersonRef_shouldReturn200_whenInstructorExists() throws Exception {
+        UUID id = UUID.randomUUID();
+        UUID personRef = UUID.randomUUID();
+
+        when(instructorDirectory.findByPersonRef(personRef))
+                .thenReturn(java.util.Optional.of(new InstructorResponse(id, personRef)));
+
+        mockMvc.perform(get("/internal/instructors/by-person-ref/{personRef}", personRef))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(id.toString()))
+                .andExpect(jsonPath("$.personRef").value(personRef.toString()));
+    }
+
+    @Test
+    void findByPersonRef_shouldReturn204_whenNoInstructorForThatPerson() throws Exception {
+        UUID personRef = UUID.randomUUID();
+
+        when(instructorDirectory.findByPersonRef(personRef)).thenReturn(java.util.Optional.empty());
+
+        mockMvc.perform(get("/internal/instructors/by-person-ref/{personRef}", personRef))
+                .andExpect(status().isNoContent());
+    }
+
     @Test
     void compensateShouldReturnOk_whenResultIsNotNull() throws Exception{
         UUID id = UUID.randomUUID();

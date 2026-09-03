@@ -7,11 +7,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 import local.sop.datawarehouse.login.saga.application.api.dto.LoginResult;
-import local.sop.datawarehouse.login.saga.application.infrastructure.request.PayloadCompensate;
-import local.sop.datawarehouse.login.saga.application.infrastructure.request.PayloadLogin;
-import local.sop.datawarehouse.login.saga.application.infrastructure.response.ResponseCompensated;
+import local.sop.datawarehouse.login.saga.application.infrastructure.request.PayloadAuthenticate;
+import local.sop.datawarehouse.login.saga.application.infrastructure.request.PayloadCreateSession;
+import local.sop.datawarehouse.login.saga.application.infrastructure.request.PayloadLogout;
 import local.sop.datawarehouse.login.saga.application.ports.out.login.LoginPort;
-import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
+import local.sop.datawarehouse.sharedlib.enums.UserRole;
 
 @Component
 public class LoginHttpAdapter implements LoginPort {
@@ -23,20 +23,29 @@ public class LoginHttpAdapter implements LoginPort {
 	}
 
 	@Override
-	public LoginResult login(String username, String password) {
+	public AuthenticationResult authenticate(String username, String password) {
 		return login.post()
-			.uri("/internal/logins/sessions/login")
-			.body(new PayloadLogin(username, password))
+			.uri("/internal/logins/sessions/authenticate")
+			.body(new PayloadAuthenticate(username, password))
+			.retrieve()
+			.body(AuthenticationResult.class);
+	}
+
+	@Override
+	public LoginResult createSession(UUID loginId, UserRole role) {
+		return login.post()
+			.uri("/internal/logins/sessions")
+			.body(new PayloadCreateSession(loginId, role))
 			.retrieve()
 			.body(LoginResult.class);
 	}
 
 	@Override
-    public ResponseCompensated compensate(UUID id, Class<?> clazz, SagaOutcome sagaState) {
-        return login.post()
-            .uri("/internal/logins/compensate")
-            .body(new PayloadCompensate(id, clazz, sagaState))
-            .retrieve()
-            .body(ResponseCompensated.class);
-    }
+	public void logout(String sessionToken) {
+		login.post()
+			.uri("/internal/logins/sessions/logout")
+			.body(new PayloadLogout(sessionToken))
+			.retrieve()
+			.toBodilessEntity();
+	}
 }

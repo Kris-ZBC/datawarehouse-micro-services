@@ -37,6 +37,7 @@ import local.sop.datawarehouse.registration.saga.application.ports.out.consentsa
 import local.sop.datawarehouse.registration.saga.application.ports.out.educationline.EducationLinePort;
 import local.sop.datawarehouse.registration.saga.application.ports.out.instructor.InstructorPort;
 import local.sop.datawarehouse.registration.saga.application.ports.out.login.LoginPort;
+import local.sop.datawarehouse.sharedlib.login.WellKnownLogins;
 import local.sop.datawarehouse.registration.saga.application.ports.out.organization.OrganizationPort;
 import local.sop.datawarehouse.registration.saga.application.ports.out.person.PersonPort;
 import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
@@ -466,7 +467,7 @@ public class RegistrationSagaApplicationService implements RegistrationDirectory
 
         // Step 7: Create instructor
         try {
-            instructorId = instructors.create(new CreateInstructorCmd(personId));
+            instructorId = instructors.create(new CreateInstructorCmd(personId, cmd.callerLoginId()));
         } catch (ConflictException ex) {
             throw ex;
         } catch (Exception ex) {
@@ -501,6 +502,27 @@ public class RegistrationSagaApplicationService implements RegistrationDirectory
             compensateLogin(loginId);
             compensatePerson(personId);
             throw new ConflictException("instructor.read.failed", Map.of("id", instructorId.toString()));
+        }
+
+        // Step 8b: Ensure the tech user is disabled, now that an
+        // instructor is confirmed to exist. Best-effort and
+        // unconditional — this doesn't try to detect whether this was
+        // specifically the FIRST instructor (a racier, more complex
+        // check with no real benefit), it just re-asserts the standing
+        // invariant "the tech user is disabled once at least one
+        // instructor exists" every time. Idempotent: disabling an
+        // already-disabled Login is a no-op on bc-login's side.
+        //
+        // Deliberately non-fatal — a real instructor now exists, which
+        // is the actual outcome this registration exists to produce.
+        // Failing to disable the bootstrap account is a security-
+        // relevant gap worth alerting on loudly, but not a reason to
+        // compensate and unwind an otherwise-successful registration.
+        try {
+            logins.disableLogin(WellKnownLogins.TECH_USER_ID);
+        } catch (Exception ex) {
+            log.error("Registration: failed to disable tech user after instructor creation — "
+                + "the bootstrap account may still be usable. Manual follow-up required.", ex);
         }
 
         // Step 9: Grant consent

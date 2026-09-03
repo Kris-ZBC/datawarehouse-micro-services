@@ -12,4 +12,11 @@ public interface LoginPort {
 	ResponseLoginCreated create(CreateLoginCmd payload);
 	LoginResponse getById(UUID id);
 	ResponseCompensated compensate(UUID id, Class<?> clazz, SagaOutcome sagaState);
+	
+	// NEW: general-purpose Login disable — used here specifically to
+	// disable the tech user once an instructor is confirmed created.
+	// Best-effort from the caller's side (see
+	// RegistrationSagaApplicationService): a failure here should not
+	// roll back an otherwise-successful instructor registration.
+	void disableLogin(UUID loginId);
 }

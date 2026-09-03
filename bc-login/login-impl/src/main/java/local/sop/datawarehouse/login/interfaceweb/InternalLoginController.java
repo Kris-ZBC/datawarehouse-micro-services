@@ -16,12 +16,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import local.sop.datawarehouse.login.application.api.LoginDirectory;
+import local.sop.datawarehouse.login.application.api.dto.AuthenticateCmd;
+import local.sop.datawarehouse.login.application.api.dto.AuthenticationResult;
 import local.sop.datawarehouse.login.application.api.dto.CreateLoginCmd;
+import local.sop.datawarehouse.login.application.api.dto.CreateSessionCmd;
 import local.sop.datawarehouse.login.application.api.dto.CreatedLoginResult;
-import local.sop.datawarehouse.login.application.api.dto.LoginCmd;
 import local.sop.datawarehouse.login.application.api.dto.LoginResult;
 import local.sop.datawarehouse.login.application.api.dto.LogoutCmd;
 import local.sop.datawarehouse.login.application.api.dto.SessionValidationResult;
+import local.sop.datawarehouse.login.application.api.dto.UpdateLoginStatusCmd;
 import local.sop.datawarehouse.login.application.api.dto.ValidateSessionCmd;
 import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
 import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
@@ -48,16 +51,30 @@ public class InternalLoginController {
         return ResponseEntity.created(Objects.requireNonNull(location)).body(result);
     }
 
+    // CHANGED: was POST /sessions/login, calling the old combined
+    // login(LoginCmd). Split into this (credential check only) and
+    // createSession below — login-saga resolves role between the two.
     @PostMapping(
-        path = "/sessions/login",
+        path = "/sessions/authenticate",
         consumes = "application/json",
         produces = "application/json")
-    public ResponseEntity<LoginResult> login(@Valid @RequestBody LoginCmd cmd) {
-        LoginResult result = directory.login(cmd);
-        log.info("Login successful for user={}, tokenPrefix={}",
-            result.username(),
-            result.sessionToken().substring(0, Math.min(8, result.sessionToken().length())));
+    public ResponseEntity<AuthenticationResult> authenticate(@Valid @RequestBody AuthenticateCmd cmd) {
+        AuthenticationResult result = directory.authenticate(cmd);
+        log.info("Authentication successful for user={}", result.username());
         return ResponseEntity.ok(result);
+    }
+
+    @PostMapping(
+        path = "/sessions",
+        consumes = "application/json",
+        produces = "application/json")
+    public ResponseEntity<LoginResult> createSession(@Valid @RequestBody CreateSessionCmd cmd) {
+        LoginResult result = directory.createSession(cmd);
+        log.info("Session created for user={}, role={}, tokenPrefix={}",
+            result.username(),
+            result.role(),
+            result.sessionToken().substring(0, Math.min(8, result.sessionToken().length())));
+        return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }
 
     @PostMapping(
@@ -87,6 +104,16 @@ public class InternalLoginController {
         ResponseCompensated result =
             directory.compensate(cmd.id(), getClass(), cmd.sagaState());
         return ResponseEntity.ok(result);
+    }
+
+    // NEW: general-purpose disable/re-activate — not tech-user-specific.
+    @PostMapping(
+        path = "/status",
+        consumes = "application/json")
+    public ResponseEntity<Void> updateLoginStatus(@Valid @RequestBody UpdateLoginStatusCmd cmd) {
+        directory.updateLoginStatus(cmd);
+        log.info("Login status updated for loginId={}, status={}", cmd.loginId(), cmd.status());
+        return ResponseEntity.noContent().build();
     }
 
     public record CompensateLoginCmd(UUID id, SagaOutcome sagaState) {}

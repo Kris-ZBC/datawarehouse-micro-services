@@ -57,6 +57,7 @@ class RegistrationInstructorSagaControllerTest {
     void setUp() {
         
         registrationId = UUID.randomUUID();
+        // CHANGED: CreateInstructorRegistrationCmd now carries callerLoginId too.
         instructorCmd = new CreateInstructorRegistrationCmd(
                 "Daniel",
                 "S",
@@ -65,7 +66,8 @@ class RegistrationInstructorSagaControllerTest {
                 phoneCmd,
                 "dani423j",
                 "ACTIVE",
-                List.of(new CreateInstructorRegistrationCmd.ConsentStatement(UUID.randomUUID(), ConsentStatus.ACTIVE)));
+                List.of(new CreateInstructorRegistrationCmd.ConsentStatement(UUID.randomUUID(), ConsentStatus.ACTIVE)),
+                UUID.randomUUID());
 
         registrationResponse = new CreatedInstructorResponse(registrationId);
     }

@@ -48,4 +48,15 @@ public class LoginHttpAdapter implements LoginPort {
             .retrieve()
             .body(LoginResponse.class);
     }
+
+    @Override
+    public void disableLogin(UUID loginId) {
+        login.post()
+            .uri("/internal/logins/status")
+            .body(new PayloadUpdateLoginStatus(loginId, "DEACTIVATED"))
+            .retrieve()
+            .toBodilessEntity();
+    }
+
+    record PayloadUpdateLoginStatus(UUID loginId, String status) {}
 }

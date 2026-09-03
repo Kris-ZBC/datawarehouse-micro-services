@@ -64,8 +64,9 @@ class LoginSagaControllerTest {
                 "data",
                 "description");
         UUID loginId = UUID.randomUUID();
+        // CHANGED: role is now a String, not UserRole (see LoginResult's own comment for why).
         loginResult = new LoginResult(loginId, UUID.randomUUID(), "testuser",
-            "test-token", LocalDateTime.now(), LocalDateTime.now().plusHours(8));
+            "INSTRUCTOR", "test-token", LocalDateTime.now(), LocalDateTime.now().plusHours(8));
     }
 
     @Test

@@ -107,71 +107,117 @@ class InternalLoginControllerTest {
         }
     }
 
-    // ── login ──────────────────────────────────────────────────────────────────
+    // ── authenticate ───────────────────────────────────────────────────────────
+    // CHANGED: was the "login" @Nested class posting to /sessions/login
+    // and asserting a sessionToken in the response — that endpoint and
+    // DTO no longer exist. This covers credential verification only;
+    // AuthenticationResult has no sessionToken field at all (see
+    // CreateSessionTests below for that).
 
     @Nested
-    class LoginTests {
+    class AuthenticateTests {
 
         @Test
-        void shouldReturn200_withSessionToken_whenCredentialsAreValid() throws Exception {
+        void shouldReturn200_withAuthenticationResult_whenCredentialsAreValid() throws Exception {
             UUID loginId = UUID.randomUUID();
-            String token = UUID.randomUUID().toString();
+            UUID personRef = UUID.randomUUID();
 
-            when(directory.login(any(LoginCmd.class)))
-                .thenReturn(new LoginResult(loginId, UUID.randomUUID(),
-                    "nick579a@zbc.dk", token,
-                    LocalDateTime.now(), LocalDateTime.now().plusHours(8)));
+            when(directory.authenticate(any(AuthenticateCmd.class)))
+                .thenReturn(new AuthenticationResult(loginId, personRef, "nick579a@zbc.dk"));
 
-            mockMvc.perform(post(BASE + "/sessions/login")
+            mockMvc.perform(post(BASE + "/sessions/authenticate")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objMapper.writeValueAsString(
-                        new LoginCmd("nick579a@zbc.dk", "Password5!"))))
+                        new AuthenticateCmd("nick579a@zbc.dk", "Password5!"))))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.sessionToken").value(token))
+                .andExpect(jsonPath("$.loginId").value(loginId.toString()))
+                .andExpect(jsonPath("$.personRef").value(personRef.toString()))
                 .andExpect(jsonPath("$.username").value("nick579a@zbc.dk"));
         }
 
         @Test
-        void shouldNotSetCookie_sessionTokenIsInResponseBodyOnly() throws Exception {
-            when(directory.login(any(LoginCmd.class)))
-                .thenReturn(new LoginResult(UUID.randomUUID(), UUID.randomUUID(),
-                    "nick579a@zbc.dk", UUID.randomUUID().toString(),
-                    LocalDateTime.now(), LocalDateTime.now().plusHours(8)));
-
-            mockMvc.perform(post(BASE + "/sessions/login")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objMapper.writeValueAsString(
-                        new LoginCmd("nick579a@zbc.dk", "Password5!"))))
-                .andExpect(status().isOk())
-                .andExpect(cookie().doesNotExist("X-Session-Token"));
-        }
-
-        @Test
         void shouldReturn400_whenCredentialsAreInvalid() throws Exception {
-            when(directory.login(any()))
+            when(directory.authenticate(any()))
                 .thenThrow(new ValidationException("login.credentials.invalid",
                     Map.of("username", "nick579a@zbc.dk")));
 
-            mockMvc.perform(post(BASE + "/sessions/login")
+            mockMvc.perform(post(BASE + "/sessions/authenticate")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objMapper.writeValueAsString(
-                        new LoginCmd("nick579a@zbc.dk", "WrongPassword5!"))))
+                        new AuthenticateCmd("nick579a@zbc.dk", "WrongPassword5!"))))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.key").value("login.credentials.invalid"));
         }
 
         @Test
         void shouldReturn400_whenLoginIsDeactivated() throws Exception {
-            when(directory.login(any()))
+            when(directory.authenticate(any()))
                 .thenThrow(new ValidationException("login.deactivated",
                     Map.of("username", "nick579a@zbc.dk")));
 
-            mockMvc.perform(post(BASE + "/sessions/login")
+            mockMvc.perform(post(BASE + "/sessions/authenticate")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objMapper.writeValueAsString(
-                        new LoginCmd("nick579a@zbc.dk", "Password5!"))))
+                        new AuthenticateCmd("nick579a@zbc.dk", "Password5!"))))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.key").value("login.deactivated"));
+        }
+    }
+
+    // ── createSession ──────────────────────────────────────────────────────────
+    // CHANGED: the other half of the old /sessions/login flow — takes
+    // an already-authenticated loginId plus a role. Returns 201
+    // (creates a resource), not 200 like the old combined endpoint did.
+
+    @Nested
+    class CreateSessionTests {
+
+        @Test
+        void shouldReturn201_withSessionTokenAndRole_whenSuccessful() throws Exception {
+            UUID loginId = UUID.randomUUID();
+            String token = UUID.randomUUID().toString();
+
+            when(directory.createSession(any(CreateSessionCmd.class)))
+                .thenReturn(new LoginResult(loginId, UUID.randomUUID(),
+                    "nick579a@zbc.dk", "INSTRUCTOR", token,
+                    LocalDateTime.now(), LocalDateTime.now().plusHours(8)));
+
+            mockMvc.perform(post(BASE + "/sessions")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objMapper.writeValueAsString(
+                        new CreateSessionCmd(loginId, "INSTRUCTOR"))))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.sessionToken").value(token))
+                .andExpect(jsonPath("$.username").value("nick579a@zbc.dk"))
+                .andExpect(jsonPath("$.role").value("INSTRUCTOR"));
+        }
+
+        @Test
+        void shouldNotSetCookie_sessionTokenIsInResponseBodyOnly() throws Exception {
+            when(directory.createSession(any(CreateSessionCmd.class)))
+                .thenReturn(new LoginResult(UUID.randomUUID(), UUID.randomUUID(),
+                    "nick579a@zbc.dk", "INSTRUCTOR", UUID.randomUUID().toString(),
+                    LocalDateTime.now(), LocalDateTime.now().plusHours(8)));
+
+            mockMvc.perform(post(BASE + "/sessions")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objMapper.writeValueAsString(
+                        new CreateSessionCmd(UUID.randomUUID(), "INSTRUCTOR"))))
+                .andExpect(status().isCreated())
+                .andExpect(cookie().doesNotExist("X-Session-Token"));
+        }
+
+        @Test
+        void shouldReturn404_whenLoginDoesNotExist() throws Exception {
+            when(directory.createSession(any()))
+                .thenThrow(new NotFoundException("login.not.found",
+                    Map.of("loginId", UUID.randomUUID())));
+
+            mockMvc.perform(post(BASE + "/sessions")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objMapper.writeValueAsString(
+                        new CreateSessionCmd(UUID.randomUUID(), "INSTRUCTOR"))))
+                .andExpect(status().isNotFound());
         }
     }
 
@@ -215,10 +261,12 @@ class InternalLoginControllerTest {
             UUID personRef = UUID.randomUUID();
             String token   = UUID.randomUUID().toString();
 
+            // CHANGED: role added — this record now has 6 components,
+            // not 5. Missing this argument doesn't compile at all.
             when(directory.validateSession(any(ValidateSessionCmd.class)))
                 .thenReturn(new SessionValidationResult(
                     true, loginId, personRef,
-                    "nick579a@zbc.dk", LocalDateTime.now().plusHours(8)));
+                    "nick579a@zbc.dk", "APPRENTICE", LocalDateTime.now().plusHours(8)));
 
             mockMvc.perform(post(BASE + "/sessions/validate")
                     .contentType(MediaType.APPLICATION_JSON)
@@ -228,6 +276,7 @@ class InternalLoginControllerTest {
                 .andExpect(jsonPath("$.loginId").value(loginId.toString()))
                 .andExpect(jsonPath("$.personRef").value(personRef.toString()))
                 .andExpect(jsonPath("$.username").value("nick579a@zbc.dk"))
+                .andExpect(jsonPath("$.role").value("APPRENTICE"))
                 .andExpect(jsonPath("$.expiresAt").exists());
         }
 
@@ -270,6 +319,46 @@ class InternalLoginControllerTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objMapper.writeValueAsString(
                         new ValidateSessionCmd("   "))))
+                .andExpect(status().isBadRequest());
+        }
+    }
+
+    // ── updateLoginStatus ──────────────────────────────────────────────────────
+    // NEW: coverage for the general-purpose disable/re-activate
+    // endpoint added as part of the tech-user lockout work.
+
+    @Nested
+    class UpdateLoginStatusTests {
+
+        @Test
+        void shouldReturn204_whenStatusUpdateSucceeds() throws Exception {
+            mockMvc.perform(post(BASE + "/status")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objMapper.writeValueAsString(
+                        new UpdateLoginStatusCmd(UUID.randomUUID(), "DEACTIVATED"))))
+                .andExpect(status().isNoContent());
+
+            verify(directory).updateLoginStatus(any(UpdateLoginStatusCmd.class));
+        }
+
+        @Test
+        void shouldReturn404_whenLoginDoesNotExist() throws Exception {
+            doThrow(new NotFoundException("login.not.found", Map.of("loginId", UUID.randomUUID())))
+                .when(directory).updateLoginStatus(any());
+
+            mockMvc.perform(post(BASE + "/status")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objMapper.writeValueAsString(
+                        new UpdateLoginStatusCmd(UUID.randomUUID(), "DEACTIVATED"))))
+                .andExpect(status().isNotFound());
+        }
+
+        @Test
+        void shouldReturn400_whenStatusIsMissing() throws Exception {
+            mockMvc.perform(post(BASE + "/status")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(objMapper.writeValueAsString(
+                        new UpdateLoginStatusCmd(UUID.randomUUID(), null))))
                 .andExpect(status().isBadRequest());
         }
     }

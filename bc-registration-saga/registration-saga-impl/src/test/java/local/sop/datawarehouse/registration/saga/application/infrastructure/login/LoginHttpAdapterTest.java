@@ -1,4 +1,4 @@
-package local.sop.datawarehouse.registration.saga.application.infrastructure;
+package local.sop.datawarehouse.registration.saga.application.infrastructure.login;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -21,7 +21,7 @@ import local.sop.common.libs.sharedkernel.sagas.compensate.request.PayloadCompen
 import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 import local.sop.datawarehouse.registration.saga.application.api.dto.login.CreateLoginCmd;
 import local.sop.datawarehouse.registration.saga.application.api.dto.login.LoginResponse;
-import local.sop.datawarehouse.registration.saga.application.infrastructure.login.LoginHttpAdapter;
+import local.sop.datawarehouse.registration.saga.application.infrastructure.login.LoginHttpAdapter.PayloadUpdateLoginStatus;
 import local.sop.datawarehouse.registration.saga.application.infrastructure.response.ResponseLoginCreated;
 
 @ExtendWith(MockitoExtension.class)
@@ -116,5 +116,32 @@ class LoginHttpAdapterTest {
         verify(loginClient).get();
         verify(mockRequestHeadersUriSpec).uri("/internal/logins/{id}", id);
         verify(mockResponseSpec).body(LoginResponse.class);
+    }
+
+    // NEW: coverage for disableLogin() — added so registration-saga can
+    // disable the tech user once an instructor is confirmed to exist.
+    // PayloadUpdateLoginStatus is a private record nested inside
+    // LoginHttpAdapter, so it can't be constructed here to match
+    // exactly — verifying the call happened with any() body is the
+    // most this test can assert from outside the class.
+    @Test
+    void disableLogin_shouldPostToStatusEndpoint() {
+        UUID loginId = UUID.randomUUID();
+
+        var mockRequestBodyUriSpec = mock(RestClient.RequestBodyUriSpec.class);
+        var mockRequestBodySpec = mock(RestClient.RequestBodySpec.class);
+        var mockResponseSpec = mock(RestClient.ResponseSpec.class);
+
+        when(loginClient.post()).thenReturn(mockRequestBodyUriSpec);
+        when(mockRequestBodyUriSpec.uri("/internal/logins/status")).thenReturn(mockRequestBodySpec);
+        when(mockRequestBodySpec.body(any(PayloadUpdateLoginStatus.class))).thenReturn(mockRequestBodySpec);
+        when(mockRequestBodySpec.retrieve()).thenReturn(mockResponseSpec);
+
+        loginAdapter.disableLogin(loginId);
+
+        verify(loginClient).post();
+        verify(mockRequestBodyUriSpec).uri("/internal/logins/status");
+        verify(mockRequestBodySpec).body(any(PayloadUpdateLoginStatus.class));
+        verify(mockResponseSpec).toBodilessEntity();
     }
 }

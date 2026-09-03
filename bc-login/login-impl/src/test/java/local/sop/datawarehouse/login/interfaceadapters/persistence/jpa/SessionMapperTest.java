@@ -18,6 +18,7 @@ import local.sop.datawarehouse.login.domain.model.valueobjects.PersonRef;
 import local.sop.datawarehouse.login.domain.model.valueobjects.SessionToken;
 import local.sop.datawarehouse.login.domain.model.valueobjects.Username;
 import local.sop.datawarehouse.sharedlib.enums.LoginStatus;
+import local.sop.datawarehouse.sharedlib.enums.UserRole;
 
 class SessionMapperTest {
 
@@ -56,12 +57,18 @@ class SessionMapperTest {
         LocalDateTime createdAt = LocalDateTime.now().minusMinutes(30);
         LocalDateTime expiresAt = LocalDateTime.now().plusHours(8);
 
+        // CHANGED: role added. Without it, entity.getRole() stays null
+        // (SessionEntity.Builder only validates role inside the setter
+        // itself, not in build() if the setter is never called) — then
+        // mapper.toDomain() would throw when it tries to build the
+        // domain Session, which DOES require role.
         SessionEntity entity = SessionEntity.builder()
             .id(UUID.randomUUID())
             .login(loginEntity)
             .sessionToken(UUID.randomUUID().toString())
             .createdAt(createdAt)
             .expiresAt(expiresAt)
+            .role(UserRole.INSTRUCTOR)
             .build();
 
         Session session = mapper.toDomain(entity);
@@ -72,6 +79,7 @@ class SessionMapperTest {
         assertEquals(entity.getSessionToken(), session.getToken().value());
         assertEquals(createdAt, session.getCreatedAt().value());
         assertEquals(expiresAt, session.getExpiresAt().value());
+        assertEquals(entity.getRole(), session.getRole());
 
         // verify the full Login aggregate is reconstructed correctly
         assertNotNull(session.getLogin());
@@ -86,11 +94,14 @@ class SessionMapperTest {
         LocalDateTime createdAt = LocalDateTime.now().minusMinutes(30);
         LocalDateTime expiresAt = LocalDateTime.now().plusHours(8);
 
+        // CHANGED: role added — the domain Session.Builder requires it,
+        // this call would throw ValidationException without it.
         Session session = Session.builder()
             .login(login)
             .sessionToken(new SessionToken(UUID.randomUUID().toString()))
             .createdAt(new CreatedAtTimestamp(createdAt))
             .expiresAt(new ExpiresAtTimestamp(expiresAt))
+            .role(UserRole.APPRENTICE)
             .build();
 
         SessionEntity entity = mapper.toEntity(session, loginEntity);
@@ -101,6 +112,7 @@ class SessionMapperTest {
         assertEquals(session.getToken().value(), entity.getSessionToken());
         assertEquals(createdAt, entity.getCreatedAt());
         assertEquals(expiresAt, entity.getExpiresAt());
+        assertEquals(session.getRole(), entity.getRole());
 
         // verify the LoginEntity reference is set correctly
         assertNotNull(entity.getLogin());
