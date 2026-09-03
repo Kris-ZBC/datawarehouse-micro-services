@@ -2,7 +2,7 @@ package local.sop.datawarehouse.auditlog.interfaceadapters.persistence.converter
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
-import local.sop.common.libs.sharedkernel.enums.ActorType;
+import local.sop.datawarehouse.sharedlib.enums.ActorType;
 
 @Converter(autoApply = false)
 public class ActorTypeConverter implements AttributeConverter<ActorType, String> {

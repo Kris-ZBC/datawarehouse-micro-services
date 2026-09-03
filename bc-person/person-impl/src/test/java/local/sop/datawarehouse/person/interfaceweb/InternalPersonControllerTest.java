@@ -22,7 +22,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import local.sop.common.libs.sharedkernel.enums.PhoneUserType;
+import local.sop.datawarehouse.sharedlib.enums.PhoneUserType;
 import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
 import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 import local.sop.datawarehouse.person.application.api.PersonDirectory;

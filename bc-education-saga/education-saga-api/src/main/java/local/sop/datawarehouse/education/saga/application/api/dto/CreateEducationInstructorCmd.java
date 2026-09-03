@@ -5,9 +5,9 @@ import java.util.UUID;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
-import local.sop.common.libs.sharedkernel.enums.Severity;
+import local.sop.datawarehouse.sharedlib.enums.ActorType;
+import local.sop.datawarehouse.sharedlib.enums.Severity;
 import local.sop.common.libs.sharedkernel.compositekey.dtos.CompositeKey;
-import local.sop.common.libs.sharedkernel.enums.ActorType;
 
 public record CreateEducationInstructorCmd(
     @NotNull(message = "{saga.sessionid.required}") UUID sessionId,

@@ -8,7 +8,8 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
-import local.sop.common.libs.sharedkernel.enums.PhoneUserType;
+import local.sop.datawarehouse.sharedlib.enums.PhoneUserType;
+
 
 class PersonApiDtoTest {
 

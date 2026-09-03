@@ -23,11 +23,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import local.sop.common.libs.infrastructure.security.DisableSecurity;
 import local.sop.common.libs.infrastructure.web.exception.EndpointExceptionHandler;
-import local.sop.common.libs.sharedkernel.enums.ActorType;
 import local.sop.datawarehouse.sharedlib.enums.ConsentPurpose;
 import local.sop.datawarehouse.sharedlib.enums.ConsentStatus;
 import local.sop.datawarehouse.sharedlib.enums.ConsentType;
-import local.sop.common.libs.sharedkernel.enums.Severity;
+import local.sop.datawarehouse.sharedlib.enums.ActorType;
+import local.sop.datawarehouse.sharedlib.enums.Severity;
 import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
 import local.sop.datawarehouse.consent.saga.application.api.ConsentSagaDirectory;
 import local.sop.datawarehouse.consent.saga.application.api.dto.ConsentResponse;

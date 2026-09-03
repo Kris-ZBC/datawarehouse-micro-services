@@ -22,7 +22,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import local.sop.datawarehouse.sharedlib.enums.ConsentPurpose;
 import local.sop.datawarehouse.sharedlib.enums.ConsentStatus;
 import local.sop.datawarehouse.sharedlib.enums.ConsentType;
-import local.sop.common.libs.sharedkernel.enums.PhoneUserType;
+import local.sop.datawarehouse.sharedlib.enums.PhoneUserType;
 import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
 import local.sop.common.libs.sharedkernel.exceptions.NotFoundException;
 import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;

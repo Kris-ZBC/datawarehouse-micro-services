@@ -9,8 +9,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import java.util.UUID;
 import java.util.Map;
 
-import local.sop.common.libs.sharedkernel.enums.ActorType;
-import local.sop.common.libs.sharedkernel.enums.Severity;
+import local.sop.datawarehouse.sharedlib.enums.ActorType;
+import local.sop.datawarehouse.sharedlib.enums.Severity;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

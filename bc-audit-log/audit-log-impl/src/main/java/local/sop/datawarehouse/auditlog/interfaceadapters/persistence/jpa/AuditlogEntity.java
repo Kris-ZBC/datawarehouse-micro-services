@@ -6,8 +6,8 @@ import java.util.UUID;
 
 import jakarta.persistence.*;
 
-import local.sop.common.libs.sharedkernel.enums.ActorType;
-import local.sop.common.libs.sharedkernel.enums.Severity;
+import local.sop.datawarehouse.sharedlib.enums.ActorType;
+import local.sop.datawarehouse.sharedlib.enums.Severity;
 import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 import local.sop.datawarehouse.auditlog.interfaceadapters.persistence.converters.ActorTypeConverter;
 import local.sop.datawarehouse.auditlog.interfaceadapters.persistence.converters.SeverityConverter;

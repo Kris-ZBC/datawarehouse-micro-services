@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 
-import local.sop.common.libs.sharedkernel.enums.PhoneUserType;
+import local.sop.datawarehouse.sharedlib.enums.PhoneUserType;
 import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 import local.sop.common.libs.sharedkernel.valueobjects.DomainId;
 import local.sop.datawarehouse.person.domain.model.valueobjects.Email;

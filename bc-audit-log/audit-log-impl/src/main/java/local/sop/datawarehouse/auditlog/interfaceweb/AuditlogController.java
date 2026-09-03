@@ -1,8 +1,8 @@
 package local.sop.datawarehouse.auditlog.interfaceweb;
 
 import jakarta.validation.Valid;
-import local.sop.common.libs.sharedkernel.enums.ActorType;
-import local.sop.common.libs.sharedkernel.enums.Severity;
+import local.sop.datawarehouse.sharedlib.enums.ActorType;
+import local.sop.datawarehouse.sharedlib.enums.Severity;
 import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 import local.sop.datawarehouse.auditlog.application.api.AuditlogDirectory;
 import local.sop.datawarehouse.auditlog.application.api.dto.AuditlogResponse;

@@ -1,7 +1,7 @@
 package local.sop.datawarehouse.anonymize.saga.application.ports.out.auditlog;
 
-import local.sop.common.libs.sharedkernel.enums.ActorType;
-import local.sop.common.libs.sharedkernel.enums.Severity;
+import local.sop.datawarehouse.sharedlib.enums.ActorType;
+import local.sop.datawarehouse.sharedlib.enums.Severity;
 import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
 import local.sop.common.libs.sharedkernel.sagas.compensate.response.ResponseCompensated;
 

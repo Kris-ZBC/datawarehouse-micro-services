@@ -8,7 +8,7 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
-import local.sop.common.libs.sharedkernel.enums.PhoneUserType;
+import local.sop.datawarehouse.sharedlib.enums.PhoneUserType;
 import local.sop.datawarehouse.person.domain.model.Person;
 import local.sop.datawarehouse.person.domain.model.PhoneNumberDraft;
 import local.sop.datawarehouse.person.domain.model.valueobjects.Email;

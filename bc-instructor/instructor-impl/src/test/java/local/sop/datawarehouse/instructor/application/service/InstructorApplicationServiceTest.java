@@ -132,6 +132,11 @@ class InstructorApplicationServiceTest {
         // @Override
         // public Boolean compensate(InstructorId id, SagaOutcome sagaState) {
         //     throw new UnsupportedOperationException("Unimplemented method 'compensate'");
+
+        @Override
+        public Boolean exists() {
+            return singleResult != null? true : false;
+        }
     }
 
 

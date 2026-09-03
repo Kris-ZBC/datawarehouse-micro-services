@@ -2,8 +2,8 @@ package local.sop.datawarehouse.educationline.saga.application.ports.out.auditlo
 
 import java.util.UUID;
 
-import local.sop.common.libs.sharedkernel.enums.ActorType;
-import local.sop.common.libs.sharedkernel.enums.Severity;
+import local.sop.datawarehouse.sharedlib.enums.ActorType;
+import local.sop.datawarehouse.sharedlib.enums.Severity;
 import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
 import local.sop.datawarehouse.educationline.saga.application.infrastructure.response.ResponseCompensated;
 

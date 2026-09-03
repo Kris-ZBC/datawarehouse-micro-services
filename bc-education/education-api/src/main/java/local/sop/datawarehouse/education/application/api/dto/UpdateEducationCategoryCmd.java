@@ -1,6 +1,5 @@
 package local.sop.datawarehouse.education.application.api.dto;
 
-import java.util.UUID;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.NotBlank;

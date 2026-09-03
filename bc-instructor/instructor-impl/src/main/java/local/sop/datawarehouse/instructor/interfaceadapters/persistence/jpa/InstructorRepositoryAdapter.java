@@ -56,4 +56,9 @@ public class InstructorRepositoryAdapter implements InstructorRepositoryPort {
         }
         return (jpaRepository.delete(id.value()) == 1);
     }
+
+    @Override
+    public Boolean exists() {
+        return jpaRepository.count() > 0;
+    }
 }

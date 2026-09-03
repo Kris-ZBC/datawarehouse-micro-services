@@ -11,6 +11,8 @@ public interface InstructorRepositoryPort {
 
     Instructor save(Instructor instructor);
 
+    Boolean exists();
+
     List<Instructor> findAll();
 
     Optional<Instructor> findById(InstructorId id);

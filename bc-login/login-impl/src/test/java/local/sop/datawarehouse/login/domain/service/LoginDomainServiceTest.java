@@ -6,7 +6,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
 import local.sop.datawarehouse.login.domain.model.Login;
-import local.sop.common.libs.sharedkernel.enums.LoginStatus;
+import local.sop.datawarehouse.sharedlib.enums.LoginStatus;
 
 public class LoginDomainServiceTest {
 	@Test

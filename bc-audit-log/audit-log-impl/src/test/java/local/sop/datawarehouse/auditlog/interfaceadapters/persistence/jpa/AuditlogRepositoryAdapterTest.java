@@ -16,8 +16,8 @@ import org.mockito.*;
 
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import local.sop.common.libs.sharedkernel.enums.ActorType;
-import local.sop.common.libs.sharedkernel.enums.Severity;
+import local.sop.datawarehouse.sharedlib.enums.ActorType;
+import local.sop.datawarehouse.sharedlib.enums.Severity;
 import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
 import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
 import local.sop.common.libs.sharedkernel.valueobjects.DomainId;

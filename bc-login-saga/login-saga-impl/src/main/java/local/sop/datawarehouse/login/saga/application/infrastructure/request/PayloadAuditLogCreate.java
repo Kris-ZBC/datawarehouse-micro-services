@@ -2,8 +2,8 @@ package local.sop.datawarehouse.login.saga.application.infrastructure.request;
 
 import java.util.UUID;
 
-import local.sop.common.libs.sharedkernel.enums.ActorType;
-import local.sop.common.libs.sharedkernel.enums.Severity;
+import local.sop.datawarehouse.sharedlib.enums.ActorType;
+import local.sop.datawarehouse.sharedlib.enums.Severity;
 
 public record PayloadAuditLogCreate(
 	UUID actor,

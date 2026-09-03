@@ -33,6 +33,11 @@
     </build>
 
     <dependencies> 
+        <!-- Common libs   -->
+        <dependency>
+            <groupId>local.sop.common.libs</groupId>
+            <artifactId>common-core</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>

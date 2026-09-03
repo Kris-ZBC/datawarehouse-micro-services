@@ -25,8 +25,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import local.sop.common.libs.infrastructure.security.DisableSecurity;
 import local.sop.common.libs.infrastructure.web.exception.EndpointExceptionHandler;
-import local.sop.common.libs.sharedkernel.enums.ActorType;
-import local.sop.common.libs.sharedkernel.enums.Severity;
+import local.sop.datawarehouse.sharedlib.enums.ActorType;
+import local.sop.datawarehouse.sharedlib.enums.Severity;
 import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
 import local.sop.datawarehouse.educationline.saga.application.api.EducationLineSagaDirectory;
 import local.sop.datawarehouse.educationline.saga.application.api.dto.*;

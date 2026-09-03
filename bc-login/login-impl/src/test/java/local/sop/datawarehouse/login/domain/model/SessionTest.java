@@ -17,7 +17,7 @@ import local.sop.datawarehouse.login.domain.model.valueobjects.HashedPassword;
 import local.sop.datawarehouse.login.domain.model.valueobjects.PersonRef;
 import local.sop.datawarehouse.login.domain.model.valueobjects.SessionToken;
 import local.sop.datawarehouse.login.domain.model.valueobjects.Username;
-import local.sop.common.libs.sharedkernel.enums.LoginStatus;
+import local.sop.datawarehouse.sharedlib.enums.LoginStatus;
 import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 
 class SessionTest {

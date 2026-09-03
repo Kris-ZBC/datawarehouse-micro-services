@@ -8,7 +8,6 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
-import local.sop.common.libs.sharedkernel.enums.PhoneUserType;
 import local.sop.datawarehouse.person.application.api.dto.PersonResponse;
 import local.sop.datawarehouse.person.application.api.dto.PhoneNumberResponse;
 import local.sop.datawarehouse.person.domain.model.Person;
@@ -18,6 +17,7 @@ import local.sop.datawarehouse.person.domain.model.valueobjects.LastName;
 import local.sop.datawarehouse.person.domain.model.valueobjects.OrganizationRef;
 import local.sop.datawarehouse.person.domain.model.valueobjects.PersonId;
 import local.sop.datawarehouse.person.domain.model.valueobjects.PhoneNumberValue;
+import local.sop.datawarehouse.sharedlib.enums.PhoneUserType;
 
 class PersonResponseMapperTest {
 

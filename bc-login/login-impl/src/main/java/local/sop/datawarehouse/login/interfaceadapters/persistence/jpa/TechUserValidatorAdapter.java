@@ -6,8 +6,8 @@ import java.util.UUID;
 import org.springframework.stereotype.Component;
 
 import local.sop.datawarehouse.login.domain.ports.out.LoginRepositoryPort;
-import local.sop.common.libs.sharedkernel.enums.LoginStatus;
-import local.sop.common.libs.sharedkernel.login.ValidateTechUser;
+import local.sop.datawarehouse.sharedlib.enums.LoginStatus;
+import local.sop.datawarehouse.sharedlib.login.ValidateTechUser;
 import local.sop.datawarehouse.login.domain.model.valueobjects.LoginId;
 
 @Component

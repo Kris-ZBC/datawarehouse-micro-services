@@ -26,7 +26,7 @@ import local.sop.datawarehouse.login.domain.model.valueobjects.*;
 import local.sop.datawarehouse.login.domain.ports.out.LoginRepositoryPort;
 import local.sop.datawarehouse.login.domain.ports.out.SessionRepositoryPort;
 import local.sop.datawarehouse.login.domain.service.LoginDomain;
-import local.sop.common.libs.sharedkernel.enums.LoginStatus;
+import local.sop.datawarehouse.sharedlib.enums.LoginStatus;
 import local.sop.common.libs.sharedkernel.exceptions.NotFoundException;
 import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;

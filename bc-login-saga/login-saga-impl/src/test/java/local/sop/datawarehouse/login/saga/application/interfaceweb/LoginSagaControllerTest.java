@@ -27,8 +27,8 @@ import local.sop.common.libs.infrastructure.web.exception.EndpointExceptionHandl
 import local.sop.datawarehouse.login.saga.application.api.LoginSagaDirectory;
 import local.sop.datawarehouse.login.saga.application.api.dto.LoginCmd;
 import local.sop.datawarehouse.login.saga.application.api.dto.LoginResult;
-import local.sop.common.libs.sharedkernel.enums.ActorType;
-import local.sop.common.libs.sharedkernel.enums.Severity;
+import local.sop.datawarehouse.sharedlib.enums.ActorType;
+import local.sop.datawarehouse.sharedlib.enums.Severity;
 
 @WebMvcTest(LoginSagaController.class)
 @Import(EndpointExceptionHandler.class)

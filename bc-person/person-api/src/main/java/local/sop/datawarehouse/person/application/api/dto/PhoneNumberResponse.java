@@ -1,7 +1,8 @@
 package local.sop.datawarehouse.person.application.api.dto;
 import java.util.UUID;
 
-import local.sop.common.libs.sharedkernel.enums.PhoneUserType;
+import local.sop.datawarehouse.sharedlib.enums.PhoneUserType;
+
 
 public record PhoneNumberResponse(
         UUID id,

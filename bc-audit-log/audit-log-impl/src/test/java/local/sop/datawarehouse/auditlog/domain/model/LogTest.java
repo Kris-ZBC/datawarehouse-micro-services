@@ -6,8 +6,8 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
-import local.sop.common.libs.sharedkernel.enums.ActorType;
-import local.sop.common.libs.sharedkernel.enums.Severity;
+import local.sop.datawarehouse.sharedlib.enums.ActorType;
+import local.sop.datawarehouse.sharedlib.enums.Severity;
 import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 import local.sop.datawarehouse.auditlog.domain.model.valueobjects.*;
 

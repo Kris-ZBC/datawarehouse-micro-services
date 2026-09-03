@@ -40,8 +40,8 @@ import local.sop.datawarehouse.registration.saga.application.ports.out.login.Log
 import local.sop.datawarehouse.registration.saga.application.ports.out.organization.OrganizationPort;
 import local.sop.datawarehouse.registration.saga.application.ports.out.person.PersonPort;
 import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
-import local.sop.common.libs.sharedkernel.enums.ActorType;
-import local.sop.common.libs.sharedkernel.enums.Severity;
+import local.sop.datawarehouse.sharedlib.enums.ActorType;
+import local.sop.datawarehouse.sharedlib.enums.Severity;
 import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
 import local.sop.common.libs.sharedkernel.exceptions.NotFoundException;
 
@@ -293,8 +293,8 @@ public class RegistrationSagaApplicationService implements RegistrationDirectory
         try {
             auditlogId = auditlogs.create(new CreateAuditlogCmd(
                     personId,
-                    local.sop.common.libs.sharedkernel.enums.ActorType.SERVICE,
-                    local.sop.common.libs.sharedkernel.enums.Severity.INFO,
+                    local.sop.datawarehouse.sharedlib.enums.ActorType.SERVICE,
+                    local.sop.datawarehouse.sharedlib.enums.Severity.INFO,
                     "registration-saga",
                     "RegistrationSagaApplicationService",
                     "registerApprentice",
@@ -558,8 +558,8 @@ public class RegistrationSagaApplicationService implements RegistrationDirectory
         try {
             auditlogId = auditlogs.create(new CreateAuditlogCmd(
                     personId,
-                    local.sop.common.libs.sharedkernel.enums.ActorType.USER,
-                    local.sop.common.libs.sharedkernel.enums.Severity.INFO,
+                    local.sop.datawarehouse.sharedlib.enums.ActorType.USER,
+                    local.sop.datawarehouse.sharedlib.enums.Severity.INFO,
                     "registration-saga",
                     "RegistrationSagaApplicationService",
                     "registerInstructor",

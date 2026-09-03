@@ -16,8 +16,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
-import local.sop.common.libs.sharedkernel.enums.LoginStatus;
 import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
+import local.sop.datawarehouse.sharedlib.enums.LoginStatus;
 
 @Entity
 @Table(name = "logins")

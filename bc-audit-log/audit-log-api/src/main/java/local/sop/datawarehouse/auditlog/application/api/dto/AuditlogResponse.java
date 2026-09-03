@@ -3,8 +3,8 @@ package local.sop.datawarehouse.auditlog.application.api.dto;
 import java.time.Instant;
 import java.util.UUID;
 
-import local.sop.common.libs.sharedkernel.enums.ActorType;
-import local.sop.common.libs.sharedkernel.enums.Severity;
+import local.sop.datawarehouse.sharedlib.enums.ActorType;
+import local.sop.datawarehouse.sharedlib.enums.Severity;
 
 public record AuditlogResponse(
         UUID id,

@@ -78,8 +78,8 @@ class ConsentSagaHttpAdapterTest {
         UUID personRef = UUID.randomUUID();
         UUID consentStatementRef = UUID.randomUUID();
         var request = new GrantConsentCmd(sessionId, personRef, consentStatementRef, ConsentStatus.ACTIVE,
-                UUID.randomUUID(), local.sop.common.libs.sharedkernel.enums.ActorType.USER,
-                local.sop.common.libs.sharedkernel.enums.Severity.INFO,
+                UUID.randomUUID(), local.sop.datawarehouse.sharedlib.enums.ActorType.USER,
+                local.sop.datawarehouse.sharedlib.enums.Severity.INFO,
                 "originSystem", "originService", "originComponent", "data", "description");
 
         // grant() returns ConsentResponse, matching consent-saga's

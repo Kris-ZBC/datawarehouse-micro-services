@@ -4,7 +4,7 @@ import java.util.Map;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
-import local.sop.common.libs.sharedkernel.enums.Severity;
+import local.sop.datawarehouse.sharedlib.enums.Severity;
 
 /**
  * Maps between the Java {@link Severity} enum and the lowercase DB ENUM values.

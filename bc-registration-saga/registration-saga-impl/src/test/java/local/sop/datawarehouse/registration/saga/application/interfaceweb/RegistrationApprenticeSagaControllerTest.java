@@ -25,12 +25,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import local.sop.common.libs.infrastructure.security.DisableSecurity;
 import local.sop.common.libs.infrastructure.web.exception.EndpointExceptionHandler;
 import local.sop.datawarehouse.sharedlib.enums.ConsentStatus;
+import local.sop.datawarehouse.sharedlib.enums.PhoneUserType;
 import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
 import local.sop.datawarehouse.registration.saga.application.api.RegistrationDirectory;
 import local.sop.datawarehouse.registration.saga.application.api.dto.CreateApprenticeRegistrationCmd;
 import local.sop.datawarehouse.registration.saga.application.api.dto.apprentice.CreatedApprenticeResponse;
 import local.sop.datawarehouse.registration.saga.application.api.dto.person.CreatePhoneNumberCmd;
-import local.sop.common.libs.sharedkernel.enums.PhoneUserType;
+
 
 @WebMvcTest(RegistrationSagaController.class)
 @Import(EndpointExceptionHandler.class)

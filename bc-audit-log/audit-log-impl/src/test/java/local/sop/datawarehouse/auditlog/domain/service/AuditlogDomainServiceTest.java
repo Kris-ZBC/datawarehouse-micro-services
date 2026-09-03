@@ -1,7 +1,7 @@
 package local.sop.datawarehouse.auditlog.domain.service;
 
-import local.sop.common.libs.sharedkernel.enums.ActorType;
-import local.sop.common.libs.sharedkernel.enums.Severity;
+import local.sop.datawarehouse.sharedlib.enums.ActorType;
+import local.sop.datawarehouse.sharedlib.enums.Severity;
 import local.sop.datawarehouse.auditlog.domain.model.Log;
 import local.sop.datawarehouse.auditlog.domain.model.valueobjects.*;
 

@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.StringJoiner;
 import java.util.Map;
 
-import local.sop.common.libs.sharedkernel.enums.PhoneUserType;
 import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 import local.sop.common.libs.sharedkernel.valueobjects.DomainId;
 import local.sop.datawarehouse.person.domain.model.valueobjects.Email;
@@ -15,6 +14,7 @@ import local.sop.datawarehouse.person.domain.model.valueobjects.OrganizationRef;
 import local.sop.datawarehouse.person.domain.model.valueobjects.PersonId;
 import local.sop.datawarehouse.person.domain.model.valueobjects.PhoneNumberId;
 import local.sop.datawarehouse.person.domain.model.valueobjects.PhoneNumberValue;
+import local.sop.datawarehouse.sharedlib.enums.PhoneUserType;
 
 public final class Person {
 	private final DomainId id;

@@ -321,4 +321,24 @@ Parent pom for multi-module project aggregator and BOM (dependency management)
     </plugin>
     </plugins>
   </build>
+  <!-- ===== Profiles ===== -->
+  <profiles>
+    <!-- Auto-add shared-lib where marker file exists -->
+    <profile>
+      <id>shared-lib-auto</id>
+      <activation>
+        <file>
+          <exists>.uses-shared-lib</exists>
+        </file>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>local.sop.datawarehouse</groupId>
+          <artifactId>shared-lib</artifactId>
+          <version>${revision}</version>
+        </dependency>
+      </dependencies>
+    </profile>
+    </profiles>
+
 </project>

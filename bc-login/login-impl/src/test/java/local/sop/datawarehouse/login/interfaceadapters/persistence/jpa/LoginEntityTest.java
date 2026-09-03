@@ -14,8 +14,8 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
-import local.sop.common.libs.sharedkernel.enums.LoginStatus;
 import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
+import local.sop.datawarehouse.sharedlib.enums.LoginStatus;
 
 @DataJpaTest
 @ActiveProfiles({"test", "h2"})
