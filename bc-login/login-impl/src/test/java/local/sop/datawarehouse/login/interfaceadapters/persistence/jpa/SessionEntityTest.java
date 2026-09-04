@@ -15,9 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
-
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
