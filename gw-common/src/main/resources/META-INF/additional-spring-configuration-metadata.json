@@ -1,12 +1,17 @@
 {"properties": [
   {
-    "name": "registration-saga.base-url",
+    "name": "login-saga.base-url",
     "type": "java.lang.String",
-    "description": "A description for 'registration-saga.base-url'"
+    "description": "A description for 'login-saga.base-url'"
   },
   {
     "name": "orgqanisation.base-url",
     "type": "java.lang.String",
     "description": "A description for 'orgqanisation.base-url'"
+  },
+  {
+    "name": "organisation.base-url",
+    "type": "java.lang.String",
+    "description": "A description for 'organisation.base-url'"
   }
 ]}
