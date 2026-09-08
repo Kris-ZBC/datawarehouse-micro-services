@@ -16,6 +16,7 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeoutException;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -36,6 +37,7 @@ import org.springframework.web.client.ResourceAccessException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import local.sop.common.libs.infrastructure.security.DisableSecurity;
+import local.sop.common.libs.infrastructure.security.context.RequestPrincipalContext;
 import local.sop.common.libs.infrastructure.web.exception.EndpointExceptionHandler;
 import local.sop.datawarehouse.sharedlib.enums.ConsentStatus;
 import local.sop.datawarehouse.gateway.admin.handlers.user.api.dto.request.RegisterInstructorRequest;
@@ -50,6 +52,20 @@ import local.sop.datawarehouse.gateway.admin.handlers.user.application.service.U
  * two-step dance: perform() + andExpect(request().asyncStarted()) to
  * capture the MvcResult, then a second perform(asyncDispatch(result))
  * to get the real status/body. performAsync() below wraps that.
+ *
+ * NOTE on RequestPrincipalContext: @WebMvcTest auto-detects
+ * WebMvcConfigurer beans in its scanned slice, so WebMvcConfig — and
+ * with it RoleAuthorizationInterceptor — is wired into this test
+ * context too, exactly as it would be in production. @DisableSecurity
+ * only turns off Spring Security's own auto-config; it has no bearing
+ * on this interceptor, which isn't part of Spring Security. In
+ * production, GatewaySessionContextFilter/InternalRoleContextFilter
+ * populate RequestPrincipalContext before the controller ever runs —
+ * neither filter is part of this slice, so setUp() stubs that same
+ * precondition directly (a session already resolved to an allowed
+ * role) rather than disabling or mocking the interceptor itself. This
+ * keeps the real authorization wiring exercised, same philosophy as
+ * ServiceFailures below testing the real exception-handling wiring.
  */
 @WebMvcTest(UserHandlerController.class)
 @Import(EndpointExceptionHandler.class)
@@ -86,6 +102,21 @@ class UserHandlerControllerTest {
                 List.of(new RegisterInstructorRequest.ConsentStatement(UUID.randomUUID(), ConsentStatus.ACTIVE)));
 
         response = new CreatedUserResponse(createdId);
+
+        // Simulates GatewaySessionContextFilter having already resolved
+        // a valid TECHUSER session — see class javadoc.
+        RequestPrincipalContext.set(new RequestPrincipalContext.Principal(
+                UUID.randomUUID(), UUID.randomUUID(), "techuser", "TECHUSER"));
+    }
+
+    @AfterEach
+    void tearDown() {
+        // MUST clear — see RequestPrincipalContext's own contract:
+        // virtual threads get reused, so a leaked ThreadLocal here
+        // leaks into whichever test method's carrier thread runs next
+        // (this class reuses one context across all @Test methods per
+        // @DirtiesContext(AFTER_CLASS)).
+        RequestPrincipalContext.clear();
     }
 
     private MvcResult startAsyncRequest() throws Exception {

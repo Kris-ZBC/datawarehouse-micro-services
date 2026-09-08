@@ -1,0 +1,30 @@
+package local.sop.datawarehouse.gateway.admin.config;
+
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
+ 
+@Configuration
+@EnableConfigurationProperties(CorsProps.class)
+public class CorsConfig {
+ 
+    @Bean
+    FilterRegistrationBean<CorsFilter> corsFilter(CorsProps props) {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowCredentials(true);
+        configuration.setAllowedOriginPatterns(props.allowedOriginPatterns());
+        configuration.addAllowedHeader("*");
+        configuration.addAllowedMethod("*");
+ 
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/api/**", configuration);
+ 
+        FilterRegistrationBean<CorsFilter> registration = new FilterRegistrationBean<>(new CorsFilter(source));
+        registration.setOrder(0);
+        return registration;
+    }
+}

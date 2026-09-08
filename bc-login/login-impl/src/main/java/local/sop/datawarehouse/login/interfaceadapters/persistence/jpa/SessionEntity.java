@@ -15,8 +15,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Version;
+import local.sop.common.libs.sharedkernel.enums.UserRole;
 import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
-import local.sop.datawarehouse.sharedlib.enums.UserRole;
 
 @Entity
 @Table(name = "login_sessions")

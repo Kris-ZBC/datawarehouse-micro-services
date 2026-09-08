@@ -18,9 +18,9 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.context.ActiveProfiles;
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
+import local.sop.common.libs.sharedkernel.enums.UserRole;
 import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
 import local.sop.datawarehouse.sharedlib.enums.LoginStatus;
-import local.sop.datawarehouse.sharedlib.enums.UserRole;
 
 @DataJpaTest
 @ActiveProfiles({"test", "h2"})

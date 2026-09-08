@@ -25,7 +25,7 @@ import local.sop.datawarehouse.login.saga.application.ports.out.login.LoginPort;
 import local.sop.datawarehouse.login.saga.application.ports.out.login.LoginPort.AuthenticationResult;
 import local.sop.datawarehouse.sharedlib.enums.ActorType;
 import local.sop.datawarehouse.sharedlib.enums.Severity;
-import local.sop.datawarehouse.sharedlib.enums.UserRole;
+import local.sop.common.libs.sharedkernel.enums.UserRole;
 import local.sop.common.libs.sharedkernel.exceptions.ConflictException;
 import local.sop.common.libs.sharedkernel.exceptions.DomainException;
 import local.sop.common.libs.sharedkernel.exceptions.ErrorCode;

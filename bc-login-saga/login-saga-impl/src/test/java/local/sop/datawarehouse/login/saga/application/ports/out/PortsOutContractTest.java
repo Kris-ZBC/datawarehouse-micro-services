@@ -14,7 +14,7 @@ import local.sop.datawarehouse.login.saga.application.ports.out.consent.ConsentP
 import local.sop.datawarehouse.login.saga.application.ports.out.login.LoginPort;
 import local.sop.datawarehouse.sharedlib.enums.ActorType;
 import local.sop.datawarehouse.sharedlib.enums.Severity;
-import local.sop.datawarehouse.sharedlib.enums.UserRole;
+import local.sop.common.libs.sharedkernel.enums.UserRole;
 import local.sop.common.libs.sharedkernel.sagas.compensate.enums.SagaOutcome;
 
 class PortsOutContractTest {

@@ -1,9 +1,9 @@
 package local.sop.datawarehouse.login.saga.application.ports.out.login;
 
 import java.util.UUID;
- 
+
+import local.sop.common.libs.sharedkernel.enums.UserRole;
 import local.sop.datawarehouse.login.saga.application.api.dto.LoginResult;
-import local.sop.datawarehouse.sharedlib.enums.UserRole;
  
 /**
  * CHANGED: was login(username, password) as one call plus a generic

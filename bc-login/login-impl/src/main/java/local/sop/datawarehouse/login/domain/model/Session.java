@@ -7,8 +7,8 @@ import local.sop.datawarehouse.login.domain.model.valueobjects.CreatedAtTimestam
 import local.sop.datawarehouse.login.domain.model.valueobjects.ExpiresAtTimestamp;
 import local.sop.datawarehouse.login.domain.model.valueobjects.SessionId;
 import local.sop.datawarehouse.login.domain.model.valueobjects.SessionToken;
+import local.sop.common.libs.sharedkernel.enums.UserRole;
 import local.sop.common.libs.sharedkernel.exceptions.ValidationException;
-import local.sop.datawarehouse.sharedlib.enums.UserRole;
 
 public class Session {
 	private final SessionId id;

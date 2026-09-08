@@ -9,6 +9,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import local.sop.common.libs.sharedkernel.enums.UserRole;
 import local.sop.datawarehouse.login.domain.model.Login;
 import local.sop.datawarehouse.login.domain.model.Session;
 import local.sop.datawarehouse.login.domain.model.valueobjects.CreatedAtTimestamp;
@@ -18,7 +19,6 @@ import local.sop.datawarehouse.login.domain.model.valueobjects.PersonRef;
 import local.sop.datawarehouse.login.domain.model.valueobjects.SessionToken;
 import local.sop.datawarehouse.login.domain.model.valueobjects.Username;
 import local.sop.datawarehouse.sharedlib.enums.LoginStatus;
-import local.sop.datawarehouse.sharedlib.enums.UserRole;
 
 class SessionMapperTest {
 

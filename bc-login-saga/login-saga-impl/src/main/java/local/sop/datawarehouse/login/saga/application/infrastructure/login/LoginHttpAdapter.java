@@ -6,12 +6,12 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
+import local.sop.common.libs.sharedkernel.enums.UserRole;
 import local.sop.datawarehouse.login.saga.application.api.dto.LoginResult;
 import local.sop.datawarehouse.login.saga.application.infrastructure.request.PayloadAuthenticate;
 import local.sop.datawarehouse.login.saga.application.infrastructure.request.PayloadCreateSession;
 import local.sop.datawarehouse.login.saga.application.infrastructure.request.PayloadLogout;
 import local.sop.datawarehouse.login.saga.application.ports.out.login.LoginPort;
-import local.sop.datawarehouse.sharedlib.enums.UserRole;
 
 @Component
 public class LoginHttpAdapter implements LoginPort {

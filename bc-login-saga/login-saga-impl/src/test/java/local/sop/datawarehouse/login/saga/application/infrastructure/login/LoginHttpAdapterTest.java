@@ -17,12 +17,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.web.client.RestClient;
 
+import local.sop.common.libs.sharedkernel.enums.UserRole;
 import local.sop.datawarehouse.login.saga.application.api.dto.LoginResult;
 import local.sop.datawarehouse.login.saga.application.infrastructure.request.PayloadAuthenticate;
 import local.sop.datawarehouse.login.saga.application.infrastructure.request.PayloadCreateSession;
 import local.sop.datawarehouse.login.saga.application.infrastructure.request.PayloadLogout;
 import local.sop.datawarehouse.login.saga.application.ports.out.login.LoginPort.AuthenticationResult;
-import local.sop.datawarehouse.sharedlib.enums.UserRole;
 
 // CHANGED: was testing login()/compensate() — neither exists on
 // LoginHttpAdapter anymore (split into authenticate()/createSession(),
